@@ -158,4 +158,3 @@ Here are several types of experiences that can be listed on Expaq:
 9. Art Experiences
 10. Historical Reenactments
 
-By adhering to these software requirements, the Cultural Exchange Marketplace can provide a seamless and enjoyable experience for users seeking authentic cultural exchange experiences around the world.
