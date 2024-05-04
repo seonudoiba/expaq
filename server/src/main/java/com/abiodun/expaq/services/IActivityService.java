@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IActivityService {
-    Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price) throws SQLException, IOException;
+    Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price,
+                            String title, String description) throws SQLException, IOException;
 
     List<String> getAllActivityTypes();
 

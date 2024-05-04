@@ -33,7 +33,8 @@ public class ActivityService implements IActivityService {
         return activityRepository.findAll();
     }
     @Override
-    public Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price) throws SQLException, IOException {
+    public Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price,
+                                   String title, String description) throws SQLException, IOException {
        Activity activity = new Activity();
        activity.setActivityType(activityType);
        activity.setPrice(price);

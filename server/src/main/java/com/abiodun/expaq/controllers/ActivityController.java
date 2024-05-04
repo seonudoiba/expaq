@@ -8,6 +8,7 @@ import com.abiodun.expaq.models.Activity;
 import com.abiodun.expaq.models.BookedActivity;
 import com.abiodun.expaq.services.IActivityService;
 import com.abiodun.expaq.services.impl.BookingService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -86,12 +87,15 @@ public class ActivityController {
             return ResponseEntity.ok(activityResponses);
         }
     }
+    @Transactional
     @PostMapping("/add/new-activities")
     public ResponseEntity<ActivityResponse> addNewActivity(
             @RequestParam("photo") MultipartFile photo,
             @RequestParam("activityType") String activityType,
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
             @RequestParam("price") BigDecimal price) throws SQLException, IOException {
-        Activity savedActivity = activityService.addNewActivity(photo, activityType, price );
+        Activity savedActivity = activityService.addNewActivity(photo, activityType, price, title, description );
         ActivityResponse response = new ActivityResponse(savedActivity.getId(), savedActivity.getActivityType(), savedActivity.getPrice());
         return ResponseEntity.ok(response);
     }

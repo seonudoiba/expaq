@@ -54,7 +54,7 @@ const ActivitiesListing: React.FC = () => {
         <div>
             <div className="pt-36">
                 <div  className="mb-3 mb-md-0 ">
-                    <ActivityFilter data={data} setFilteredData={setFilteredData} />
+                    <ActivityFilter data={data} setFilteredData={setFilteredData} /> 
                 </div>
                 <div  className="d-flex align-items-center justify-content-end">
                     

@@ -28,10 +28,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/add-activity" element={<AddActivities />} />
           <Route path="/activities" element={<ActivityListing />}/>
-          {/* <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Registration />} />
-          <Route path="/profile" element={<Profile />} /> */}
-
           <Route path="/edit-activity/:activityId" element={<EditActivity/>} />
           <Route path="/existing-activities" element={<ExistingActivities />} />
           

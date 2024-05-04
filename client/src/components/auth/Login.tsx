@@ -32,6 +32,8 @@ const Login: React.FC = () => {
       const token = success.token;
       auth.handleLogin(token);
       navigate(redirectUrl, { replace: true });
+      alert("logged in")
+      console.log(token)
     } else {
       setErrorMessage("Invalid username or password. Please try again.");
     }
