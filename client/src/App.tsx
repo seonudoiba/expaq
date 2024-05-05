@@ -16,7 +16,7 @@ import Admin from './components/admin/Admin';
 import BookingSuccess from './components/booking/BookingSuccess';
 import Bookings from './components/booking/Bookings';
 import FindBooking from './components/booking/FindBooking';
-import { useLocation } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom';
 
 function App() {
   

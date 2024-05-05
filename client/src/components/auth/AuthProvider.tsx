@@ -15,7 +15,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
-  handleLogin: (token: string) => {},
+  handleLogin: () => {},
   handleLogout: () => {}
 });
 
@@ -41,6 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
+  
   return (
     <AuthContext.Provider value={{ user, handleLogin, handleLogout }}>
       {children}

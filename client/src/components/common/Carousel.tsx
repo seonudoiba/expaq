@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, Carousel, Col, Container, Row } from "react-bootstrap";
-import { Activity } from "../../types/activity"; // assuming you have a type definition for Activity
+import { ActivityResponse } from "../../types/activity"; // assuming you have a type definition for Activity
 import { getAllActivities } from "../../utils/apiFunctions";
 
 const ActivityCarousel: React.FC = () => {
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<ActivityResponse[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setIsLoading(true);
     getAllActivities()
-      .then((data: Activity[]) => {
+      .then((data: ActivityResponse[]) => {
         setActivities(data);
         setIsLoading(false);
       })
@@ -54,7 +54,7 @@ const ActivityCarousel: React.FC = () => {
                       </Link>
                       <Card.Body>
                         <Card.Title className="hotel-color">{activity.activityType}</Card.Title>
-                        <Card.Title className="activity-price">${activity.activityPrice}/night</Card.Title>
+                        <Card.Title className="activity-price">${activity.price}/night</Card.Title>
                         <div className="flex-shrink-0">
                           <Link to={`/book-activity/${activity.id}`} className="btn btn-hotel btn-sm">
                             Book Now

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import moment from "moment";
 import { cancelBooking, getBookingByConfirmationCode } from "../../utils/apiFunctions";
 import { BookingInfo } from "../../types/booking";
@@ -63,7 +63,7 @@ const FindBooking: React.FC = () => {
         setTimeout(() => setIsLoading(false), 2000);
     };
 
-    const handleBookingCancellation = async (bookingId: string) => {
+    const handleBookingCancellation = async (bookingId: string="") => {
         try {
             await cancelBooking(bookingInfo.id);
             setIsDeleted(true);
@@ -72,6 +72,7 @@ const FindBooking: React.FC = () => {
             setConfirmationCode("");
             setError(null);
         } catch (error: any) {
+            console.error(bookingId);
             setError(error.message);
         }
         setTimeout(() => {

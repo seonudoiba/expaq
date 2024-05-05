@@ -1,4 +1,4 @@
-import  { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import  { useState, useEffect, ChangeEvent } from "react";
 import { getActivityTypes } from "../../utils/apiFunctions";
 
 interface ActivityTypeSelectorProps {

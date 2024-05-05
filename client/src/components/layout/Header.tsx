@@ -1,19 +1,19 @@
-import { useState } from 'react'
+// import { useState } from 'react'
 import { Link } from 'react-router-dom';
 
 
 const Header = () => {
-    const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
+    // const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+    // const [isHovered, setIsHovered] = useState(false);
 
-    const toggleSubMenu = () => {
-        setIsSubMenuOpen(!isSubMenuOpen);
-    };
+    // const toggleSubMenu = () => {
+    //     setIsSubMenuOpen(!isSubMenuOpen);
+    // };
 
-    const handleHover = () => {
-        setIsHovered(!isHovered);
-        setIsSubMenuOpen(!isSubMenuOpen);
-    };
+    // const handleHover = () => {
+    //     setIsHovered(!isHovered);
+    //     setIsSubMenuOpen(!isSubMenuOpen);
+    // };
     return (
         <header>
             <nav className="fixed overflow-hidden z-20 w-full bg-white dark:bg-gray-950/75 dark:shadow-md rounded-b-lg dark:shadow-gray-950/10 border-b border-[--ui-light-border-color] border-x dark:border-[--ui-dark-border-color] backdrop-blur">

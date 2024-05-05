@@ -14,7 +14,7 @@ interface Registration {
 }
 
 export const api = axios.create({
-  baseURL: "http://localhost:8080/"
+  baseURL: process.env.REACT_APP_API_BASE_URL
 });
 export const getHeader = () => {
 	const token = localStorage.getItem("token")
@@ -191,13 +191,14 @@ export async function loginUser(login: Login) {
 }
 
 /*  This is function to get the user profile */
-export async function getUserProfile(userId: string , token: string) {
+export async function getUserProfile(userId: string, token: string ="") {
 	try {
 		const response = await api.get(`users/profile/${userId}`, {
 			headers: getHeader()
 		})
 		return response.data
 	} catch (error) {
+		console.error("Error fetching user:", token)
 		throw error
 	}
 }
@@ -210,19 +211,21 @@ export async function deleteUser(userId: string ) {
 		})
 		return response.data
 	} catch (error: any) {
+		
 		return error.message;
 	}
 	
 }
 
 /* This is the function to get a single user */
-export async function getUser(userId: string, token:string) {
+export async function getUser(userId: string, token:string = "") {
 	try {
 		const response = await api.get(`/users/${userId}`, {
 			headers: getHeader()
 		})
 		return response.data
 	} catch (error) {
+		console.error("Error fetching user:", token)
 		throw error
 	}
 }
@@ -235,7 +238,7 @@ export async function getBookingsByUserId(userId: string | string, token: string
 		})
 		return response.data
 	} catch (error: any) {
-		console.error("Error fetching bookings:", error.message)
+		console.error("Error fetching bookings:", token)
 		throw new Error("Failed to fetch bookings")
 	}
 }

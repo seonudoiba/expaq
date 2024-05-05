@@ -9,13 +9,7 @@ const Card = ({ key, activity }: CardProps) => {
     console.log("key", key)
     console.log(activity)
     const {
-        activityType,
-        booked,
-        bookings,
-        capacity,
         description,
-        hostName,
-        id,
         location,
         photo,
         price,

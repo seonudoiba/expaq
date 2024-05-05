@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import moment from "moment";
 import BookingSummary from "./BookingSummary";
 import { bookActivity, getActivityById } from "../../utils/apiFunctions";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../auth/AuthProvider";
+// import { useAuth } from "../auth/AuthProvider";
 
 interface Booking {
     guestFullName: string;

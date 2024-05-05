@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, FormEvent, ReactNode } from "react";
 import { addActivity } from "../../utils/apiFunctions";
 import ActivityTypeSelector from "../common/ActivityTypeSelector"
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 
 const AddActivity: React.FC<{}> = (): ReactNode => {

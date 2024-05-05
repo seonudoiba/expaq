@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { Form, Button, Row, Col, Container } from "react-bootstrap"
 import moment from "moment"
 import { getAvailableActivities } from "../../utils/apiFunctions";
@@ -16,7 +16,7 @@ const ActivitySearch = () => {
 	const [availableActivities, setAvailableActivities] = useState([])
 	const [isLoading, setIsLoading] = useState(false)
 
-	const handleSearch = (e) => {
+	const handleSearch = (e:any) => {
 		e.preventDefault()
 		const checkInMoment = moment(searchQuery.checkInDate)
 		const checkOutMoment = moment(searchQuery.checkOutDate)
@@ -29,7 +29,7 @@ const ActivitySearch = () => {
 			return
 		}
 		setIsLoading(true)
-		getAvailableActivities(searchQuery.checkInDate, searchQuery.checkOutDate, searchQuery.activityType)
+		getAvailableActivities(new Date(Date.parse(searchQuery.checkInDate)), new Date(Date.parse(searchQuery.checkOutDate)), searchQuery.activityType)
 			.then((response) => {
 				setAvailableActivities(response.data)
 				setTimeout(() => setIsLoading(false), 2000)
@@ -42,7 +42,7 @@ const ActivitySearch = () => {
 			})
 	}
 
-	const handleInputChange = (e) => {
+	const handleInputChange = (e: any) => {
 		const { name, value } = e.target
 		setSearchQuery({ ...searchQuery, [name]: value })
 		const checkInDate = moment(searchQuery.checkInDate)

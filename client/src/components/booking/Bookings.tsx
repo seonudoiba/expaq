@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { cancelBooking, getAllBookings } from "../../utils/apiFunctions";
 //import Header from "../common/Header";
 import BookingsTable from "./BookingsTable";

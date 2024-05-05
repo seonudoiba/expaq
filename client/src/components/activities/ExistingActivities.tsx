@@ -13,10 +13,11 @@ const ExistingActivities: React.FC = () => {
   const [activitiesPerPage] = useState<number>(8);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [filteredActivities, setFilteredActivities] = useState<ActivityResponse[]>([]);
-  const [selectedActivityType, setSelectedActivityType] = useState<string>("");
+  // const [selectedActivityType, setSelectedActivityType] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
+  const selectedActivityType = ""
   useEffect(() => {
     fetchActivities();
   }, []);

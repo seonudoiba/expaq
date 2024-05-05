@@ -1,4 +1,3 @@
-import React from 'react';
 import Search from '../icons/Search';
 import SearchSelectForm from './SearchSelectForm';
 

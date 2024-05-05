@@ -9,7 +9,7 @@ const Featured = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [filteredData, setFilteredData] = useState<ActivityResponse[]>([]);
     
-
+    console.log(data)
     useEffect(() => {
         setIsLoading(true);
         getAllActivities()
