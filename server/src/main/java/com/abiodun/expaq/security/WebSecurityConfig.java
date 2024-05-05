@@ -1,12 +1,11 @@
 package com.abiodun.expaq.security;
-
 import com.abiodun.expaq.security.jwt.AuthTokenFilter;
 import com.abiodun.expaq.security.jwt.JwtAuthEntryPoint;
 import com.abiodun.expaq.security.user.ExpaqUserDetailsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -56,14 +55,13 @@ public class WebSecurityConfig {
                         exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/activities/**","/bookings/**").permitAll()
-                        .requestMatchers("/roles/**").hasRole("ADMIN")
+                        .requestMatchers("/auth/**", "/activities/**","/bookings/**")
+                        .permitAll().requestMatchers("/roles/**").hasRole("ADMIN")
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
 
 
 }
