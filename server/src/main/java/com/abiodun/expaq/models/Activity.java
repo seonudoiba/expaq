@@ -5,13 +5,13 @@ import lombok.*;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.math.BigDecimal;
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 public class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,35 +19,42 @@ public class Activity {
     private String title;
     private String description;
     private String location;
-    private int capacity; //capacity or maximum number of participants
-    private String activityType; // e.g., Cooking Class, Language Exchange Meetup, Artisan Workshop, etc.
+    private int capacity;
+    private String activityType;
     private BigDecimal price;
     private boolean isBooked = false;
-    @Lob
     private String photo;
 
     @OneToMany(mappedBy="activity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BookedActivity> bookings;
 
     @OneToMany(mappedBy="activity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rating> ratings = new ArrayList<Rating>();
+    private List<Rating> ratings = new ArrayList<>();
+
+    private String hostName;// Store the concatenated first name and last name of the user
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User hostName;
-
-    public Activity() {
-        this.bookings = new ArrayList<>();
-    }
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;// Reference to the User entity
 
     public void addBooking(BookedActivity booking) {
-        if (bookings == null) {
-            bookings = new ArrayList<>();
-        }
         bookings.add(booking);
         booking.setActivity(this);
         isBooked = true;
         String bookingCode = RandomStringUtils.randomNumeric(10);
         booking.setBookingConfirmationCode(bookingCode);
+    }
+
+    public Activity(User user) {
+        if (user != null) {
+            this.user = user;
+            this.hostName = user.getFirstName() + " " + user.getLastName();
+        }
+    }
+    @PostLoad
+    private void populateHostName() {
+        if (user != null) {
+            this.hostName = user.getFirstName() + " " + user.getLastName();
+        }
     }
 }

@@ -31,9 +31,6 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles = new HashSet<>();
 
-//    @OneToMany(mappedBy="user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Activity> activities = new ArrayList<Activity>();
-
     @OneToMany(mappedBy="hostName", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Activity> activities = new ArrayList<Activity>();
 

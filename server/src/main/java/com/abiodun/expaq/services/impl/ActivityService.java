@@ -1,7 +1,6 @@
 package com.abiodun.expaq.services.impl;
 
 import com.abiodun.expaq.exception.InternalServerException;
-import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.models.Activity;
 import com.abiodun.expaq.repository.ActivityRepository;
 import com.abiodun.expaq.services.IActivityService;

@@ -27,11 +27,11 @@ public class ActivityResponse {
     private boolean isBooked = false;
     private String photo;
     private List<BookingResponse> bookings;
-    private User hostName;
+    private String hostName;
 
     public ActivityResponse(Long id, String title, String description, String location, int capacity, String activityType,
                             BigDecimal price, boolean isBooked, String photo,
-                            List<BookingResponse> bookings, User hostName) {
+                            List<BookingResponse> bookings, String hostName) {
         this.id = id;
         this.title = title;
         this.description = description;
