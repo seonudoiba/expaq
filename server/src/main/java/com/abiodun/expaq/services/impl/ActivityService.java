@@ -2,13 +2,22 @@ package com.abiodun.expaq.services.impl;
 
 import com.abiodun.expaq.exception.InternalServerException;
 import com.abiodun.expaq.models.Activity;
+import com.abiodun.expaq.models.User;
 import com.abiodun.expaq.repository.ActivityRepository;
+import com.abiodun.expaq.repository.UserRepository;
+import com.abiodun.expaq.security.user.ExpaqUserDetails;
 import com.abiodun.expaq.services.IActivityService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -26,6 +35,7 @@ import static org.hibernate.query.sqm.tree.SqmNode.log;
 @RequiredArgsConstructor
 public class ActivityService implements IActivityService {
     private  final ActivityRepository activityRepository;
+       private  final UserRepository userRepository;
     private final DataSource dataSource;
     private final Cloudinary cloudinary;
 
@@ -37,14 +47,18 @@ public class ActivityService implements IActivityService {
     public List<String> getAllActivityTypes() {
         return activityRepository.findDistinctActivityTypes();
     }
-    @Override
     public Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price,
-                                   String title, String description) throws SQLException, IOException {
+                                   String title, String description, ExpaqUserDetails user) throws SQLException, IOException {
+        Long userId = user.getId(); // Get the ID of the signed-in user
+        User currentUser = userRepository.findById(userId).orElseThrow();
+
         Activity activity = new Activity();
         activity.setActivityType(activityType);
         activity.setPrice(price);
         activity.setDescription(description);
         activity.setTitle(title);
+        activity.setHostName(currentUser.getFirstName() + " " + currentUser.getLastName());
+
         if (!photo.isEmpty()){
             try {
                 if (!photo.getContentType().startsWith("image/")) {
@@ -82,26 +96,36 @@ public class ActivityService implements IActivityService {
         }
     }
 
+
+
     @Override
-    public Activity updateActivity(Long activityId, String activityType, BigDecimal price, MultipartFile photo, String title, String description) throws SQLException, IOException {
-        Activity activity = activityRepository.findById(activityId).orElseThrow();
-        if (activityType != null) activity.setActivityType(activityType);
-        if (price != null) activity.setPrice(price);
-        if (title != null) activity.setTitle(title);
-        if (description != null) activity.setDescription(description);
-        if (photo != null && !photo.isEmpty()) {
-            try {
-                String photoUrl = cloudinary.uploader()
-                        .upload(photo, ObjectUtils.asMap(
-                                "public_id", UUID.randomUUID().toString()
-                        )).get("url").toString();
-                activity.setPhoto(photoUrl);
-            } catch (IOException ex) {
-                log.error("Error uploading photo to Cloudinary", ex);
-                throw new InternalServerException("Fail uploading photo to Cloudinary", ex);
+    public Activity updateActivity(Long activityId, String activityType, BigDecimal price, MultipartFile photo, String title, String description, User currentUser) throws SQLException, IOException {
+        Optional<Activity> activityOptional = activityRepository.findById(activityId);
+        if (activityOptional.isPresent()) {
+            Activity activity = activityOptional.get();
+            if (!activity.getUser().getId().equals(currentUser.getId())) {
+                throw new AccessDeniedException("You are not authorized to update this activity");
             }
+            if (activityType != null) activity.setActivityType(activityType);
+            if (price != null) activity.setPrice(price);
+            if (title != null) activity.setTitle(title);
+            if (description != null) activity.setDescription(description);
+            if (photo != null && !photo.isEmpty()) {
+                try {
+                    String photoUrl = cloudinary.uploader()
+                            .upload(photo, ObjectUtils.asMap(
+                                    "public_id", UUID.randomUUID().toString()
+                            )).get("url").toString();
+                    activity.setPhoto(photoUrl);
+                } catch (IOException ex) {
+                    log.error("Error uploading photo to Cloudinary", ex);
+                    throw new InternalServerException("Fail uploading photo to Cloudinary", ex);
+                }
+            }
+            return activityRepository.save(activity);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found");
         }
-        return activityRepository.save(activity);
     }
 
 }

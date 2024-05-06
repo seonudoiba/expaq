@@ -18,10 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @RequiredArgsConstructor
-@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class WebSecurityConfig {
     private final ExpaqUserDetailsService userDetailsService;
     private final JwtAuthEntryPoint jwtAuthEntryPoint;
@@ -58,11 +56,10 @@ public class WebSecurityConfig {
                         .requestMatchers("/auth/**", "/activities/**","/bookings/**", "/swagger-ui/**",
                                 "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .requestMatchers("/roles/**").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated())
+                .userDetailsService(userDetailsService); // Add this line
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
-
 }

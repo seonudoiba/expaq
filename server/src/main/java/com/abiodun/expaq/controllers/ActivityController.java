@@ -2,10 +2,12 @@ package com.abiodun.expaq.controllers;
 
 import com.abiodun.expaq.dto.response.ActivityResponse;
 import com.abiodun.expaq.dto.response.BookingResponse;
-import com.abiodun.expaq.exception.PhotoRetrievalException;
+import com.abiodun.expaq.security.user.ExpaqUserDetails;
+import org.springframework.security.access.AccessDeniedException;
 import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.models.Activity;
 import com.abiodun.expaq.models.BookedActivity;
+import com.abiodun.expaq.models.User;
 import com.abiodun.expaq.services.IActivityService;
 import com.abiodun.expaq.services.impl.BookingService;
 import jakarta.transaction.Transactional;
@@ -15,10 +17,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
+import java.io.Console;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -79,30 +83,58 @@ public class ActivityController {
     }
     @Transactional
     @PostMapping("/add/new-activities")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_HOST')")
     public ResponseEntity<ActivityResponse> addNewActivity(
             @RequestParam("photo") MultipartFile photo,
             @RequestParam("activityType") String activityType,
             @RequestParam("title") String title,
             @RequestParam("description") String description,
-            @RequestParam("price") BigDecimal price) throws SQLException, IOException {
-        Activity savedActivity = activityService.addNewActivity(photo, activityType, price, title, description );
+            @RequestParam("price") BigDecimal price,
+            @AuthenticationPrincipal ExpaqUserDetails user) throws SQLException, IOException {
+
+        Activity savedActivity = activityService.addNewActivity(photo, activityType, price, title, description, user);
         ActivityResponse response = getActivityResponse(savedActivity);
         return ResponseEntity.ok(response);
     }
 
+//    @PutMapping("/update/{activityId}")
+//    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_HOST')")
+//    public ResponseEntity<ActivityResponse> updateActivity(
+//            @PathVariable Long activityId,
+//            @RequestParam(required = false) MultipartFile photo,
+//            @RequestParam(required = false)  String activityType,
+//            @RequestParam(required = false) String title,
+//            @RequestParam(required = false)  String description,
+//            @RequestParam(required = false) BigDecimal price) throws SQLException, IOException {
+//        Activity theActivity = activityService.updateActivity(activityId, activityType, price, photo, title, description);
+//        ActivityResponse activityResponse = getActivityResponse(theActivity);
+//        return ResponseEntity.ok(activityResponse);
+//    }
+
     @PutMapping("/update/{activityId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_HOST')")
     public ResponseEntity<ActivityResponse> updateActivity(
             @PathVariable Long activityId,
             @RequestParam(required = false) MultipartFile photo,
             @RequestParam(required = false)  String activityType,
             @RequestParam(required = false) String title,
             @RequestParam(required = false)  String description,
-            @RequestParam(required = false) BigDecimal price) throws SQLException, IOException {
-        Activity theActivity = activityService.updateActivity(activityId, activityType, price, photo, title, description);
-        ActivityResponse activityResponse = getActivityResponse(theActivity);
-        return ResponseEntity.ok(activityResponse);
+            @RequestParam(required = false) BigDecimal price,
+            @AuthenticationPrincipal User currentUser) throws SQLException, IOException {
+        Optional<Activity> activityOptional = activityService.getActivityById(activityId);
+        if (activityOptional.isPresent()) {
+            Activity theActivity = activityOptional.get();
+            if (!theActivity.getUser().getId().equals(currentUser.getId())) {
+                throw new AccessDeniedException("You are not authorized to update this activity");
+            }
+            theActivity = activityService.updateActivity(activityId, activityType, price, photo, title, description, currentUser);
+            ActivityResponse activityResponse = getActivityResponse(theActivity);
+            return ResponseEntity.ok(activityResponse);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
+
     @DeleteMapping("/delete/activity/{activityId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteActivity(@PathVariable Long activityId){

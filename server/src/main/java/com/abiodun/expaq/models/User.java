@@ -1,5 +1,6 @@
 package com.abiodun.expaq.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,9 +32,8 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy="hostName", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Activity> activities = new ArrayList<Activity>();
-
-
 
 }
