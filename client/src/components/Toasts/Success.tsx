@@ -1,4 +1,4 @@
-import { HiCheck, HiExclamation, HiX } from "react-icons/hi";
+import { HiCheck } from "react-icons/hi";
 import { Toast } from "flowbite-react";
 
 interface ToastProps {

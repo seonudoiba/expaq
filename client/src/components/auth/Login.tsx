@@ -39,7 +39,6 @@ const Login: React.FC = () => {
     if (success) {
       const token = success.token;
       const decodedUser: JwtPayload = jwtDecode(token);
-      console.log("Hey", decodedUser);
       localStorage.setItem("userId", decodedUser.sub || "");
       if (decodedUser.roles && decodedUser.roles.length > 0) {
         localStorage.setItem("userRole", decodedUser.roles.join(","));
