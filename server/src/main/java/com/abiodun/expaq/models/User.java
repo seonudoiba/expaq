@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -30,9 +31,11 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles = new HashSet<>();
 
-//    @OneToMany(mappedBy = "guest", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @OneToMany(mappedBy = "hostName", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Activity> activitiesHosted;
+//    @OneToMany(mappedBy="user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Activity> activities = new ArrayList<Activity>();
+
+    @OneToMany(mappedBy="hostName", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Activity> activities = new ArrayList<Activity>();
 
 
 

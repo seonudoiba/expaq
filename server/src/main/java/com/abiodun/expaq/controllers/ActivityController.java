@@ -41,13 +41,8 @@ public class ActivityController {
         List<ActivityResponse> activityResponses = new ArrayList<>();
 
         for (Activity activity : activities) {
-            byte[] photoBytes = activityService.getActivityPhotoByActivityId(activity.getId());
-            if (photoBytes != null && photoBytes.length > 0) {
-                String base64Photo = Base64.encodeBase64String(photoBytes);
-                ActivityResponse activityResponse = getActivityResponse(activity);
-                activityResponse.setPhoto(base64Photo);
-                activityResponses.add(activityResponse);
-            }
+            ActivityResponse activityResponse = getActivityResponse(activity);
+            activityResponses.add(activityResponse);
         }
 
         return ResponseEntity.ok(activityResponses);
@@ -73,13 +68,8 @@ public class ActivityController {
         List<Activity> availableActivities = activityService.getAvailableActivities(checkInDate, checkOutDate, activityType);
         List<ActivityResponse> activityResponses = new ArrayList<>();
         for (Activity activity : availableActivities){
-            byte[] photoBytes = activityService.getActivityPhotoByActivityId(activity.getId());
-            if (photoBytes != null && photoBytes.length > 0){
-                String photoBase64 = Base64.encodeBase64String(photoBytes);
-                ActivityResponse activityResponse = getActivityResponse(activity);
-                activityResponse.setPhoto(photoBase64);
-                activityResponses.add(activityResponse);
-            }
+            ActivityResponse activityResponse = getActivityResponse(activity);
+            activityResponses.add(activityResponse);
         }
         if(activityResponses.isEmpty()){
             return ResponseEntity.noContent().build();
@@ -96,11 +86,23 @@ public class ActivityController {
             @RequestParam("description") String description,
             @RequestParam("price") BigDecimal price) throws SQLException, IOException {
         Activity savedActivity = activityService.addNewActivity(photo, activityType, price, title, description );
-        ActivityResponse response = new ActivityResponse(savedActivity.getId(), savedActivity.getActivityType(), savedActivity.getPrice());
+        ActivityResponse response = getActivityResponse(savedActivity);
         return ResponseEntity.ok(response);
     }
 
-
+    @PutMapping("/update/{activityId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ActivityResponse> updateActivity(
+            @PathVariable Long activityId,
+            @RequestParam(required = false) MultipartFile photo,
+            @RequestParam(required = false)  String activityType,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false)  String description,
+            @RequestParam(required = false) BigDecimal price) throws SQLException, IOException {
+        Activity theActivity = activityService.updateActivity(activityId, activityType, price, photo, title, description);
+        ActivityResponse activityResponse = getActivityResponse(theActivity);
+        return ResponseEntity.ok(activityResponse);
+    }
     @DeleteMapping("/delete/activity/{activityId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteActivity(@PathVariable Long activityId){
@@ -108,20 +110,6 @@ public class ActivityController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/update/{activityId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ActivityResponse> updateActivity(@PathVariable Long activityId,
-                                                   @RequestParam(required = false)  String activityType,
-                                                   @RequestParam(required = false) BigDecimal activityPrice,
-                                                   @RequestParam(required = false) MultipartFile photo) throws SQLException, IOException {
-        byte[] photoBytes = photo != null && !photo.isEmpty() ?
-                photo.getBytes() : activityService.getActivityPhotoByActivityId(activityId);
-        Blob photoBlob = photoBytes != null && photoBytes.length >0 ? new SerialBlob(photoBytes): null;
-        Activity theActivity = activityService.updateActivity(activityId, activityType, activityPrice, photoBytes);
-        theActivity.setPhoto(photoBlob);
-        ActivityResponse activityResponse = getActivityResponse(theActivity);
-        return ResponseEntity.ok(activityResponse);
-    }
 
     private ActivityResponse getActivityResponse(Activity activity) {
         List<BookedActivity> bookings = getAllBookingsByActivityId(activity.getId());
@@ -130,18 +118,9 @@ public class ActivityController {
                 .map(booking -> new BookingResponse(booking.getBookingId(),
                         booking.getCheckInDate(),
                         booking.getCheckOutDate(), booking.getBookingConfirmationCode())).toList();
-        byte[] photoBytes = null;
-        Blob photoBlob = activity.getPhoto();
-        if (photoBlob != null) {
-            try {
-                photoBytes = photoBlob.getBytes(1, (int) photoBlob.length());
-            } catch (SQLException e) {
-                throw new PhotoRetrievalException("Error retrieving photo");
-            }
-        }
         return new ActivityResponse(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getLocation(), activity.getCapacity(),
                 activity.getActivityType(), activity.getPrice(),
-                activity.isBooked(), photoBytes, bookingInfo, activity.getHostName());
+                activity.isBooked(), activity.getPhoto(), bookingInfo, activity.getHostName());
     }
 
     private List<BookedActivity> getAllBookingsByActivityId(Long activityId) {

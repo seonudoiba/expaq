@@ -2,6 +2,7 @@ import { useState, ChangeEvent, FormEvent } from "react"
 import { registerUser } from "../../utils/apiFunctions";
 
 import { Link } from "react-router-dom"
+import Success from "../Toasts/Success";
 
 const Registration = () => {
 	const [registration, setRegistration] = useState({
@@ -46,6 +47,8 @@ const Registration = () => {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Create an account
             </h1>
+            {successMessage && <Success message={successMessage} />}
+
             <form className="space-y-4 md:space-y-6" onSubmit={handleRegistration} >
               <div>
                 <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900

@@ -15,15 +15,12 @@ public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    private String title;
+    private String content;
+    private int stars;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id", nullable = false)
     private Activity activity;
-
-    private Double rating;
-    private String userId; // Optional: depends on your authentication system
-
-
-    // Constructors, getters, and setters
 }
 

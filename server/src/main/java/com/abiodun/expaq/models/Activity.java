@@ -24,17 +24,16 @@ public class Activity {
     private BigDecimal price;
     private boolean isBooked = false;
     @Lob
-    private Blob photo;
+    private String photo;
 
     @OneToMany(mappedBy="activity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BookedActivity> bookings;
 
-    @OneToMany(mappedBy="activity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Rating> ratings;
-
+    @OneToMany(mappedBy="activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> ratings = new ArrayList<Rating>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User hostName;
 
     public Activity() {

@@ -1,22 +1,30 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { loginUser } from "../../utils/apiFunctions";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthProvider";
+// import { useAuth } from "./AuthProvider";
+import Success from "../Toasts/Success";
+import { jwtDecode } from "jwt-decode";
+
 
 interface LoginState {
   email: string;
   password: string;
 }
+interface JwtPayload {
+  sub: string;
+  roles: string[];
+}
 
 const Login: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [login, setLogin] = useState<LoginState>({
     email: "",
     password: ""
   });
 
   const navigate = useNavigate();
-  const auth = useAuth();
+  // const {handleLogin} = useAuth();
   const location = useLocation();
   const redirectUrl = location.state?.path || "/";
 
@@ -30,10 +38,15 @@ const Login: React.FC = () => {
     const success = await loginUser(login);
     if (success) {
       const token = success.token;
-      auth.handleLogin(token);
+      const decodedUser: JwtPayload = jwtDecode(token);
+      console.log("Hey", decodedUser);
+      localStorage.setItem("userId", decodedUser.sub || "");
+      if (decodedUser.roles && decodedUser.roles.length > 0) {
+        localStorage.setItem("userRole", decodedUser.roles.join(","));
+      }      localStorage.setItem("token", token);
       navigate(redirectUrl, { replace: true });
-      alert("logged in")
-      console.log(token)
+      setIsLoggedin(true);
+      
     } else {
       setErrorMessage("Invalid username or password. Please try again.");
     }
@@ -43,54 +56,8 @@ const Login: React.FC = () => {
   };
 
   return (
-    // <section className="container pt-32 col-6 mt-5 mb-5">
-    //   {errorMessage && <p className="alert alert-danger">{errorMessage}</p>}
-    //   <h2>Login</h2>
-    //   <form onSubmit={handleSubmit}>
-    //     <div className="row mb-3">
-    //       <label htmlFor="email" className="col-sm-2 col-form-label">
-    //         Email
-    //       </label>
-    //       <div>
-    //         <input
-    //           id="email"
-    //           name="email"
-    //           type="email"
-    //           className="form-control"
-    //           value={login.email}
-    //           onChange={handleInputChange}
-    //         />
-    //       </div>
-    //     </div>
-
-    //     <div className="row mb-3">
-    //       <label htmlFor="password" className="col-sm-2 col-form-label">
-    //         Password
-    //       </label>
-    //       <div>
-    //         <input
-    //           id="password"
-    //           name="password"
-    //           type="password"
-    //           className="form-control"
-    //           value={login.password}
-    //           onChange={handleInputChange}
-    //         />
-    //       </div>
-    //     </div>
-
-    //     <div className="mb-3">
-    //       <button type="submit" className="btn btn-hotel" style={{ marginRight: "10px" }}>
-    //         Login
-    //       </button>
-    //       <span style={{ marginLeft: "10px" }}>
-    //         Don't have an account yet?<Link to={"/register"}> Register</Link>
-    //       </span>
-    //     </div>
-    //   </form>
-    // </section>
-
     <section className="bg-gray-50 pt-12 dark:bg-gray-900">
+    
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           {errorMessage && <p className="alert alert-danger">{errorMessage}</p>}
@@ -98,6 +65,7 @@ const Login: React.FC = () => {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your account
             </h1>
+            {isLoggedin && <Success message="You have successfully logged in!" />}
             <form className="space-y-4 md:space-y-6" action="#" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
@@ -109,7 +77,7 @@ const Login: React.FC = () => {
                   placeholder="name@company.com"
                   required
                   value={login.email}
-                  onChange={handleInputChange}        
+                  onChange={handleInputChange}
                 />
               </div>
               <div>

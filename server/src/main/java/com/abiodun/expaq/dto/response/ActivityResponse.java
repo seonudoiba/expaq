@@ -30,7 +30,7 @@ public class ActivityResponse {
     private User hostName;
 
     public ActivityResponse(Long id, String title, String description, String location, int capacity, String activityType,
-                            BigDecimal price, boolean isBooked, byte[] photoBytes,
+                            BigDecimal price, boolean isBooked, String photo,
                             List<BookingResponse> bookings, User hostName) {
         this.id = id;
         this.title = title;
@@ -40,7 +40,7 @@ public class ActivityResponse {
         this.activityType = activityType;
         this.price = price;
         this.isBooked = isBooked;
-        this.photo = photoBytes != null ? Base64.encodeBase64String(photoBytes) : null;
+        this.photo = photo;
         this.bookings = bookings;
         this.hostName = hostName;
     }
@@ -51,16 +51,4 @@ public class ActivityResponse {
         this.price = price;
     }
 
-
-
-//    public ActivityResponse(Long id, String activityType, BigDecimal price, boolean isBooked,
-//                            byte[] photoBytes , List<BookingResponse> bookings) {
-//        this.id = id;
-//        this.activityType = activityType;
-//        this.price = price;
-//        this.isBooked = isBooked;
-//        this.photo = photoBytes != null ? Base64.encodeBase64String(photoBytes) : null;
-//        this.bookings = bookings;
-//    }
-//
 }

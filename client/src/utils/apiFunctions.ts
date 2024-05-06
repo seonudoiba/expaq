@@ -1,20 +1,21 @@
 import axios, { AxiosResponse } from 'axios';
 import { Activity, ActivityResponse } from '../types/activity';
 
-
 interface Login {
-    email: string;
-    password: string;
+	email: string;
+	password: string;
 }
 interface Registration {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
+	firstName: string;
+	lastName: string;
+	email: string;
+	password: string;
 }
+const baseURL: string = import.meta.env.VITE_API_BASE_URL || '';
+console.log("hello", baseURL)
 
 export const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL
+  baseURL,
 });
 export const getHeader = () => {
 	const token = localStorage.getItem("token")

@@ -1,5 +1,5 @@
 # Expaq (A Cultural Exchange Marketplace) - Software Requirements
-
+api Doc  /swagger-ui/index.html
 ## 1. Introduction
 Expaq is a web-based platform designed to facilitate cultural exchange experiences between travelers and local hosts. The platform aims to connect users based on shared interests, languages, and cultural backgrounds, allowing them to offer and book various cultural exchange activities.
 

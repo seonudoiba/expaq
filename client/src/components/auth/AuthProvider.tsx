@@ -1,54 +1,28 @@
-import  { createContext, useState, useContext, ReactNode } from "react";
-import { jwtDecode } from "jwt-decode";
-
-
-interface User {
-	sub: string;
-	roles: string;
-}
-
-interface AuthContextType {
-	user: User | null;
-	handleLogin: (token: string) => void;
-	handleLogout: () => void;
-}
-
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  handleLogin: () => {},
-  handleLogout: () => {}
-});
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
+import { useCallback, useState } from "react";
+// ...
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const handleLogin = (token: string) => {
+  const handleLogin = useCallback((token: string) => {
     const decodedUser: User = jwtDecode(token);
+    console.log("Hey", decodedUser);
     localStorage.setItem("userId", decodedUser.sub);
     localStorage.setItem("userRole", decodedUser.roles);
     localStorage.setItem("token", token);
     setUser(decodedUser);
-  };
+  }, [setUser]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem("userId");
     localStorage.removeItem("userRole");
     localStorage.removeItem("token");
     setUser(null);
-  };
+  }, [setUser]);
 
-  
   return (
     <AuthContext.Provider value={{ user, handleLogin, handleLogout }}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  return useContext(AuthContext);
 };

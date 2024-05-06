@@ -5,67 +5,76 @@ import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.models.Activity;
 import com.abiodun.expaq.repository.ActivityRepository;
 import com.abiodun.expaq.services.IActivityService;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
-import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import org.springframework.jdbc.datasource.DataSourceUtils;
+import java.util.UUID;
+
+import static org.hibernate.query.sqm.tree.SqmNode.log;
 
 @Service
 @RequiredArgsConstructor
 public class ActivityService implements IActivityService {
     private  final ActivityRepository activityRepository;
     private final DataSource dataSource;
-
+    private final Cloudinary cloudinary;
 
     @Override
     public List<Activity> getAllActivities() {
         return activityRepository.findAll();
     }
     @Override
-    public Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price,
-                                   String title, String description) throws SQLException, IOException {
-       Activity activity = new Activity();
-       activity.setActivityType(activityType);
-       activity.setPrice(price);
-        if (!photo.isEmpty()){
-            byte[] photoBytes = photo.getBytes();
-            Blob photoBlob = new SerialBlob(photoBytes);
-            activity.setPhoto(photoBlob);
-        }
-        return activityRepository.save(activity);
-
-    }
-
-    @Override
     public List<String> getAllActivityTypes() {
         return activityRepository.findDistinctActivityTypes();
     }
-
-
     @Override
-    public byte[] getActivityPhotoByActivityId(Long activityId) throws SQLException {
-        Optional<Activity> theActivity = activityRepository.findById(activityId);
-        if (theActivity.isEmpty()) {
-            throw new ResourceNotFoundException("Sorry, Activity not found!");
+    public Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price,
+                                   String title, String description) throws SQLException, IOException {
+        Activity activity = new Activity();
+        activity.setActivityType(activityType);
+        activity.setPrice(price);
+        activity.setDescription(description);
+        activity.setTitle(title);
+        if (!photo.isEmpty()){
+            try {
+                if (!photo.getContentType().startsWith("image/")) {
+                    throw new IOException("Only image files are allowed");
+                }
+                if (photo.getSize() > 10485760) { // 10MB
+                    throw new IOException("File size exceeds 10MB");
+                }
+                String photoUrl = cloudinary.uploader()
+                        .upload(photo.getBytes(),
+                                Map.of("public_id", UUID.randomUUID().toString()))
+                        .get("url")
+                        .toString();
+                activity.setPhoto(photoUrl);
+            } catch (IOException e) {
+                throw new SQLException("Error uploading photo: " + e.getMessage());
+            }
         }
-        Blob photoBlob = theActivity.get().getPhoto();
-        if(photoBlob != null){
-            return photoBlob.getBytes(1, (int) photoBlob.length());
-        }
-        return null;
+        return activityRepository.save(activity);
     }
 
+    @Override
+    public Optional<Activity> getActivityById(Long activityId) {
+        return Optional.of(activityRepository.findById(activityId).get());
+    }
+    @Override
+    public List<Activity> getAvailableActivities(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
+        return activityRepository.findAvailableActivitiesByDatesAndType(checkInDate, checkOutDate, roomType);
+    }
     @Override
     public void deleteActivity(Long activityId) {
         Optional<Activity> theActivity = activityRepository.findById(activityId);
@@ -75,32 +84,25 @@ public class ActivityService implements IActivityService {
     }
 
     @Override
-    public Activity updateActivity(Long activityId, String activityType, BigDecimal Price, byte[] photoBytes) {
-        Activity activity = activityRepository.findById(activityId).get();
+    public Activity updateActivity(Long activityId, String activityType, BigDecimal price, MultipartFile photo, String title, String description) throws SQLException, IOException {
+        Activity activity = activityRepository.findById(activityId).orElseThrow();
         if (activityType != null) activity.setActivityType(activityType);
-        if (Price != null) activity.setPrice(Price);
-        if (photoBytes != null && photoBytes.length > 0) {
+        if (price != null) activity.setPrice(price);
+        if (title != null) activity.setTitle(title);
+        if (description != null) activity.setDescription(description);
+        if (photo != null && !photo.isEmpty()) {
             try {
-                activity.setPhoto(new SerialBlob(photoBytes));
-            } catch (SQLException ex) {
-                throw new InternalServerException("Fail updating activity", ex);
+                String photoUrl = cloudinary.uploader()
+                        .upload(photo, ObjectUtils.asMap(
+                                "public_id", UUID.randomUUID().toString()
+                        )).get("url").toString();
+                activity.setPhoto(photoUrl);
+            } catch (IOException ex) {
+                log.error("Error uploading photo to Cloudinary", ex);
+                throw new InternalServerException("Fail uploading photo to Cloudinary", ex);
             }
         }
         return activityRepository.save(activity);
-    }
-
-//    @Override
-//    public Optional<Activity> getActivityById(Long activityId) {
-//        return Optional.of(activityRepository.findById(activityId).get());
-//    }
-
-    @Override
-    public Optional<Activity> getActivityById(Long activityId) {
-        return Optional.of(activityRepository.findById(activityId).get());
-    }
-    @Override
-    public List<Activity> getAvailableActivities(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
-        return activityRepository.findAvailableActivitiesByDatesAndType(checkInDate, checkOutDate, roomType);
     }
 
 }

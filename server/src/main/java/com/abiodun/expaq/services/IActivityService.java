@@ -18,13 +18,11 @@ public interface IActivityService {
 
     List<Activity> getAllActivities();
 
-    byte[] getActivityPhotoByActivityId(Long id) throws SQLException;
-
     Optional<Activity> getActivityById(Long activityId);
 
     void deleteActivity(Long activityId);
 
-    Activity updateActivity(Long activityId, String ActivityType, BigDecimal price, byte[] photoBytes);
+    Activity updateActivity(Long activityId, String activityType, BigDecimal price, MultipartFile photo, String title, String description) throws SQLException, IOException;
 
     List<Activity> getAvailableActivities(LocalDate checkInDate, LocalDate checkOutDate, String activityType);
 }

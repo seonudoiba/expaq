@@ -1,14 +1,15 @@
 package com.abiodun.expaq.services;
 
-import com.abiodun.expaq.models.BookedActivity;
-import com.abiodun.expaq.models.Rating;
+
+
+import com.abiodun.expaq.dto.response.RatingResponse;
 
 import java.util.List;
 
 public interface IRatingService {
-    List<Rating> getRatings();
-    Rating saveRating(Long ActivityId, Rating rating);
-    Double getAverageRating(Long activityId);
-    List<Rating> getAllRatingsByActivityId(Long activityId);
-
+    RatingResponse createRating(Long activityId, RatingResponse ratingResponse);
+    List<RatingResponse> getRatingsByActivityId(Long id);
+    RatingResponse getRatingById(Long ratingId, Long activityId);
+    RatingResponse updateRating(Long activityId, Long ratingId, RatingResponse ratingResponse);
+    void deleteRating(Long activityId, Long ratingId);
 }
