@@ -20,6 +20,7 @@ const ActivityPaginator: React.FC<ActivityPaginatorProps> = ({ currentPage, tota
           </li>
         ))}
       </ul>
+      
     </nav>
   );
 };

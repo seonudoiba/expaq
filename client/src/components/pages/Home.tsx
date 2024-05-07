@@ -1,4 +1,5 @@
 
+import ActivitySearch from '../common/ActivitySearch'
 import ActivityTypes from '../Home/ActivityTypes'
 import Featured from '../Home/Featured'
 import Hero from '../Home/Hero'
@@ -9,7 +10,8 @@ const Home = () => {
   return (
     <div>
         <Hero/>
-      <ActivityTypes />
+        <ActivitySearch/>
+      {/* <ActivityTypes /> */}
       <TypesCarousel/>
       <Featured />
       {/* <HowItWorks /> */}

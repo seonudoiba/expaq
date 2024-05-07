@@ -1,9 +1,10 @@
 import { useState } from "react"
-import { Form, Button, Row, Col, Container } from "react-bootstrap"
+import { div, Button, Container } from "react-bootstrap"
 import moment from "moment"
 import { getAvailableActivities } from "../../utils/apiFunctions";
 import ActivitySearchResults from "./ActivitySearchResult"
 import ActivityTypeSelector from "./ActivityTypeSelector"
+import SearchActivityTypeSelector from "./SearchActivityTypeSelector"
 
 const ActivitySearch = () => {
 	const [searchQuery, setSearchQuery] = useState({
@@ -16,7 +17,7 @@ const ActivitySearch = () => {
 	const [availableActivities, setAvailableActivities] = useState([])
 	const [isLoading, setIsLoading] = useState(false)
 
-	const handleSearch = (e:any) => {
+	const handleSearch = (e: any) => {
 		e.preventDefault()
 		const checkInMoment = moment(searchQuery.checkInDate)
 		const checkOutMoment = moment(searchQuery.checkOutDate)
@@ -62,36 +63,36 @@ const ActivitySearch = () => {
 
 	return (
 		<>
-			<Container className="shadow mt-n5 mb-5 py-5">
-				<Form onSubmit={handleSearch}>
-					<Row className="justify-content-center">
-						<Col xs={12} md={3}>
-							<Form.Group controlId="checkInDate">
-								<Form.Label>Check-in Date</Form.Label>
-								<Form.Control
+			{/* <Container className="shadow mt-n5 mb-5 py-5">
+				<div onSubmit={handleSearch}>
+					<div className="justify-content-center">
+						<div>
+							<div controlId="checkInDate">
+								<div>Check-in Date</div>
+								<input
 									type="date"
 									name="checkInDate"
 									value={searchQuery.checkInDate}
 									onChange={handleInputChange}
 									min={moment().format("YYYY-MM-DD")}
 								/>
-							</Form.Group>
-						</Col>
-						<Col xs={12} md={3}>
-							<Form.Group controlId="checkOutDate">
-								<Form.Label>Check-out Date</Form.Label>
-								<Form.Control
+							</div>
+						</div>
+						<div>
+							<div controlId="checkOutDate">
+								<div>Check-out Date</div>
+								<input
 									type="date"
 									name="checkOutDate"
 									value={searchQuery.checkOutDate}
 									onChange={handleInputChange}
 									min={moment().format("YYYY-MM-DD")}
 								/>
-							</Form.Group>
-						</Col>
-						<Col xs={12} md={3}>
-							<Form.Group controlId="activityType">
-								<Form.Label>Activity Type</Form.Label>
+							</div>
+						</div>
+						<div>
+							<div controlId="activityType">
+								<div>Activity Type</div>
 								<div className="d-flex">
 									<ActivityTypeSelector
 										handleActivityInputChange={handleInputChange}
@@ -101,10 +102,10 @@ const ActivitySearch = () => {
 										Search
 									</Button>
 								</div>
-							</Form.Group>
-						</Col>
-					</Row>
-				</Form>
+							</div>
+						</div>
+					</div>
+				</div>
 
 				{isLoading ? (
 					<p className="mt-4">Finding availble activities....</p>
@@ -114,7 +115,59 @@ const ActivitySearch = () => {
 					<p className="mt-4">No activities available for the selected dates and activity type.</p>
 				)}
 				{errorMessage && <p className="text-danger">{errorMessage}</p>}
-			</Container>
+			</Container> */}
+
+			<div  >
+				<div className='flex  items-center justify-center' onSubmit={handleSearch}>
+					<div className="category grid grid-cols-2 bg-yellow-400 gap-2 w-[90vw] absolute h-[12rem] rounded-lg  items-center justify-around">
+
+						<div className="flex justify-center items-center  h-full w-full ">
+								<div className="">
+								<div className="text-xl text-center text-white">Check-in Date:</div>
+								<input
+									className="rounded-l-lg text-center border-0 right-0 w-full h-16 md:w-72"
+									type="date"
+									name="checkInDate"
+									value={searchQuery.checkInDate}
+									onChange={handleInputChange}
+									min={moment().format("YYYY-MM-DD")}
+								/>
+								</div>
+								
+								<div >
+									<div className="text-xl text-center text-white">Check-out Date:</div>
+									<input
+										className="rounded-r-lg text-center border-0 left-0 w-full h-16 md:w-64"
+										type="date"
+										name="checkOutDate"
+										value={searchQuery.checkOutDate}
+										onChange={handleInputChange}
+										min={moment().format("YYYY-MM-DD")}
+									/>
+								</div>
+						</div>
+
+						<div className="flex justify-center items-center gap-2 h-full w-full ">
+							<div >
+								<div className="text-xl text-center text-white">Activity Type</div>
+								<SearchActivityTypeSelector handleActivityInputChange={handleInputChange}
+									newActivity={searchQuery} />
+
+							</div>
+							<div className=" ">
+							<div className="text-xl text-yellow-400">clear</div>
+							<Button type="submit" className="bg-red-200 rounded-lg  border-0 left-0 h-16 w-24">
+								Clear
+							</Button>
+						</div>
+						</div>
+						
+
+
+
+					</div>
+				</div>
+			</div>
 		</>
 	)
 }
