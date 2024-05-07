@@ -20,8 +20,8 @@ const Card = ({ key, activity }: CardProps) => {
         <div className="block rounded-3xl z-100  mt-12 p-1 ml-4 ">
             <div className="">
                 <img className="rounded-xl sm:m-h-64 md:h-64 w-full"
-                    src={`data:image/png;base64,${photo as string}`}
-                    alt="" />
+                    src={photo as string ?? "https://res.cloudinary.com/do0rdj8oj/image/upload/v1715010623/cacb1fe8-0e99-41e8-a044-5518d5af2f48.jpg"}
+                    alt={title + description} />
 
             </div>
 
@@ -41,7 +41,7 @@ const Card = ({ key, activity }: CardProps) => {
                     </h5> */}
                 </div>
                 <p className="mb-1 text-md text-neutral-600 dark:text-neutral-200">
-                    {(description ?? 'No description').substring(0, 60) + (description.length > 200 ? '...' : '')}
+                    {(description ?? 'No description').substring(0, 100) + (description.length > 100 ? '...' : '')}
                 </p>
                 {/* <p className="mb-1 text-sm text-neutral-600 dark:text-neutral-200">
                     Added X weeks ago

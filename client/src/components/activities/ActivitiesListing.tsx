@@ -10,7 +10,7 @@ const ActivitiesListing: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [activitiesPerPage] = useState<number>(6);
+    const [activitiesPerPage] = useState<number>(30);
     const [filteredData, setFilteredData] = useState<ActivityResponse[]>([]);
     
 
