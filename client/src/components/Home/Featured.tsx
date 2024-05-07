@@ -7,22 +7,22 @@ import Skeleton from "@mui/material/Skeleton";
 
 const Featured = () => {
     const [data, setData] = useState<ActivityResponse[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    // const [error, setError] = useState<string | null>(null);
+    // const [isLoading, setIsLoading] = useState<boolean>(false);
     const [filteredData, setFilteredData] = useState<ActivityResponse[]>([]);
 
     console.log(data)
     useEffect(() => {
-        setIsLoading(true);
         getAllActivities()
             .then((data: ActivityResponse[]) => {
                 setData(data);
                 setFilteredData(data);
-                setIsLoading(false);
+                // setIsLoading(false);
             })
             .catch((error: Error) => {
-                setError(error.message);
-                setIsLoading(false);
+                // setError(error.message);
+                // setIsLoading(false);
+                return error;
             });
     }, []);
 

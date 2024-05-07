@@ -15,6 +15,8 @@ const ActivitiesListing: React.FC = () => {
     const [activitiesPerPage] = useState<number>(30);
     const [filteredData, setFilteredData] = useState<ActivityResponse[]>([]);
 
+    console.log(error, isLoading);
+
 
     useEffect(() => {
         setIsLoading(true);
