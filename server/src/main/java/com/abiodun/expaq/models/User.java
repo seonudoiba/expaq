@@ -33,7 +33,7 @@ public class User {
     private Collection<Role> roles = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy="hostName", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Activity> activities = new ArrayList<Activity>();
+    @OneToMany(mappedBy="host", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Activity> activities = new ArrayList<>();
 
 }

@@ -1,5 +1,6 @@
 package com.abiodun.expaq.models;
 
+import com.abiodun.expaq.security.user.ExpaqUserDetails;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -19,13 +20,16 @@ public class Activity {
     private Long id;
     private String title;
     private String description;
-    private String location;
     private int capacity;
     private String activityType;
     private BigDecimal price;
     private boolean isBooked = false;
     private String photo;
-    private String hostName;
+    private boolean isFeatured = false;
+    private String address;
+    private String city;
+    private String country;
+
 
     @OneToMany(mappedBy="activity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BookedActivity> bookings;
@@ -35,7 +39,7 @@ public class Activity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true)
-    private User user;// Reference to the User entity
+    private User host;// Reference to the User entity
 
 
     public void addBooking(BookedActivity booking) {
@@ -45,33 +49,4 @@ public class Activity {
         String bookingCode = RandomStringUtils.randomNumeric(10);
         booking.setBookingConfirmationCode(bookingCode);
     }
-//    public void addUser(User user) {
-//        users.add(user);
-//        user.setActivity(this);
-//        if (user != null) {
-//            if (user.getFirstName() != null && user.getLastName() != null) {
-//                this.hostName = user.getFirstName() + " " + user.getLastName();
-//            }
-//        }
-//    }
-
-//    public Activity(User user) {
-//        if (user != null) {
-//            this.user = user;
-//            if (user.getFirstName() != null && user.getLastName() != null) {
-//                this.hostName = user.getFirstName() + " " + user.getLastName();
-//            }
-//        }
-//    }
-//
-//    @PostLoad
-//    private void populateHostName() {
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (principal instanceof User currentUser) {
-//            if (currentUser.getFirstName() != null && currentUser.getLastName() != null) {
-//                this.hostName = currentUser.getFirstName() + " " + currentUser.getLastName();
-//            }
-//            this.user = currentUser; // Set the user field to the currently logged-in user
-//        }
-//    }
 }

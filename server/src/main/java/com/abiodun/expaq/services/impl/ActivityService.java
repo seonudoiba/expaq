@@ -2,32 +2,24 @@ package com.abiodun.expaq.services.impl;
 
 import com.abiodun.expaq.exception.InternalServerException;
 import com.abiodun.expaq.models.Activity;
+import com.abiodun.expaq.models.BookedActivity;
 import com.abiodun.expaq.models.User;
 import com.abiodun.expaq.repository.ActivityRepository;
-import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.security.user.ExpaqUserDetails;
 import com.abiodun.expaq.services.IActivityService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hibernate.query.sqm.tree.SqmNode.log;
 
@@ -35,33 +27,40 @@ import static org.hibernate.query.sqm.tree.SqmNode.log;
 @RequiredArgsConstructor
 public class ActivityService implements IActivityService {
     private  final ActivityRepository activityRepository;
-       private  final UserRepository userRepository;
-    private final DataSource dataSource;
     private final Cloudinary cloudinary;
 
     @Override
     public List<Activity> getAllActivities() {
         return activityRepository.findAll();
     }
+
+
+
     @Override
     public List<String> getAllActivityTypes() {
         return activityRepository.findDistinctActivityTypes();
     }
-    public Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price,
-                                   String title, String description, ExpaqUserDetails user) throws SQLException, IOException {
-        Long userId = user.getId(); // Get the ID of the signed-in user
-        User currentUser = userRepository.findById(userId).orElseThrow();
 
+    @Override
+    public Activity addNewActivity(MultipartFile photo, String activityType, BigDecimal price,
+                                   String title, String description, ExpaqUserDetails user, String address,
+                                   String city, String country, int capacity) throws SQLException, IOException {
         Activity activity = new Activity();
         activity.setActivityType(activityType);
         activity.setPrice(price);
         activity.setDescription(description);
         activity.setTitle(title);
-        activity.setHostName(currentUser.getFirstName() + " " + currentUser.getLastName());
-
+        activity.setAddress(address);
+        activity.setCity(city);
+        activity.setCountry(country);
+        activity.setCapacity(capacity);
+        if(!user.isEnabled() & !user.isAccountNonExpired() & !user.isAccountNonLocked() & !user.isCredentialsNonExpired()){
+            User currentUser = convertToUser(user);
+            activity.setHost(currentUser);
+        }
         if (!photo.isEmpty()){
             try {
-                if (!photo.getContentType().startsWith("image/")) {
+                if (!Objects.requireNonNull(photo.getContentType()).startsWith("image/")) {
                     throw new IOException("Only image files are allowed");
                 }
                 if (photo.getSize() > 10485760) { // 10MB
@@ -85,6 +84,12 @@ public class ActivityService implements IActivityService {
         return Optional.of(activityRepository.findById(activityId).get());
     }
     @Override
+    public List<Activity> getAllActivitiesByUserId(Long userId) {
+        return activityRepository.findByHost_Id(userId);
+    }
+
+
+    @Override
     public List<Activity> getAvailableActivities(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
         return activityRepository.findAvailableActivitiesByDatesAndType(checkInDate, checkOutDate, roomType);
     }
@@ -96,16 +101,13 @@ public class ActivityService implements IActivityService {
         }
     }
 
-
-
     @Override
-    public Activity updateActivity(Long activityId, String activityType, BigDecimal price, MultipartFile photo, String title, String description, User currentUser) throws SQLException, IOException {
+    public Activity updateActivity(Long activityId, String activityType, BigDecimal price, MultipartFile photo, String title,
+                                   String description, ExpaqUserDetails currentUser, String address, String city, String country,
+                                   int capacity) throws SQLException, IOException {
         Optional<Activity> activityOptional = activityRepository.findById(activityId);
         if (activityOptional.isPresent()) {
             Activity activity = activityOptional.get();
-            if (!activity.getUser().getId().equals(currentUser.getId())) {
-                throw new AccessDeniedException("You are not authorized to update this activity");
-            }
             if (activityType != null) activity.setActivityType(activityType);
             if (price != null) activity.setPrice(price);
             if (title != null) activity.setTitle(title);
@@ -127,5 +129,11 @@ public class ActivityService implements IActivityService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found");
         }
     }
-
+    private User convertToUser(ExpaqUserDetails currentUser) {
+        User user = new User();
+        user.setId(currentUser.getId());
+        user.setEmail(currentUser.getUsername());
+        user.setPassword(currentUser.getPassword());
+        return user;
+    }
 }

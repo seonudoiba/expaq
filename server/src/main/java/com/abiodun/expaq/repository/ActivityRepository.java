@@ -2,6 +2,7 @@ package com.abiodun.expaq.repository;
 
 import com.abiodun.expaq.dto.response.ActivityResponse;
 import com.abiodun.expaq.models.Activity;
+import com.abiodun.expaq.models.BookedActivity;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,8 @@ import java.util.List;
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
     @Query("SELECT DISTINCT r.activityType FROM Activity r")
     List<String> findDistinctActivityTypes();
-
+//    List<Activity> findByUserId(Long userId);
+    List<Activity> findByHost_Id(Long userId);
 //    @EntityGraph(attributePaths = {"title", "description", "location", "capacity", "activityType", "price", "photo", "isBooked", "hostName.id", "hostName.firstName", "hostName.lastName", "hostName.email"})
 //    @Query("SELECT a FROM Activity a") // Use a custom query
 //    List<Activity> findAllActivities();
