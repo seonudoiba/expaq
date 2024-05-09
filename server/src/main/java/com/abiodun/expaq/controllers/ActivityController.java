@@ -48,7 +48,7 @@ public class ActivityController {
 
         return ResponseEntity.ok(activityResponses);
     }
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<ActivityResponse>> getAllHostActivities(@PathVariable Long userId) throws SQLException {
         List<Activity> activities = activityService.getAllActivitiesByUserId(userId);
         List<ActivityResponse> activityResponses = new ArrayList<>();
