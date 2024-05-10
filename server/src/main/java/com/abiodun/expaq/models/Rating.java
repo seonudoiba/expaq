@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.net.ssl.SSLSession;
+
 @Entity
 @Getter
 @Setter
@@ -22,5 +24,10 @@ public class Rating {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id", nullable = false)
     private Activity activity;
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
 }
 

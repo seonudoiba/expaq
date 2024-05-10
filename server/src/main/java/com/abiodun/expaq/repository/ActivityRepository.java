@@ -16,8 +16,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByHost_Id(Long userId);
     List<Activity> findByIsFeaturedTrue();
 
-//    @Query("SELECT a FROM Activity a WHERE a.is_featured = true")
-//    List<Activity> findFeaturedActivities();
 
     @Query(" SELECT r FROM Activity r " +
             " WHERE r.activityType LIKE %:activityType% " +

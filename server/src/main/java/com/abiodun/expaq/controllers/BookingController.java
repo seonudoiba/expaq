@@ -24,7 +24,6 @@ public class BookingController {
     private final IBookingService bookingService;
     private final IActivityService activityService;
 
-
     @GetMapping("/all-bookings")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<BookingResponse>> getAllBookings(){

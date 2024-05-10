@@ -1,19 +1,29 @@
 package com.abiodun.expaq.services.impl;
 
+import com.abiodun.expaq.exception.InternalServerException;
 import com.abiodun.expaq.exception.UserAlreadyExistsException;
+import com.abiodun.expaq.models.Activity;
 import com.abiodun.expaq.models.Role;
 import com.abiodun.expaq.models.User;
 import com.abiodun.expaq.repository.RoleRepository;
 import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.services.IUserService;
+import com.cloudinary.utils.ObjectUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.hibernate.query.sqm.tree.SqmNode.log;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +44,20 @@ public class UserService implements IUserService {
         return userRepository.save(user);
     }
 
+    @Override
+    public User updateUserHostStatus(Long userId, String hostStatus) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setHostStatus(hostStatus);
+            return userRepository.save(user);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+    }
+    public List<User> findPendingHosts() {
+        return userRepository.findByHostStatusEquals("pending");
+    }
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();

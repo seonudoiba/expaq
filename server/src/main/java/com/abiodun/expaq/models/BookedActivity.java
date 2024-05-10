@@ -31,13 +31,7 @@ public class BookedActivity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id")
     private Activity activity;
-
-
-//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    @JoinTable(name = "booked_activity_mapping",
-//            joinColumns = @JoinColumn(name = "booked_activity_id"),
-//            inverseJoinColumns = @JoinColumn(name = "activity_id"))
-//    private List<Activity> activities;
+    
 
     public void calculateTotalGuest() {
         this.totalNumOfGuest = this.numOfAdults + this.numOfChildren;
@@ -53,4 +47,11 @@ public class BookedActivity {
         calculateTotalGuest();
     }
 
+    public void setBookingConfirmationCode(String bookingConfirmationCode) {
+        this.bookingConfirmationCode = bookingConfirmationCode;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
 }

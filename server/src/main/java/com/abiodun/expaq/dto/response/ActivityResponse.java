@@ -60,7 +60,4 @@ public class ActivityResponse {
         this.activityType = activityType;
         this.price = price;
     }
-
-    public ActivityResponse(Long id, String title, String description, String address, int capacity, String activityType, BigDecimal price, boolean booked, boolean featured, String photo, List<BookingResponse> bookingInfo, User host) {
-    }
 }

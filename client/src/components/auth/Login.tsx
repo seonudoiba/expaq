@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 // import { useAuth } from "./AuthProvider";
 import Success from "../Toasts/Success";
 import { jwtDecode } from "jwt-decode";
+import { GoogleLogin } from "@react-oauth/google";
 
 
 interface LoginState {
@@ -42,10 +43,10 @@ const Login: React.FC = () => {
       localStorage.setItem("userId", decodedUser.sub || "");
       if (decodedUser.roles && decodedUser.roles.length > 0) {
         localStorage.setItem("userRole", decodedUser.roles.join(","));
-      }      localStorage.setItem("token", token);
+      } localStorage.setItem("token", token);
       navigate(redirectUrl, { replace: true });
       setIsLoggedin(true);
-      
+
     } else {
       setErrorMessage("Invalid username or password. Please try again.");
     }
@@ -56,7 +57,7 @@ const Login: React.FC = () => {
 
   return (
     <section className="bg-gray-50 pt-12 dark:bg-gray-900">
-    
+
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           {errorMessage && <p className="alert alert-danger">{errorMessage}</p>}
@@ -115,6 +116,14 @@ const Login: React.FC = () => {
               >
                 Sign in
               </button>
+              <GoogleLogin
+                onSuccess={credentialResponse => {
+                  console.log(credentialResponse);
+                }}
+                onError={() => {
+                  console.log('Login Failed');
+                }}
+              />;
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Don’t have an account yet? <Link to={"/register"} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</Link>
               </p>

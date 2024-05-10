@@ -12,7 +12,6 @@ interface Registration {
 	password: string;
 }
 const baseURL: string = import.meta.env.VITE_API_BASE_URL || '';
-console.log("hello", baseURL)
 
 export const api = axios.create({
   baseURL,

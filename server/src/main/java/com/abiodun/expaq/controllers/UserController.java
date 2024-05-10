@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final IUserService userService;
-
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> getUsers(){
@@ -36,6 +35,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching user");
         }
     }
+    @PatchMapping("/update/{userId}/host-status")
+    public User updateHostStatus(@PathVariable Long userId, @RequestBody String hostStatus) {
+        return userService.updateUserHostStatus(userId, hostStatus);
+    }
+    @GetMapping("/pending-hosts")
+    public List<User> findPendingHosts() {
+        return userService.findPendingHosts();
+    }
+
     @DeleteMapping("/delete/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and #email == principal.username)")
     public ResponseEntity<String> deleteUser(@PathVariable("userId") String email){

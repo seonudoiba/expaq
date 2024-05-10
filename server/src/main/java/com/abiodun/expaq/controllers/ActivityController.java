@@ -30,12 +30,11 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/activities")
+@RequiredArgsConstructor
 public class ActivityController {
     private  final IActivityService activityService;
     private  final BookingService bookingService;
-
     @GetMapping("/")
     public ResponseEntity<List<ActivityResponse>> getAllActivities() throws SQLException {
         List<Activity> activities = activityService.getAllActivities();
