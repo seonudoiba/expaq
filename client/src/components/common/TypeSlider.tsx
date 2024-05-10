@@ -31,10 +31,6 @@ const TypeSlider = () => {
           },
         }}
         freeMode={true}
-        pagination={{
-          clickable: true,
-        }}
-        modules={[FreeMode, Pagination]}
         className="max-w-[90%] lg:max-w-[80%]"
         loop={true}
         autoplay={{
@@ -45,7 +41,7 @@ const TypeSlider = () => {
           dynamicBullets: true,
         }}
         navigation={true}
-        modules={[Autoplay, Pagination, Navigation]}
+        modules={[FreeMode, Autoplay, Pagination, Navigation]}
       >
         {TypesData.map((item) => (
           <SwiperSlide key={item.title}>

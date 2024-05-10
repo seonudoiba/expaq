@@ -1,17 +1,14 @@
 // import { useState } from 'react'
-import React, { useEffect, useState } from 'react'
-import { GrMail } from 'react-icons/gr'
-import { IoIosCall } from 'react-icons/io'
-import { MdOutlineKeyboardArrowDown } from 'react-icons/md'
-import { FaLinkedinIn, FaFacebookF, FaUser, FaLock, FaList } from 'react-icons/fa'
-import { AiOutlineTwitter, AiFillGithub, AiFillHeart, AiFillShopping } from 'react-icons/ai'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+
+import { FaLock, FaList } from 'react-icons/fa'
+// import { AiOutlineTwitter, AiFillGithub, AiFillHeart, AiFillShopping } from 'react-icons/ai'
+import { Link, useLocation } from 'react-router-dom'
 import Logout from '../auth/Logout'
 // import { useSelector, useDispatch } from 'react-redux'
 // import { get_card_products, get_wishlist_products } from '../store/reducers/cardReducer'
 
 const Header = () => {
-
     const location = useLocation();
     const pathname = location.pathname;
     // const dispatch = useDispatch()
@@ -21,9 +18,9 @@ const Header = () => {
     // const { card_product_count, wishlist_count } = useSelector(state => state.card)
 
     const [showShidebar, setShowShidebar] = useState(true);
-    const [categoryShow, setCategoryShow] = useState(true)
-    const [searchValue, setSearchValue] = useState('')
-    const [category, setCategory] = useState('')
+    // const [categoryShow, setCategoryShow] = useState(true)
+    // const [searchValue, setSearchValue] = useState('')
+    // const [category, setCategory] = useState('')
 
     // const search = () => {
     //     navigate(`/products/search?category=${category}&&value=${searchValue}`)
@@ -66,7 +63,7 @@ const Header = () => {
         setUserInfo({ userId, userRole });
     }, [userInfo.userId, userInfo.userRole]);
 
-    console.log(userInfo);
+    console.log(showShidebar);
     return (
         <header>
             <nav className="fixed overflow-hidden z-20 w-full bg-white dark:bg-gray-950/75 dark:shadow-md rounded-b-lg dark:shadow-gray-950/10 border-b border-[--ui-light-border-color] border-x dark:border-[--ui-dark-border-color] backdrop-blur">
