@@ -1,5 +1,6 @@
 
 import ActivitySearch from '../common/ActivitySearch'
+import TypeSlider from '../common/TypeSlider'
 // import ActivityTypes from '../Home/ActivityTypes'
 import Featured from '../Home/Featured'
 import Hero from '../Home/Hero'
@@ -12,6 +13,7 @@ const Home = () => {
         <Hero/>
         <ActivitySearch/>
       {/* <ActivityTypes /> */}
+      <TypeSlider/>
       <TypesCarousel/>
       <Featured />
       {/* <HowItWorks /> */}
