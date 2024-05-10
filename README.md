@@ -120,3 +120,15 @@ Expaq is a web-based platform designed to facilitate cultural exchange experienc
 - Expand the platform to support offline cultural exchange events and workshops.
 - Partner with travel influencers and cultural organizations to promote the platform globally.
 - Partnering with cultural organizations and tourism boards to expand activity offerings.
+
+## 11. Here are 10 cultural exchange types:
+-Homestay: Live with a local family and experience daily life and traditions.
+-Language Exchange: Practice a new language with a native speaker and teach your own language in return.
+-Cooking Classes: Learn traditional cuisine and cooking techniques from a local chef or host.
+-Artisan Workshops: Learn traditional crafts and skills from local artisans.
+-Music and Dance: Learn traditional music and dance from local musicians and dancers.
+-Festival and Event Participation: Join local festivals and events to experience cultural celebrations.
+-Volunteer Work: Volunteer for local projects and causes to give back to the community.
+-Cultural Immersion Programs: Participate in programs that immerse you in local culture, such as internships or research projects.
+-Food Tours: Explore local cuisine and restaurants with a guided tour.
+-Traditional Ceremony Participation: Participate in traditional ceremonies and rituals, such as weddings or coming-of-age ceremonies.
