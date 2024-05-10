@@ -46,7 +46,7 @@ public class SwaggerConfig {
                         .version("1.0")
                 )
                 .tags(List.of(
-                        new Tag().name("Experiences").description("Endpoints for managing cultural exchange experiences"),
+                        new Tag().name("Activities").description("Endpoints for managing cultural exchange Experiences and Activities"),
                         new Tag().name("Users").description("Endpoints for managing users and authentication"),
                         new Tag().name("Ratings").description("Endpoints for managing ratings"),
                         new Tag().name("Bookings").description("Endpoints for managing bookings"),
