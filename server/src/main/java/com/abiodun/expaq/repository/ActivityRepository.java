@@ -13,11 +13,11 @@ import java.util.List;
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
     @Query("SELECT DISTINCT r.activityType FROM Activity r")
     List<String> findDistinctActivityTypes();
-//    List<Activity> findByUserId(Long userId);
     List<Activity> findByHost_Id(Long userId);
-//    @EntityGraph(attributePaths = {"title", "description", "location", "capacity", "activityType", "price", "photo", "isBooked", "hostName.id", "hostName.firstName", "hostName.lastName", "hostName.email"})
-//    @Query("SELECT a FROM Activity a") // Use a custom query
-//    List<Activity> findAllActivities();
+    List<Activity> findByIsFeaturedTrue();
+
+//    @Query("SELECT a FROM Activity a WHERE a.is_featured = true")
+//    List<Activity> findFeaturedActivities();
 
     @Query(" SELECT r FROM Activity r " +
             " WHERE r.activityType LIKE %:activityType% " +

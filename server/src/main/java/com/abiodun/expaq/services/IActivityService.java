@@ -23,6 +23,7 @@ public interface IActivityService {
 
     Optional<Activity> getActivityById(Long activityId);
     List<Activity> getAllActivitiesByUserId(Long userId);
+    List<Activity> getFeaturedActivities();
 
     void deleteActivity(Long activityId);
 

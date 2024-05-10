@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ActivityResponse } from "../../types/activity";
-import { getAllActivities } from "../../utils/apiFunctions";
+import { getFeaturedActivities } from "../../utils/apiFunctions";
 import Card from "../common/Card";
 import Stack from '@mui/material/Stack';
 import Skeleton from "@mui/material/Skeleton";
@@ -13,7 +13,7 @@ const Featured = () => {
 
     console.log(data)
     useEffect(() => {
-        getAllActivities()
+        getFeaturedActivities()
             .then((data: ActivityResponse[]) => {
                 setData(data);
                 setFilteredData(data);

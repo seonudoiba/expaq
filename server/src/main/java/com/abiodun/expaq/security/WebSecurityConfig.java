@@ -53,13 +53,28 @@ public class WebSecurityConfig {
                         exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/activities/**","/bookings/**", "/swagger-ui/**",
-                                "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                        .requestMatchers("/auth/**", "/activities/**","/bookings/**").permitAll()
                         .requestMatchers("/roles/**").hasRole("ADMIN")
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .anyRequest().authenticated())
                 .userDetailsService(userDetailsService); // Add this line
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+    private static final String[] SWAGGER_WHITELIST = {
+            "/v2/api-docs",
+            "/api/v1/auth/**",
+            "/api/v3/auth/**",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/webjars/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+
+    };
 }

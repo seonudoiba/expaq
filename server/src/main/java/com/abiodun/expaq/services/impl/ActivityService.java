@@ -88,6 +88,11 @@ public class ActivityService implements IActivityService {
         return activityRepository.findByHost_Id(userId);
     }
 
+    @Override
+    public List<Activity> getFeaturedActivities() {
+        return activityRepository.findByIsFeaturedTrue();
+    }
+
 
     @Override
     public List<Activity> getAvailableActivities(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
@@ -112,6 +117,10 @@ public class ActivityService implements IActivityService {
             if (price != null) activity.setPrice(price);
             if (title != null) activity.setTitle(title);
             if (description != null) activity.setDescription(description);
+            if (address != null) activity.setAddress(address);
+            if (city != null) activity.setCity(city);
+            if (country != null) activity.setCountry(country);
+            if (capacity != 0) activity.setCapacity(capacity);
             if (photo != null && !photo.isEmpty()) {
                 try {
                     String photoUrl = cloudinary.uploader()

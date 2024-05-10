@@ -73,6 +73,16 @@ public class ActivityController {
             return  ResponseEntity.ok(Optional.of(activityResponse));
         }).orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
     }
+    @GetMapping("/featured")
+    public ResponseEntity<List<ActivityResponse>> getFeaturedActivities() throws SQLException {
+        List<Activity> featuredActivities = activityService.getFeaturedActivities();
+        List<ActivityResponse> activityResponses = new ArrayList<>();
+        for (Activity activity : featuredActivities){
+            ActivityResponse activityResponse = getActivityResponse(activity);
+            activityResponses.add(activityResponse);
+        }
+        return ResponseEntity.ok(activityResponses);
+    }
 
     @GetMapping("/available-activities")
     public ResponseEntity<List<ActivityResponse>> getAvailableActivities(
@@ -117,14 +127,14 @@ public class ActivityController {
     public ResponseEntity<ActivityResponse> updateActivity(
             @PathVariable Long activityId,
             @RequestParam(required = false) MultipartFile photo,
-            @RequestParam(required = false)  String activityType,
+            @RequestParam(required = false) String activityType,
             @RequestParam(required = false) String title,
-            @RequestParam(required = false)  String description,
+            @RequestParam(required = false) String description,
             @RequestParam(required = false) BigDecimal price,
-            @RequestParam("country") String country,
-            @RequestParam("city") String city,
-            @RequestParam("address") String address,
-            @RequestParam("capacity") int capacity,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) int capacity,
             @AuthenticationPrincipal ExpaqUserDetails currentUser) throws SQLException, IOException {
         Optional<Activity> activityOptional = activityService.getActivityById(activityId);
         if (activityOptional.isPresent()) {

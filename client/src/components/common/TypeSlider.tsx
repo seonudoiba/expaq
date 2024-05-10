@@ -3,8 +3,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/free-mode";
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
-import { FreeMode, Pagination } from "swiper/modules";
+import { FreeMode, Autoplay, Pagination, Navigation } from 'swiper/modules';
 
 import { RxArrowTopRight } from "react-icons/rx";
 import { TypesData } from "./typesconstant";
@@ -12,7 +14,11 @@ console.log(TypesData)
 
 const TypeSlider = () => {
   return (
-    <div className="flex items-center justify-center flex-col h-[900px] bg-[#6c34af]">
+    <div className="mt-48 flex flex-col justify-center">
+ <h2 className="text-4xl text-center mb-12 font-bold">
+                    Types of Experiences and Activities
+                </h2 >
+
       <Swiper
         breakpoints={{
           340: {
@@ -30,6 +36,16 @@ const TypeSlider = () => {
         }}
         modules={[FreeMode, Pagination]}
         className="max-w-[90%] lg:max-w-[80%]"
+        loop={true}
+        autoplay={{
+          delay: 2500,
+          disableOnInteraction: false,
+        }}
+        pagination={{
+          dynamicBullets: true,
+        }}
+        navigation={true}
+        modules={[Autoplay, Pagination, Navigation]}
       >
         {TypesData.map((item) => (
           <SwiperSlide key={item.title}>

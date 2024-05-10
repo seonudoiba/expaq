@@ -68,6 +68,16 @@ export async function getAllActivities(): Promise<ActivityResponse[]> {
     throw new Error("Error fetching activities");
   }
 }
+// Function to get all activities
+export async function getFeaturedActivities(): Promise<ActivityResponse[]> {
+	try {
+	  const response = await api.get("/activities/featured");
+	  return response.data;
+	} catch (error) {
+	  console.error("Error fetching activities:", error);
+	  throw new Error("Error fetching activities");
+	}
+  }
 
 /* This function deletes a activity by the Id */
 export async function deleteActivity(activityId: string): Promise<AxiosResponse> {
