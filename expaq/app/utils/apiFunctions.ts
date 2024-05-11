@@ -11,7 +11,7 @@ interface Registration {
 	email: string;
 	password: string;
 }
-const baseURL: string = import.meta.env.VITE_API_BASE_URL || '';
+const baseURL: string = 'http://localhost:8080/';
 
 export const api = axios.create({
   baseURL,
@@ -51,11 +51,26 @@ export async function getActivityTypes(): Promise<string[]> {
   try {
     
     const response = await api.get("/activities/activity/types");
-    return response.data;
+	console.log(response.data.json())
+    return response.data.json();
+
+
   } catch (error) {
     throw new Error("Error fetching activity types");
   }
 }
+
+const getData = async () => {
+	const res = await fetch("http://localhost:3001/api/categories", {
+	  cache: "no-store",
+	});
+  
+	if (!res.ok) {
+	  throw new Error("Failed");
+	}
+  
+	return res.json();
+  };
 
 // Function to get all activities
 export async function getAllActivities(): Promise<ActivityResponse[]> {
