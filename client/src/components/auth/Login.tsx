@@ -118,12 +118,12 @@ const Login: React.FC = () => {
               </button>
               <GoogleLogin
                 onSuccess={credentialResponse => {
-                  console.log(credentialResponse);
+                  console.log("Clicked",credentialResponse);
                 }}
                 onError={() => {
                   console.log('Login Failed');
                 }}
-              />;
+              />
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Don’t have an account yet? <Link to={"/register"} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</Link>
               </p>
