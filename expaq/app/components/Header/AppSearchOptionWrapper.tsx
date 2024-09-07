@@ -1,8 +1,6 @@
-import { FC, PropsWithChildren } from 'react';
+import { IAppSearchOptionProps } from '@/app/types/Interface';
+import { FC } from 'react';
 
-interface IAppSearchOptionProps extends PropsWithChildren<any> {
-  className: string;
-}
 
 const AppSearchOptionWrapper: FC<IAppSearchOptionProps> = ({ className, children }) => {
   return (

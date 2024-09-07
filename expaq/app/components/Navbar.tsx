@@ -1,11 +1,11 @@
 'use client'
 import { FC, useEffect, useState } from 'react';
-import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
+// import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Image from 'next/image';
 import './nav.css'
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { GlobeAltIcon, MenuIcon, SearchIcon } from '@heroicons/react/outline';
+import { MenuIcon } from '@heroicons/react/outline';
 import { UserCircleIcon } from '@heroicons/react/solid';
 import {NavbarProps} from '../types/Interface'
 import AppSearchBar from './Header/AppSearchBar';
@@ -17,7 +17,6 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname()
-  
   const [isSnapTop, setIsSnapTop] = useState<boolean>(searchPage ? false : true);
   const [isActiveSearch, setIsActiveSearch] = useState<boolean>(
     searchPage ? false : true
@@ -25,6 +24,8 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
   const [activeMenu, setActiveMenu] = useState<EHeaderOpions | null>(
     EHeaderOpions.PLACES_TO_STAY
   );
+  setActiveMenu(activeMenu)
+  console.log(query, isSnapTop)
 
   const handleOnScroll = () => {
     const position = window.scrollY;
@@ -37,13 +38,13 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
     }
   };
 
-  const headerBehavior = () => {
-    let style = [];
-    if (!isSnapTop) style.push('bg-white shadow-lg');
-    if (!isActiveSearch) style.push('h-[86px] pb-5');
-    if (isActiveSearch) style.push('pb-8');
-    return style.join(' ');
-  };
+  // const headerBehavior = () => {
+  //   let style = [];
+  //   if (!isSnapTop) style.push('bg-white shadow-lg');
+  //   if (!isActiveSearch) style.push('h-[86px] pb-5');
+  //   if (isActiveSearch) style.push('pb-8');
+  //   return style.join(' ');
+  // };
 
   useEffect(() => {
     // listen to scroll
@@ -117,7 +118,7 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
 
             </li>
             {navItems.map(page => {
-              let activePage = (pathname?.startsWith(page.path) && page.path !== '/');
+              const activePage = (pathname?.startsWith(page.path) && page.path !== '/');
 
               return (
                 <li

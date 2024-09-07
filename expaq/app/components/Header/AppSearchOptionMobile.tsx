@@ -1,23 +1,25 @@
-import Image from 'next/image';
+// import Image from 'next/image';
 import { FC, useState } from 'react';
-import { useRouter } from 'next/router';
-// components
-import AppSearchOptionWrapperMobile from './AppSearchOptionWrapperMobile';
-import AppDateRange from './AppDateRange';
-import AppCounter from './AppCounter';
-// icons
-import { SearchIcon } from '@heroicons/react/outline';
-// context
-import { useDataContext } from '../../hooks/useDataContext';
-import { DATA_ACTION_TYPES } from '../../context/actionTypes';
-import { EHeaderOpions } from '../../types';
+// import { useRouter } from 'next/router';
+// // components
+// import AppSearchOptionWrapperMobile from './AppSearchOptionWrapperMobile';
+// import AppDateRange from './AppDateRange';
+// import AppCounter from './AppCounter';
+// // icons
+// import { SearchIcon } from '@heroicons/react/outline';
+// // context
+// import { useDataContext } from '../../hooks/useDataContext';
+// import { DATA_ACTION_TYPES } from '../../context/actionTypes';
+// import { EHeaderOpions } from '../../types';
 
 interface IAppSearchOptionMobileProps {
   active: boolean;
   onClose: () => void;
 }
 
-const AppSearchOptionMobile: FC<IAppSearchOptionMobileProps> = ({ active, onClose }) => {
+const AppSearchOptionMobile: FC<IAppSearchOptionMobileProps> = ({ active,
+  //  onClose 
+  }) => {
   const stepName = [
     'What are you looking for?',
     'When will you be there?',
@@ -27,7 +29,7 @@ const AppSearchOptionMobile: FC<IAppSearchOptionMobileProps> = ({ active, onClos
   // const router = useRouter();
   // data
   // const [{ location, checkIn, checkOut, guests }, dispatch] = useDataContext();
-
+setStep(step)
   return (
     <div
       className={`${

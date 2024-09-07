@@ -3,17 +3,19 @@
 import React, { FC, MouseEvent, useState } from 'react';
 import Link from 'next/link';
 // context
-import { DATA_ACTION_TYPES } from '../../context/actionTypes';
-import { useDataContext } from '../../hooks/useDataContext';
+// import { DATA_ACTION_TYPES } from '../../context/actionTypes';
+// import { useDataContext } from '../../hooks/useDataContext';
 // components
-import AppClearButtonProps from './AppClearButton';
+// import AppClearButtonProps from './AppClearButton';
 import AppNearby from './AppNearby';
 import AppSearchOptionMobile from './AppSearchOptionMobile';
 import AppMobileNavigation from './AppNavigationMobile';
 // icons
 import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from '@heroicons/react/outline';
 // typings
-import { DataContextType, IExploreNearby } from '../../types';
+import { 
+  // DataContextType,
+   IExploreNearby } from '../../types';
 
 interface IAppSearchBarMobileProps {
   exploreNearby: IExploreNearby[];

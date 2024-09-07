@@ -1,5 +1,5 @@
 import React, { FC, FocusEvent, FormEvent, useState } from 'react';
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
 // components
 import AppSearchOptionButton from './AppSearchOptionButton';
 import AppDateRange from './AppDateRange';
@@ -35,8 +35,8 @@ interface IAppSearchBarProps {
 const AppSearchBar: FC<IAppSearchBarProps> = ({
   menu,
   isActiveHeader,
-  closeSearch,
-  searchPage,
+  // closeSearch,
+  // searchPage,
 }) => {
   //   const router = useRouter();
   const [searchMenu, setSearchMenu] = useState<ESearchMenu | null>(null);
@@ -186,7 +186,7 @@ const AppSearchBar: FC<IAppSearchBarProps> = ({
                     handleOnBlur();
                   }}
                   isSearch={!!searchMenu}
-                  onSearch={() => setSearchMenu(ESearchMenu.LOCATION)}
+                  // onSearch={() => setSearchMenu(ESearchMenu.LOCATION)}
                 >
                   <AppSearchOptionWrapper className="right-0 w-96">
                     <div>

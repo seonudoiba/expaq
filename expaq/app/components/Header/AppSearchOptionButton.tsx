@@ -3,22 +3,9 @@ import React, { ChangeEvent, FC, FocusEvent, PropsWithChildren } from 'react';
 import AppClearButtonProps from './AppClearButton';
 // icons
 import { SearchIcon } from '@heroicons/react/outline';
+import { IAppSearchOptionButtonProps } from '@/app/types/Interface';
 
-interface IAppSearchOptionButtonProps extends PropsWithChildren<any> {
-  relative?: boolean;
-  withSearch?: boolean;
-  separator?: boolean;
-  isSearch?: boolean;
-  type?: string;
-  title: string;
-  placeholder: string;
-  active: boolean;
-  value: any;
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
-  onFocus: () => void;
-  onBlur: (event: FocusEvent<HTMLElement>) => void;
-  onClear: () => void;
-}
+
 
 const AppSearchOptionButton: FC<IAppSearchOptionButtonProps> = ({
   relative,
