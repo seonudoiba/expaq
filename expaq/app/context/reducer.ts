@@ -1,7 +1,7 @@
 import { DATA_ACTION_TYPES } from './actionTypes';
 import { initialState } from './store';
 
-export const dataReducer = (state, action) => {
+export const dataReducer = (state: { guests: { adults: any; children: any; infants: any; }; }, action: { type: any; payload: any; }) => {
   const { type, payload } = action;
   const { adults, children, infants } = state.guests;
   switch (type) {
