@@ -58,11 +58,11 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
   };
   console.log(isOpen, pathname)
   // Array containing navigation items
-  const navItems = [
-    { id: 2, name: 'About', path: '/about' },
-    { id: 3, name: 'Destinations', path: '/destinations' },
-    { id: 4, name: 'Activities', path: '/activities' },
-    { id: 5, name: 'Hosts', path: '/hosts' },
+  const navItems: any[] = [
+    // { id: 2, name: 'About', path: '/about' },
+    // { id: 3, name: 'Destinations', path: '/destinations' },
+    // { id: 4, name: 'Activities', path: '/activities' },
+    // { id: 5, name: 'Hosts', path: '/hosts' },
   ];
 
 
