@@ -1,12 +1,23 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import Navbar from "./components/Navbar";
+import AppHead from "./components/Header/AppHead";
 
-const inter = Inter({ subsets: ["latin"] });
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+});
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+});
 
 export const metadata: Metadata = {
   title: "Expaq",
-  description: "Activities Exchange Platform",
+  description: "Explore diverse cultural activities",
 };
 
 export default function RootLayout({
@@ -16,20 +27,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-      {/* <AuthProvider>
-          <ThemeContextProvider>
-            <ThemeProvider>
-              <div className="container">
-                <div className="wrapper"> */}
-                  {/* <Navbar /> */}
-                  {children}
-                  {/* <Footer /> */}
-                {/* </div>
-              </div>
-            </ThemeProvider>
-          </ThemeContextProvider>
-        </AuthProvider> */}
+      <AppHead />
+      <body
+      >
+
+        {/* <Navbar/> exploreNearby={exploreNearby} */}
+        <div className="bg-[url('/hero.jpg')] bg-[length:900px] md:bg-[length:100%] bg-no-repeat bg-opacity">
+          <Navbar />
+
+          {children}
+        </div>
+
       </body>
     </html>
   );
