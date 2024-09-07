@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, FocusEvent, PropsWithChildren } from 'react';
+import React, {  FC } from 'react';
 // components
 import AppClearButtonProps from './AppClearButton';
 // icons
@@ -39,7 +39,7 @@ const AppSearchOptionButton: FC<IAppSearchOptionButtonProps> = ({
         } flex flex-col flex-grow pl-7 pr-3 text-left`}
       >
         <span className="text-xs font-bold tracking-wider text-gray-500">{title}</span>
-        {type === 'inputText' ? (
+        {/* {type === 'inputText' ? (
           <input
             type="text"
             value={value}
@@ -52,16 +52,16 @@ const AppSearchOptionButton: FC<IAppSearchOptionButtonProps> = ({
           <span className="text-sm text-gray-300 truncate max-w-[105px] lg:max-w-none">
             {value || placeholder}
           </span>
-        )}
+        )} */}
       </div>
 
       {/* clear icon */}
-      <AppClearButtonProps
+      {/* <AppClearButtonProps
         onClick={onClear}
         active={value}
         isFocus={active}
         separator={separator}
-      />
+      /> */}
 
       {withSearch && (
         <button

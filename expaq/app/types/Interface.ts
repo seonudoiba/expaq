@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FocusEvent, PropsWithChildren } from 'react';
+import { ChangeEvent, FocusEvent, PropsWithChildren } from 'react';
 
 
 export interface IExploreNearby {
@@ -17,11 +17,14 @@ export   interface DataContextType {
   location: string;
 }
 
+
 export interface NavbarProps {
   exploreNearby?: IExploreNearby[];
   searchPage?: boolean;
-  query?: any;
+  query?: string;
 }
+
+
 
 export interface IExploreNearby {
   location: string;
@@ -50,12 +53,13 @@ export interface IAppSearchOptionButtonProps extends PropsWithChildren<object> {
   title: string;
   placeholder: string;
   active: boolean;
-  value: any;
+  value: string | null | Date | guestProps | number | boolean;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onFocus: () => void;
   onBlur: (event: FocusEvent<HTMLElement>) => void;
   onClear: () => void;
 }
+
 export interface IAppSearchOptionProps extends PropsWithChildren<object> {
   className: string;
 }
@@ -74,4 +78,13 @@ export interface IInitialState {
     children: number;
     infants: number;
   };
+}
+
+export interface IFormatGuestOptions {
+  noInfants?: boolean;
+}
+export interface guestProps{
+  children:number,
+  adults:number,
+  infants:number
 }

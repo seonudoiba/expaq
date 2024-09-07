@@ -1,5 +1,6 @@
 import { createContext, useReducer } from 'react';
 import { dataReducer } from './reducer';
+import { IInitialState } from '../types/Interface';
 
 
 export const initialState: IInitialState = {

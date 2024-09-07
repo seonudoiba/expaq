@@ -1,8 +1,8 @@
-interface IFormatGuestOptions {
-  noInfants?: boolean;
-}
+import { guestProps, IFormatGuestOptions } from "../types/Interface";
 
-export const formatGuests = (guests: any, options?: IFormatGuestOptions) => {
+
+
+export const formatGuests = (guests: guestProps, options?: IFormatGuestOptions) => {
   if (!guests) return false;
   const { noInfants } = options || {};
   const { children, adults, infants } = guests;
