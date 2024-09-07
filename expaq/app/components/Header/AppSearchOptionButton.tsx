@@ -1,6 +1,6 @@
 import React, {  FC } from 'react';
 // components
-import AppClearButtonProps from './AppClearButton';
+// import AppClearButtonProps from './AppClearButton';
 // icons
 import { SearchIcon } from '@heroicons/react/outline';
 import { IAppSearchOptionButtonProps } from '@/app/types/Interface';
@@ -10,18 +10,18 @@ import { IAppSearchOptionButtonProps } from '@/app/types/Interface';
 const AppSearchOptionButton: FC<IAppSearchOptionButtonProps> = ({
   relative,
   children,
-  separator,
+  // separator,
   withSearch,
   isSearch,
-  type,
+  // type,
   title,
-  placeholder,
+  // placeholder,
   active,
-  value,
-  onChange,
+  // value,
+  // onChange,
   onFocus,
   onBlur,
-  onClear,
+  // onClear,
 }) => {
   return (
     <span

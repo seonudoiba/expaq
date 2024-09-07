@@ -1,19 +1,16 @@
 import { FC, PropsWithChildren } from 'react';
 // icons
 import { ChevronLeftIcon } from '@heroicons/react/outline';
+import { IAppSearchOptionWrapperMobileProps } from '@/app/types/Interface';
 // context
-import { useDataContext } from '../../hooks/useDataContext';
+// import { useDataContext } from '../../hooks/useDataContext';
 // utils
-import { formatRangeDate, formatGuests } from '../../utils';
+// import { formatRangeDate, formatGuests } from '../../utils';
 
-interface IAppSearchOptionWrapperMobileProps extends PropsWithChildren<any> {
-  title: string;
-  handleOnBack: () => void;
-  haveNavigation: boolean;
-}
+
 
 const AppSearchOptionWrapperMobile: FC<IAppSearchOptionWrapperMobileProps> = ({
-  title,
+  // title,
   children,
   handleOnBack,
   haveNavigation,

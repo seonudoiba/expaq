@@ -14,8 +14,8 @@ export const initialState: IInitialState = {
 
 interface IDataContext {
   state: IInitialState;
-  dispatch: (args: any) => void;
-}
+  // dispatch: (args: any) => void;
+  dispatch: (args: unknown) => void;}
 
 export const DataContext = createContext<IDataContext>({ state: initialState, dispatch: () => {} });
 
