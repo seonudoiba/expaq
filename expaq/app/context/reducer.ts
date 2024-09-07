@@ -9,16 +9,37 @@ export const dataReducer = (state: IInitialState, action: { type: string; payloa
   const { adults, children, infants } = state.guests;
   switch (type) {
     case DATA_ACTION_TYPES.SET_LOCATION:
-      return { ...state, location: payload };
+      if (payload instanceof Date || payload === null) {
+        return { ...state, checkIn: payload };
+      } else {
+        throw new Error('Invalid payload type for SET_CHECK_IN action');
+      }
+    // case DATA_ACTION_TYPES.SET_CHECK_IN:
+    //   return { ...state, checkIn: payload };
 
-    case DATA_ACTION_TYPES.SET_CHECK_IN:
-      return { ...state, checkIn: payload };
-
-    case DATA_ACTION_TYPES.SET_CHECK_OUT:
-      return { ...state, checkOut: payload };
+    // case DATA_ACTION_TYPES.SET_CHECK_OUT:
+    //   return { ...state, checkOut: payload };
 
     case DATA_ACTION_TYPES.SET_GUESTS:
-      return { ...state, guests: payload };
+      if (payload instanceof Date || payload === null) {
+        return { ...state, checkIn: payload };
+      } else {
+        throw new Error('Invalid payload type for SET_CHECK_IN action');
+      }
+
+      case DATA_ACTION_TYPES.SET_CHECK_IN:
+  if (payload instanceof Date || payload === null) {
+    return { ...state, checkIn: payload };
+  } else {
+    throw new Error('Invalid payload type for SET_CHECK_IN action');
+  }
+
+case DATA_ACTION_TYPES.SET_CHECK_OUT:
+  if (payload instanceof Date || payload === null) {
+    return { ...state, checkOut: payload };
+  } else {
+    throw new Error('Invalid payload type for SET_CHECK_OUT action');
+  }
 
     case DATA_ACTION_TYPES.RESET_DATES:
       return { ...state, checkOut: null, checkIn: null };
