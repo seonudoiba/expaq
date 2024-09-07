@@ -58,12 +58,12 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
   };
   console.log(isOpen, pathname)
   // Array containing navigation items
-  // const navItems = [
-  //   { id: 2, name: 'About', path: '/about' },
-  //   { id: 3, name: 'Destinations', path: '/destinations' },
-  //   { id: 4, name: 'Activities', path: '/activities' },
-  //   { id: 5, name: 'Hosts', path: '/hosts' },
-  // ];
+  const navItems = [
+    { id: 2, name: 'About', path: '/about' },
+    { id: 3, name: 'Destinations', path: '/destinations' },
+    { id: 4, name: 'Activities', path: '/activities' },
+    { id: 5, name: 'Hosts', path: '/hosts' },
+  ];
 
 
 
@@ -117,18 +117,7 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
                 className={`${(pathname == '/') && 'text-secondary border-b-2 border-secondary '}' hover:text-secondary block  transition-all'`}>Home</Link>
 
             </li>
-
-                <li
-                className= 'max-lg:border-b '
-                // max-lg:py-3 px-3
-                >
-                  <Link href={'/'}
-                    className={` 'text-secondary border-b-2 border-secondary  '} ' hover:text-secondary 
-                    block  transition-all'`}>page</Link>
-
-                </li>
-
-            {/* {navItems.map(page => {
+            {navItems.map(page => {
               const activePage = (pathname?.startsWith(page.path) && page.path !== '/');
 
               return (
@@ -144,7 +133,7 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
                 </li>
               )
 
-            })} */}
+            })}
           </ul>
         </div>
 
