@@ -15,7 +15,7 @@ const AppHeaderOption: FC<IAppHeaderOptionProps> = ({
   onClick,
 }) => {
   const headerMenuBehavior = () => {
-    let style = [];
+    const style = [];
     if (isSnap) style.push('text-white after:bg-white');
     if (!isSnap) style.push('text-gray-500 after:bg-gray-500');
     if (isActiveHeader) style.push('inline-block');
