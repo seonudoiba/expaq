@@ -9,7 +9,8 @@ interface IAppDateRangeProps {
 }
 
 const AppDateRange: FC<IAppDateRangeProps> = ({ months }) => {
-  const [{ checkIn, checkOut }, dispatch] = useDataContext();
+  const {state, dispatch} = useDataContext();
+  const { checkIn, checkOut } = state
 
   const selectionRange = {
     startDate: checkIn,
@@ -17,7 +18,7 @@ const AppDateRange: FC<IAppDateRangeProps> = ({ months }) => {
     key: 'selection',
   };
 
-  const handleDatePicker = (range) => {
+  const handleDatePicker = (range: { selection: { startDate: any; endDate: any; }; }) => {
     const { startDate, endDate } = range.selection;
     dispatch({ type: DATA_ACTION_TYPES.SET_CHECK_IN, payload: startDate });
     dispatch({ type: DATA_ACTION_TYPES.SET_CHECK_OUT, payload: endDate });
@@ -26,8 +27,8 @@ const AppDateRange: FC<IAppDateRangeProps> = ({ months }) => {
   return (
     <div className="md:py-4 rounded-3xl">
       <DateRange
-        ranges={[selectionRange]}
-        onChange={handleDatePicker}
+        // ranges={[selectionRange]}
+        // onChange={handleDatePicker}
         months={months || 2}
         direction="horizontal"
         showMonthAndYearPickers={false}
