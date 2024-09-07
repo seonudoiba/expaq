@@ -1,6 +1,8 @@
 import { FC, PropsWithChildren } from 'react';
 
-interface IAppHeaderOptionProps extends PropsWithChildren<any> {
+
+
+interface IAppHeaderOptionProps extends PropsWithChildren<{}> {
   active?: boolean;
   isSnap?: boolean;
   isActiveHeader?: boolean;
