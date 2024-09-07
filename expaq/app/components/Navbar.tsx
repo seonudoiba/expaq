@@ -1,5 +1,5 @@
 'use client'
-import { FC, useState } from 'react';
+import { FC, Suspense, useState } from 'react';
 // import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Image from 'next/image';
 import './nav.css'
@@ -8,51 +8,16 @@ import { usePathname } from 'next/navigation';
 import { MenuIcon } from '@heroicons/react/outline';
 import { UserCircleIcon } from '@heroicons/react/solid';
 import {NavbarProps} from '../types/Interface'
-import AppSearchBar from './Header/AppSearchBar';
-import AppSearchBarMobile from './Header/AppSearchBarMobile';
-import { EHeaderOpions } from '../types/Enums';
+
+import Search from './Search';
 
 
 const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname()
-  // const [isSnapTop, setIsSnapTop] = useState<boolean>(searchPage ? false : true);
-  // const [isActiveSearch, setIsActiveSearch] = useState<boolean>(
-  //   searchPage ? false : true
-  // );
-  const [activeMenu, setActiveMenu] = useState<EHeaderOpions | null>(
-    EHeaderOpions.PLACES_TO_STAY
-  );
-  setActiveMenu(activeMenu)
-  console.log(query)
 
-  // const handleOnScroll = () => {
-  //   const position = window.scrollY;
-  //   if (position >= 50) {
-  //     setIsSnapTop(false);
-  //     setIsActiveSearch(false);
-  //   } else {
-  //     setIsSnapTop(true);
-  //     setIsActiveSearch(true);
-  //   }
-  // };
 
-  // const headerBehavior = () => {
-  //   let style = [];
-  //   if (!isSnapTop) style.push('bg-white shadow-lg');
-  //   if (!isActiveSearch) style.push('h-[86px] pb-5');
-  //   if (isActiveSearch) style.push('pb-8');
-  //   return style.join(' ');
-  // };
-
-  // useEffect(() => {
-  //   // listen to scroll
-  //   if (!searchPage) {
-  //     window.addEventListener('scroll', handleOnScroll);
-  //   }
-  //   return () => window.removeEventListener('scroll', handleOnScroll);
-  // }, [searchPage]);
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
@@ -64,8 +29,6 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
     { id: 4, name: 'Activities', path: '/activities' },
     { id: 5, name: 'Hosts', path: '/hosts' },
   ];
-
-
 
   return (
     
@@ -97,18 +60,7 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
               </Link>
 
             </li>
-            {/* search Navigation */}
-            {/* <li className='hidden md:flex'>
-              <div className="flex px-3 py-2 rounded-xl search border-primary overflow-hidden max-w-md mx-auto font-[sans-serif]">
-                <input type="email" placeholder="Search Activities..."
-                  className="w-full outline-none bg-transparent text-gray-600 text-sm" />
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px" className="fill-gray-600">
-                  <path
-                    d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
-                  </path>
-                </svg>
-              </div>
-            </li> */}
+          
 
             <li
             className= 'max-lg:border-b'
@@ -140,15 +92,6 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
         <div className='flex ml-auto'>
           {/* <button className='px-6 py-2 rounded-xl text-white bg-primary transition-all hover:text-secondary'>Login</button> */}
           <div className="flex items-center justify-end gap-2 ">
-            {/* <Link href="/"
-                className={`${
-                  isSnapTop
-                    ? 'text-white hover:bg-white hover:bg-opacity-10'
-                    : 'text-gray-500 hover:bg-gray-100 '
-                } flex items-center h-10 px-4 rounded-full font-medium tracking-wide text-sm`}
-              >
-                Become a host
-            </Link> */}
           
               <Link href='/'
                 className={`hidden hover:text-secondary block font-medium transition-all md:block'`}>Become a host</Link>
@@ -168,18 +111,13 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
           </button>
         </div>
       </div>
-              {/* main search bar */}
-              <AppSearchBar
-          // menu={null}
-          // isActiveHeader={isActiveSearch}
-          // searchPage={searchPage}
-          // closeSearch={() => setIsActiveSearch(false)}
-        />
-        {/* mobile search bar */}
-        {
-          !isOpen && <AppSearchBarMobile exploreNearby={exploreNearby || []} searchPage={searchPage} />
-
-        }
+              <div className='flex justify-center items-center'>
+              <Suspense fallback={<></>}>
+            <Search />
+          </Suspense>
+              </div>
+       
+     
     </header>
   );
 };
