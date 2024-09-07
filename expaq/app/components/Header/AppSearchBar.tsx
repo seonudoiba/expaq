@@ -234,7 +234,7 @@ const AppSearchBar: FC<IAppSearchBarProps> = ({
                           <p className="text-sm leading-4 text-gray-300">Under 2</p>
                         </div>
                         <AppCounter
-                          value={guests.infants}
+                          value={guests?.infants}
                           maxValue={5}
                           onIncrease={() =>
                             dispatch({ type: DATA_ACTION_TYPES.INCREASE_INFANTS })

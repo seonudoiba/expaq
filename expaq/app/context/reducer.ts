@@ -1,9 +1,10 @@
 import { DATA_ACTION_TYPES } from './actionTypes';
-import { initialState} from './store';
+import { initialState } from './store';
 import { IInitialState } from '../types/Interface';
 
+type PayloadType = string | number | object | null;
 
-export const dataReducer = (state: IInitialState, action: { type: string; payload?: any }): IInitialState => {
+export const dataReducer = (state: IInitialState, action: { type: string; payload?: PayloadType }): IInitialState => {
   const { type, payload } = action;
   const { adults, children, infants } = state.guests;
   switch (type) {

@@ -12,13 +12,12 @@ export const initialState: IInitialState = {
 
 
 
-// interface IDataContext {
-//   state: IInitialState;
-//   // dispatch: (args: any) => void;
-// dispatch: (args: unknown) => void;}
+
+type PayloadType = string | number | object | null;
+
 interface IDataContext {
   state: IInitialState;
-  dispatch: (value: { type: string; payload?: any }) => void;
+  dispatch: (value: { type: string; payload?: PayloadType }) => void;
 }
 
 export const DataContext = createContext<IDataContext>({ state: initialState, dispatch: () => {} });
