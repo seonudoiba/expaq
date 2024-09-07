@@ -1,5 +1,5 @@
 'use client'
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 // import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Image from 'next/image';
 import './nav.css'
@@ -17,26 +17,26 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname()
-  const [isSnapTop, setIsSnapTop] = useState<boolean>(searchPage ? false : true);
-  const [isActiveSearch, setIsActiveSearch] = useState<boolean>(
-    searchPage ? false : true
-  );
+  // const [isSnapTop, setIsSnapTop] = useState<boolean>(searchPage ? false : true);
+  // const [isActiveSearch, setIsActiveSearch] = useState<boolean>(
+  //   searchPage ? false : true
+  // );
   const [activeMenu, setActiveMenu] = useState<EHeaderOpions | null>(
     EHeaderOpions.PLACES_TO_STAY
   );
   setActiveMenu(activeMenu)
-  console.log(query, isSnapTop)
+  console.log(query)
 
-  const handleOnScroll = () => {
-    const position = window.scrollY;
-    if (position >= 50) {
-      setIsSnapTop(false);
-      setIsActiveSearch(false);
-    } else {
-      setIsSnapTop(true);
-      setIsActiveSearch(true);
-    }
-  };
+  // const handleOnScroll = () => {
+  //   const position = window.scrollY;
+  //   if (position >= 50) {
+  //     setIsSnapTop(false);
+  //     setIsActiveSearch(false);
+  //   } else {
+  //     setIsSnapTop(true);
+  //     setIsActiveSearch(true);
+  //   }
+  // };
 
   // const headerBehavior = () => {
   //   let style = [];
@@ -46,13 +46,13 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
   //   return style.join(' ');
   // };
 
-  useEffect(() => {
-    // listen to scroll
-    if (!searchPage) {
-      window.addEventListener('scroll', handleOnScroll);
-    }
-    return () => window.removeEventListener('scroll', handleOnScroll);
-  }, [searchPage]);
+  // useEffect(() => {
+  //   // listen to scroll
+  //   if (!searchPage) {
+  //     window.addEventListener('scroll', handleOnScroll);
+  //   }
+  //   return () => window.removeEventListener('scroll', handleOnScroll);
+  // }, [searchPage]);
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
@@ -170,10 +170,10 @@ const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
       </div>
               {/* main search bar */}
               <AppSearchBar
-          menu={activeMenu}
-          isActiveHeader={isActiveSearch}
-          searchPage={searchPage}
-          closeSearch={() => setIsActiveSearch(false)}
+          // menu={null}
+          // isActiveHeader={isActiveSearch}
+          // searchPage={searchPage}
+          // closeSearch={() => setIsActiveSearch(false)}
         />
         {/* mobile search bar */}
         {
