@@ -58,6 +58,8 @@ const AddActivity: React.FC<{}> = (): ReactNode => {
             <h2 className="mt-5 mb-2 text-center text-3xl font-semibold">Add a New Activity</h2><hr/>
             {successMessage && <div className="alert alert-success fade show">{successMessage}</div>}
             {errorMessage && <div className="alert alert-danger fade show">{errorMessage}</div>}
+
+            
             <form onSubmit={handleSubmit} className=" ">
               <div className="w-full rounded-md">
                 <ActivityTypeSelector
