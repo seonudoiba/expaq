@@ -1,7 +1,9 @@
 import { DATA_ACTION_TYPES } from './actionTypes';
-import { initialState } from './store';
+import { initialState} from './store';
+import { IInitialState } from '../types/Interface';
 
-export const dataReducer = (state: { guests: { adults: any; children: any; infants: any; }; }, action: { type: any; payload: any; }) => {
+
+export const dataReducer = (state: IInitialState, action: { type: string; payload?: any }): IInitialState => {
   const { type, payload } = action;
   const { adults, children, infants } = state.guests;
   switch (type) {
@@ -59,5 +61,8 @@ export const dataReducer = (state: { guests: { adults: any; children: any; infan
     case DATA_ACTION_TYPES.DECREASE_INFANTS:
       if (infants <= 0) return state;
       return { ...state, guests: { ...state.guests, infants: infants - 1 } };
+
+    default:
+      return state;
   }
 };

@@ -12,10 +12,14 @@ export const initialState: IInitialState = {
 
 
 
+// interface IDataContext {
+//   state: IInitialState;
+//   // dispatch: (args: any) => void;
+// dispatch: (args: unknown) => void;}
 interface IDataContext {
   state: IInitialState;
-  // dispatch: (args: any) => void;
-  dispatch: (args: unknown) => void;}
+  dispatch: (value: { type: string; payload?: any }) => void;
+}
 
 export const DataContext = createContext<IDataContext>({ state: initialState, dispatch: () => {} });
 
@@ -26,6 +30,7 @@ export const DataContext = createContext<IDataContext>({ state: initialState, di
 
 export const ContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(dataReducer, initialState);
+
 
   return (
     <DataContext.Provider value={{ state, dispatch }}>
