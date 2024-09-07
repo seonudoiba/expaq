@@ -1,13 +1,7 @@
-import { FC, PropsWithChildren } from 'react';
+import { FC } from 'react';
+import {IAppHeaderOptionProps } from '../../types/Interface'
 
 
-
-interface IAppHeaderOptionProps extends PropsWithChildren<{}> {
-  active?: boolean;
-  isSnap?: boolean;
-  isActiveHeader?: boolean;
-  onClick?: () => void;
-}
 
 const AppHeaderOption: FC<IAppHeaderOptionProps> = ({
   children,

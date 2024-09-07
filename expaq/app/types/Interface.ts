@@ -1,3 +1,5 @@
+import { PropsWithChildren } from "react";
+
 export interface IExploreNearby {
   location: string;
   img: string;
@@ -29,4 +31,11 @@ export interface IExploreNearby {
 export interface ILiveAnywhere {
   img: string;
   title: string;
+}
+
+export interface IAppHeaderOptionProps extends PropsWithChildren<object> {
+  active?: boolean;
+  isSnap?: boolean;
+  isActiveHeader?: boolean;
+  onClick?: () => void;
 }
