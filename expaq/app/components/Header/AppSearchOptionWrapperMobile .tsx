@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from 'react';
+import { FC } from 'react';
 // icons
 import { ChevronLeftIcon } from '@heroicons/react/outline';
 import { IAppSearchOptionWrapperMobileProps } from '@/app/types/Interface';
