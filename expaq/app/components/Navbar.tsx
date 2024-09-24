@@ -2,11 +2,8 @@
 import { FC, Suspense, useState } from "react";
 // import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Image from "next/image";
-import "./nav.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MenuIcon } from "@heroicons/react/outline";
-import { UserCircleIcon } from "@heroicons/react/solid";
 import { NavbarProps } from "../types/Interface";
 
 import Search from "./Search";
