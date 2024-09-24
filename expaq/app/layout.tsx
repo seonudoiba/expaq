@@ -1,19 +1,13 @@
 import type { Metadata } from "next";
-// import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "./components/Navbar";
-// import AppHead from "./components/Header/AppHead";
-
-// const geistSans = localFont({
-//   src: "./fonts/GeistVF.woff",
-//   variable: "--font-geist-sans",
-//   weight: "100 900",
-// });
-// const geistMono = localFont({
-//   src: "./fonts/GeistMonoVF.woff",
-//   variable: "--font-geist-mono",
-//   weight: "100 900",
-// });
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from '@clerk/nextjs'
 
 export const metadata: Metadata = {
   title: "Expaq",
@@ -26,19 +20,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      {/* <AppHead /> */}
-      <body
-      >
-
-        {/* <Navbar/> exploreNearby={exploreNearby} */}
-        <div className="bg-[url('/hero.jpg')] bg-[length:900px] md:bg-[length:100%] bg-no-repeat bg-opacity">
+      <ClerkProvider>
+        <html lang="en">
+          <body>
+           
+            <div className="bg-[url('/hero.jpg')] bg-[length:900px] md:bg-[length:100%] bg-no-repeat bg-opacity">
           <Navbar />
 
           {children}
         </div>
-
-      </body>
-    </html>
+          </body>
+        </html>
+      </ClerkProvider>  
   );
 }
+
