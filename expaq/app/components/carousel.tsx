@@ -11,7 +11,7 @@ import {
 
  export default function CarouselSpacing() {
   return (
-    <Carousel className="w-full max-w-sm">
+    <Carousel className="w-11/12  bg-slate-600">
       <CarouselContent className="-ml-1">
         {Array.from({ length: 5 }).map((_, index) => (
           <CarouselItem key={index} className="pl-1 md:basis-1/2 lg:basis-1/3">

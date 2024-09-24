@@ -1,5 +1,5 @@
 "use client";
-import { FC, useState } from "react";
+import { FC, Suspense, useState } from "react";
 // import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Image from "next/image";
 import Link from "next/link";
@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { NavbarProps } from "../types/Interface";
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import  Search  from "./Search";
 
 const Navbar: FC<NavbarProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,9 +80,9 @@ const Navbar: FC<NavbarProps> = () => {
               </Link>
             </li>
 
-            {/* <Suspense fallback={<></>}>
+            <Suspense fallback={<></>}>
               <Search />
-            </Suspense> */}
+            </Suspense>
             <li className="max-lg:border-b">
               <Link
                 href="/"
@@ -124,7 +125,7 @@ const Navbar: FC<NavbarProps> = () => {
           <div className="flex items-center justify-end gap-2 ">
             <Link
               href="/"
-              className={`hidden hover:text-secondary block font-medium transition-all md:block'`}
+              className={`hidden hover:text-secondary font-medium transition-all md:block'`}
             >
               Become a host
             </Link>
