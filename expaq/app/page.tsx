@@ -1,8 +1,7 @@
 import Hero from "./components/Hero";
 import Slider from "./components/Slider";
 import TopActivities from "./components/TopActivities";
-import TypesCarossel from "./components/TypesCarossel";
-import TypesCarousel from "./components/TypesCarossel";
+import CarouselSpacing from "./components/carousel"
 
 export default function Home() {
   
@@ -19,7 +18,7 @@ const slides = [
     <div>
           {/* hero */}
           <Hero />
-          <TypesCarossel slides={slides}/>
+          <CarouselSpacing/>
 
     </div>
   );

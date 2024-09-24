@@ -9,7 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 
-export function CarouselSpacing() {
+ export default function CarouselSpacing() {
   return (
     <Carousel className="w-full max-w-sm">
       <CarouselContent className="-ml-1">
