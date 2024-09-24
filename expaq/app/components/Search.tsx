@@ -1,8 +1,4 @@
 "use client";
-import React, { useMemo } from "react";
-import { differenceInDays } from "date-fns";
-import { useSearchParams } from "next/navigation";
-import { FaSearch } from "react-icons/fa";
 
 // import Modal from "./modals/Modal";
 
@@ -11,31 +7,6 @@ import { FaSearch } from "react-icons/fa";
 // });
 
 const Search = () => {
-  const searchParams = useSearchParams();
-
-  const country = searchParams?.get("country");
-
-  const startDate = searchParams?.get("startDate");
-  const endDate = searchParams?.get("endDate");
-  const guestCount = searchParams?.get("guestCount");
-
-  const durationLabel = useMemo(() => {
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      let diff = differenceInDays(end, start);
-
-      if (diff === 0) {
-        diff = 1;
-      }
-
-      return `${diff} Days`;
-    }
-
-    return "Any week";
-  }, [endDate, startDate]);
-
-  const guestLabel = guestCount ? `${guestCount} Guests` : "Add Guests";
 
   return (
     // <Modal>
