@@ -3,10 +3,6 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import {
   ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton
 } from '@clerk/nextjs'
 
 export const metadata: Metadata = {

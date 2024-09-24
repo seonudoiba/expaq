@@ -9,7 +9,7 @@ import { NavbarProps } from "../types/Interface";
 import Search from "./Search";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
-const Navbar: FC<NavbarProps> = ({ exploreNearby, searchPage, query }) => {
+const Navbar: FC<NavbarProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
