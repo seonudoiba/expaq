@@ -1,12 +1,11 @@
 "use client";
-import { FC, Suspense, useState } from "react";
+import { FC, useState } from "react";
 // import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavbarProps } from "../types/Interface";
 
-import Search from "./Search";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 const Navbar: FC<NavbarProps> = () => {
@@ -80,9 +79,9 @@ const Navbar: FC<NavbarProps> = () => {
               </Link>
             </li>
 
-            <Suspense fallback={<></>}>
+            {/* <Suspense fallback={<></>}>
               <Search />
-            </Suspense>
+            </Suspense> */}
             <li className="max-lg:border-b">
               <Link
                 href="/"
