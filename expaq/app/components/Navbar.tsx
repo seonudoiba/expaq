@@ -1,5 +1,5 @@
 "use client";
-import { FC, Suspense, useState } from "react";
+import { FC, useState } from "react";
 // import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { NavbarProps } from "../types/Interface";
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import  Search  from "./Search";
+// import  Search  from "./Search";
 
 const Navbar: FC<NavbarProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +27,7 @@ const Navbar: FC<NavbarProps> = () => {
 
   return (
     <header className="py-4 px-4 sm:px-10 z-50 min-h-[70px] bg-transparent">
-      <div className="relative flex flex-wrap items-center gap-4">
+      <div className="relative flex justify-between flex-wrap items-center gap-4">
         <Link href="/">
           <Image
             src="/expaqlogo.png"
@@ -67,96 +67,93 @@ const Navbar: FC<NavbarProps> = () => {
             </svg>
           </button>
 
-          <ul className="lg:ml-12 lg:flex justify-center items-center gap-x-6 max-lg:space-y-3 max-lg:fixed max-lg:bg-white max-lg:w-full max-lg:min-w-[300px] max-lg:top-0 max-lg:left-0 max-lg:p-6 max-lg:h-full max-lg:shadow-md max-lg:overflow-auto z-50">
-            <li className="mb-6 hidden max-lg:block">
-              <Link href="/">
-                <Image
-                  src="/expaqlogo.png"
-                  width={150}
-                  height={60}
-                  alt="Expaq Logo"
-                  className="w-36"
-                />
-              </Link>
-            </li>
-
-            <Suspense fallback={<></>}>
-              <Search />
-            </Suspense>
-            <li className="max-lg:border-b">
-              <Link
-                href="/"
-                className={`${
-                  pathname == "/" &&
-                  "text-secondary border-b-2 border-secondary "
-                }' hover:text-secondary block  transition-all'`}
-              >
-                Home
-              </Link>
-            </li>
-            {navItems.map((page) => {
-              const activePage =
-                pathname?.startsWith(page.path) && page.path !== "/";
-
-              return (
-                <li
-                  key={page.id}
-                  className="max-lg:border-b "
-                  // max-lg:py-3 px-3
-                >
-                  <Link
-                    href={page.path}
-                    className={`${
-                      activePage &&
-                      "text-secondary border-b-2 border-secondary  "
-                    } ' hover:text-secondary 
-                    block  transition-all'`}
-                  >
-                    {page.name}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        <div className="flex ml-auto">
-          {/* <button className='px-6 py-2 rounded-xl text-white bg-primary transition-all hover:text-secondary'>Login</button> */}
-          <div className="flex items-center justify-end gap-2 ">
-            <Link
-              href="/"
-              className={`hidden hover:text-secondary font-medium transition-all md:block'`}
-            >
-              Become a host
+          <div className="mb-6 hidden max-lg:block">
+            <Link href="/">
+              <Image
+                src="/expaqlogo.png"
+                width={150}
+                height={60}
+                alt="Expaq Logo"
+                className="w-36"
+              />
             </Link>
-
-            <button className="flex items-center px-6 py-2 bg-white border border-secondary rounded-full h-10 hover:shadow-md">
-              <SignedOut>
-                <SignInButton />
-              </SignedOut>
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
-            </button>
           </div>
+          <div className=" gap-16 flex justify-between items-center">
+            <ul className="lg:ml-12 lg:flex justify-center items-center gap-x-6 max-lg:space-y-3 max-lg:fixed max-lg:bg-white max-lg:w-full max-lg:min-w-[300px] max-lg:top-0 max-lg:left-0 max-lg:p-6 max-lg:h-full max-lg:shadow-md max-lg:overflow-auto z-50">
+              <li className="max-lg:border-b">
+                <Link
+                  href="/"
+                  className={`${
+                    pathname == "/" &&
+                    "text-secondary border-b-2 border-secondary "
+                  }' hover:text-secondary block  transition-all'`}
+                >
+                  Home
+                </Link>
+              </li>
+              {navItems.map((page) => {
+                const activePage =
+                  pathname?.startsWith(page.path) && page.path !== "/";
 
-          <button
-            id="toggleOpen"
-            className={`${isOpen && "hidden"} ' lg:hidden ml-7 pl-2'`}
-            onClick={handleClick}
-          >
-            <svg
-              className="w-8 fill-primary"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-          </button>
+                return (
+                  <li
+                    key={page.id}
+                    className="max-lg:border-b "
+                    // max-lg:py-3 px-3
+                  >
+                    <Link
+                      href={page.path}
+                      className={`${
+                        activePage &&
+                        "text-secondary border-b-2 border-secondary  "
+                      } ' hover:text-secondary 
+                    block  transition-all'`}
+                    >
+                      {page.name}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="flex ml-auto">
+              {/* <button className='px-6 py-2 rounded-xl text-white bg-primary transition-all hover:text-secondary'>Login</button> */}
+              <div className="flex items-center justify-end gap-2 ">
+                <Link
+                  href="/"
+                  className={`hover:text-secondary font-medium transition-all md:block'`}
+                >
+                  Become a host
+                </Link>
+
+                <button className="flex items-center px-6 py-2 bg-white border border-secondary rounded-full h-10 hover:shadow-md">
+                  <SignedOut>
+                    <SignInButton />
+                  </SignedOut>
+                  <SignedIn>
+                    <UserButton />
+                  </SignedIn>
+                </button>
+              </div>
+
+              <button
+                id="toggleOpen"
+                className={`${isOpen && "hidden"} ' lg:hidden ml-7 pl-2'`}
+                onClick={handleClick}
+              >
+                <svg
+                  className="w-8 fill-primary"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </header>

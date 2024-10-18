@@ -1,6 +1,6 @@
 // import TopActivities from "./components/TopActivities";
-import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import CarouselSpacing from "./components/carousel";
+// import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+// import CarouselSpacing from "./components/carousel";
 
 export default function Home() {
   // const slides = [
@@ -14,13 +14,16 @@ export default function Home() {
   // ];
   return (
     <div className="pt-8">
-      <CardHeader>
+
+
+      
+      {/* <CardHeader>
         <CardTitle>Categories</CardTitle>
         <CardDescription>
           Your personal activity categories.{" "}
         </CardDescription>
       </CardHeader>
-      <CarouselSpacing />
+      <CarouselSpacing /> */}
     </div>
   );
 }

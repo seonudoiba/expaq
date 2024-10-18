@@ -88,3 +88,8 @@ export interface guestProps{
   adults:number,
   infants:number
 }
+// Define the global content type
+export type GlobalContent = {
+  state: IInitialState;
+  dispatch: (action: any) => void;
+};
