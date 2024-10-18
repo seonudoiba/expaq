@@ -1,15 +1,13 @@
 "use client";
-import { FC, useState } from "react";
-// import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NavbarProps } from "../types/Interface";
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 // import  Search  from "./Search";
 
-const Navbar: FC<NavbarProps> = () => {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 

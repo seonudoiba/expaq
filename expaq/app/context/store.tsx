@@ -22,11 +22,11 @@ export const initialState: IInitialState = {
 
 export const DataContext = createContext<[any, Dispatch<any>] | null>(null);
 
-export const ContextProvider = ({ children }) => (
-  <DataContext.Provider value={useReducer(dataReducer, initialState)}>
-    {children}
-  </DataContext.Provider>
-);
+// export const ContextProvider = ({ children }) => (
+//   <DataContext.Provider value={useReducer(dataReducer, initialState)}>
+//     {children}
+//   </DataContext.Provider>
+// );
 
 
 // import { createContext, useReducer, ReactNode } from 'react';
