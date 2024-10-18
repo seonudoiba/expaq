@@ -5,6 +5,7 @@ import {
   ClerkProvider,
 } from '@clerk/nextjs'
 import Hero from "./components/Hero";
+import ShowNavLayout from "./components/ShowNavLayout";
 
 export const metadata: Metadata = {
   title: "Expaq",
@@ -22,12 +23,8 @@ export default function RootLayout({
       <ClerkProvider>
         <html lang="en">
           <body>
-           
-          <div className="bg-[url('/hero.jpg')] bg-[length:900px] md:bg-[length:100%] bg-no-repeat">
-          <Navbar />
-          <Hero />
-          </div>
-
+          
+<ShowNavLayout/>
 
           {children}
           </body>
