@@ -11,8 +11,10 @@ import com.abiodun.expaq.services.IUserService;
 import com.cloudinary.utils.ObjectUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,18 +30,23 @@ import static org.hibernate.query.sqm.tree.SqmNode.log;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
+    @Autowired
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
     private final RoleRepository roleRepository;
+    @Autowired
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User registerUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())){
             throw new UserAlreadyExistsException(user.getEmail() + " already exists");
         }
+
+//        user.setPassword(encoder.encode(user.getPassword()));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        System.out.println(user.getPassword());
-        Role userRole = roleRepository.findByName("ROLE_USER").get();
+
+        Role userRole = roleRepository.findByName("GUEST").get();
         user.setRoles(Collections.singletonList(userRole));
         return userRepository.save(user);
     }

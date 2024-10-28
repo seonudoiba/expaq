@@ -9,8 +9,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -24,34 +26,46 @@ public class ExpaqUserDetails implements UserDetails {
     private String password;
     private Collection<GrantedAuthority> authorities;
 
-    public static ExpaqUserDetails buildUserDetails(User user){
-        List<GrantedAuthority> authorities = user.getRoles()
+    public ExpaqUserDetails (User user){
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+        this.authorities = user.getRoles()
                 .stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
-        return new ExpaqUserDetails(
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
-                authorities);
-
     }
+
+//    public static ExpaqUserDetails buildUserDetails(Optional<User> user){
+//        List<GrantedAuthority> authorities = user.getRoles()
+//                .stream()
+//                .map(role -> new SimpleGrantedAuthority(role.getName()))
+//                .collect(Collectors.toList());
+//        return new ExpaqUserDetails(
+//                user.getId(),
+//                user.getEmail(),
+//                user.getPassword(),
+//                authorities);
+//
+//    }
+
 
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+
+        return this.authorities;
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return this.email;
     }
 
     @Override

@@ -54,11 +54,12 @@ public class ActivityService implements IActivityService {
         activity.setCity(city);
         activity.setCountry(country);
         activity.setCapacity(capacity);
-        if(!user.isEnabled() & !user.isAccountNonExpired() & !user.isAccountNonLocked() & !user.isCredentialsNonExpired()){
+        if(user.isEnabled() & user.isAccountNonExpired() & user.isAccountNonLocked() & user.isCredentialsNonExpired()){
             User currentUser = convertToUser(user);
             activity.setHost(currentUser);
         }
         if (!photo.isEmpty()){
+            System.out.println("It is not empty.............................................................................................................................jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj.................................................");
             try {
                 if (!Objects.requireNonNull(photo.getContentType()).startsWith("image/")) {
                     throw new IOException("Only image files are allowed");

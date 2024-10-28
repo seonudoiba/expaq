@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "slick-carousel/slick/slick.css";
 import {Nunito} from 'next/font/google'
 import {
   ClerkProvider,

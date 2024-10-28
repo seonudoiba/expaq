@@ -1,9 +1,13 @@
 package com.abiodun.expaq.controllers;
 
+import com.abiodun.expaq.dto.request.newActivity;
 import com.abiodun.expaq.dto.response.ActivityResponse;
 import com.abiodun.expaq.dto.response.BookingResponse;
 import com.abiodun.expaq.dto.response.HostResponse;
 import com.abiodun.expaq.security.user.ExpaqUserDetails;
+import com.abiodun.expaq.services.impl.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.models.Activity;
@@ -17,7 +21,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,8 +40,13 @@ import java.util.Optional;
 @RequestMapping("/activities")
 @RequiredArgsConstructor
 public class ActivityController {
+    @Autowired
     private  final IActivityService activityService;
+    @Autowired
     private  final BookingService bookingService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/")
     public ResponseEntity<List<ActivityResponse>> getAllActivities() throws SQLException {
         List<Activity> activities = activityService.getAllActivities();
@@ -101,8 +113,8 @@ public class ActivityController {
         }
     }
     @Transactional
-    @PostMapping("/add/new-activities")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_HOST')")
+    @PostMapping( "/new-activities")
+//        @PreAuthorize("hasRole('ADMIN') or hasRole('HOST') or hasRole('GUEST')")
     public ResponseEntity<ActivityResponse> addNewActivity(
             @RequestParam("photo") MultipartFile photo,
             @RequestParam("activityType") String activityType,
@@ -112,10 +124,20 @@ public class ActivityController {
             @RequestParam("country") String country,
             @RequestParam("city") String city,
             @RequestParam("address") String address,
-            @RequestParam("capacity") int capacity,
-            @AuthenticationPrincipal ExpaqUserDetails currentUser) throws SQLException, IOException {
-        Activity savedActivity = activityService.addNewActivity(photo, activityType, price, title, description,
-                currentUser, address, city, country, capacity);
+            @RequestParam("capacity") int capacity) throws SQLException, IOException {
+
+        // Verify authentication
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        // Get logged-in user
+        ExpaqUserDetails currentUser = (ExpaqUserDetails) authentication.getPrincipal();
+        System.out.println(currentUser.getId() +".............................................................................................................................m,nbbbbbbnjkkkmm,,");
+        Activity savedActivity = activityService.addNewActivity(
+                photo, activityType, price, title, description,
+                currentUser, address, city, country, capacity
+                );
         ActivityResponse response = getActivityResponse(savedActivity);
         return ResponseEntity.ok(response);
     }

@@ -2,6 +2,8 @@
 // import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 // import CarouselSpacing from "./components/carousel";
 
+import Feature from "./components/Feature";
+
 export default function Home() {
   // const slides = [
   //   { image: '/img1.jpg', title: 'Category 1' },
@@ -13,9 +15,9 @@ export default function Home() {
   //   // Add more slides as needed
   // ];
   return (
-    <div className="pt-8">
+    <div className="">
 
-
+<Feature/>
       .
       {/* <CardHeader>
         <CardTitle>Categories</CardTitle>

@@ -1,3 +1,4 @@
+"use client"
 // import Card from "../common/Card";
 // import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
