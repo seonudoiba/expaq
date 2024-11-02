@@ -51,7 +51,7 @@ const Search = () => {
               type="range"
               max={"5000"}
               min={"1000"}
-              className="border-non outline-none
+              className="border-none outline-none
                     w-full regular-14"
             />
           </div>

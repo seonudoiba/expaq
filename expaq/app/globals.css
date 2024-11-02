@@ -254,3 +254,18 @@
   }
 
 }
+
+input:focus {
+  outline: none;
+  border-style: none;
+  background-color: #fcfdfe; /* Replace with your desired color */
+}
+.image-container {
+  height: 600px; /* Set the height */
+}
+
+.image-container img {
+  object-fit: cover; /* Scale the image to cover the container */
+  width: 100%; /* Take full width */
+  height: 100%; /* Take full height */
+}

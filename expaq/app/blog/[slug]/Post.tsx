@@ -2,10 +2,6 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  type PortableTextBlock,
-  type PortableTextComponentProps,
-} from "@portabletext/react";
 import { Prose } from "../components/Prose";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReadMore } from "../components/ReadMore";
@@ -29,7 +25,7 @@ type WordPressPost = {
 
 export function Post({ post }: { post: WordPressPost }) {
   // Fetch the featured image and author data using the IDs
-  const featuredImageUrl = `https://expaq.starrstudio.pro/wp-json/wp/v2/media/${post.featured_media}`;
+//   const featuredImageUrl = `https://expaq.starrstudio.pro/wp-json/wp/v2/media/${post.featured_media}`;
   const authorUrl = `https://expaq.starrstudio.pro/wp-json/wp/v2/users/${post.author}`;
 
   return (
@@ -105,21 +101,21 @@ const AuthorInfo = ({ authorUrl }: { authorUrl: string }) => {
   );
 };
 
-const createHeadingComponent =
-  (Tag: "h2" | "h3") =>
-  ({ children, value }: PortableTextComponentProps<PortableTextBlock>) => {
-    // const text = extractTextFromPortableTextBlock(value);
-    // const id = slugify(text);
+// const createHeadingComponent =
+//   (Tag: "h2" | "h3") =>
+//   ({ children, value }: PortableTextComponentProps<PortableTextBlock>) => {
+//     // const text = extractTextFromPortableTextBlock(value);
+//     // const id = slugify(text);
 
-    return (
-        <div>Tag</div>
-    //   <Tag id={id} className="group relative flex items-center">
-    //     <Link href={`#${id}`} className="flex items-center">
-    //       <span className="absolute left-0 -translate-x-full pr-2 opacity-0 transition-opacity group-hover:opacity-100">
-    //         <LinkIcon className="size-4" />
-    //       </span>
-    //       {children}
-    //     </Link>
-    //   </Tag>
-    );
-  };
+//     return (
+//         <div>Tag</div>
+//     //   <Tag id={id} className="group relative flex items-center">
+//     //     <Link href={`#${id}`} className="flex items-center">
+//     //       <span className="absolute left-0 -translate-x-full pr-2 opacity-0 transition-opacity group-hover:opacity-100">
+//     //         <LinkIcon className="size-4" />
+//     //       </span>
+//     //       {children}
+//     //     </Link>
+//     //   </Tag>
+//     );
+//   };
