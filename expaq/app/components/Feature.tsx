@@ -33,14 +33,18 @@ const Feature = () => {
     )
   }
 
-  var settings = {
+  const settings = {
     arrows: true,
     infinite: true,
     autoplay: true,
     slidesToShow: 4,
     slidesToScroll: 1,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
+    nextArrow: <NextArrow onClick={function (): void {
+      throw new Error("Function not implemented.");
+    } } />,
+    prevArrow: <PrevArrow onClick={function (): void {
+      throw new Error("Function not implemented.");
+    } } />,
     responsive: [
       {
         breakpoint: 1024,
