@@ -11,7 +11,7 @@ const FeatureItem = ({ title, URL, des }: FeatureItem) => {
   return (
     <div className="mx-4 overflow-hidden group">
       <Link href={"/"} className="overflow-hidden relative">
-      <div className="h-[410px] w-[510px] ">
+      <div className="h-[390px] w-[510px] ">
           <Image
             src={URL}
             alt={title}
