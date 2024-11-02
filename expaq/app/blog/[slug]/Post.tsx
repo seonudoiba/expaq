@@ -23,6 +23,20 @@ type WordPressPost = {
   author: number; // Assuming this is the ID of the author
 };
 
+interface Author {
+  avatar_urls: {
+    [key: number]: string;
+  };
+  name: string;
+  twitter?: string;
+}
+
+// interface Props {
+//   authorUrl: string;
+// }
+
+
+
 export function Post({ post }: { post: WordPressPost }) {
   // Fetch the featured image and author data using the IDs
 //   const featuredImageUrl = `https://expaq.starrstudio.pro/wp-json/wp/v2/media/${post.featured_media}`;
@@ -61,7 +75,7 @@ export function Post({ post }: { post: WordPressPost }) {
 }
 
 const AuthorInfo = ({ authorUrl }: { authorUrl: string }) => {
-  const [author, setAuthor] = React.useState<any>(null);
+  const [author, setAuthor] = React.useState<Author | null>(null);
 
   React.useEffect(() => {
     const fetchAuthor = async () => {

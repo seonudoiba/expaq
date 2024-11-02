@@ -4,10 +4,13 @@ import Slider from "react-slick";
 import { FEATURE } from "../constants";
 import FeatureItem from "./FeatureItem";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
-import next from "next";
+
+interface ArrowProps {
+  onClick: () => void;
+}
 
 const Feature = () => {
-  const NextArrow = (props: any) =>{
+  const NextArrow = (props: ArrowProps) =>{
     const {onClick} = props;
     return (
       <div onClick={onClick} className="bg-white text-2xl inline 
@@ -18,7 +21,7 @@ const Feature = () => {
       </div>
     )
   }
-  const PrevArrow = (props: any) =>{
+  const PrevArrow = (props: ArrowProps) =>{
     const {onClick} = props;
     return (
       <div onClick={onClick} className="bg-white text-2xl inline 

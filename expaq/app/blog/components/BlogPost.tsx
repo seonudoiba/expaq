@@ -1,5 +1,4 @@
 // import { format, parseISO } from "date-fns";
-import Image from "next/image";
 import { Prose } from "@/app/blog/components/Prose";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -9,7 +8,8 @@ export function BlogPost(props: {
   author: string;
   content: React.ReactNode;
 }) {
-  const { date, title, author, content } = props;
+  const {content } = props;
+  // const { date, title, author, content } = props;
 
   return (
       <article className="mx-auto max-w-2xl px-6 py-20">

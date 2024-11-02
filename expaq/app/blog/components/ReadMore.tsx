@@ -12,9 +12,9 @@ type BlogPostPreview = {
   featured_media: number; // ID of the featured media
 };
 
-type Media = {
-  source_url: string; // URL of the media
-};
+// type Media = {
+//   source_url: string; // URL of the media
+// };
 
 export function ReadMore() {
   const [blogPosts, setBlogPosts] = useState<BlogPostPreview[]>([]);
@@ -31,7 +31,7 @@ export function ReadMore() {
         const posts: BlogPostPreview[] = await response.json();
         setBlogPosts(posts);
       } catch (err) {
-        setError("Failed to load blog posts");
+        setError( err + ": Failed to load blog posts");
       } finally {
         setLoading(false);
       }

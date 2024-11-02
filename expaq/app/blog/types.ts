@@ -182,13 +182,21 @@ interface Guid {
     format!: string;
     meta!: Meta;
     categories!: number[];
-    tags!: any[];
+    tags!: string[];
     class_list!: string[];
     _links!: Links;
     _embedded!: Embedded;
   
-    constructor(data: any) {
+    constructor(data: Date) {
       Object.assign(this, data);
     }
+    // tags!: string[];
+    // class_list!: any[];
+    // _links!: Links;
+    // _embedded!: Embedded;
+  
+    // constructor(data: any) {
+    //   Object.assign(this, data);
+    // }
   }
   export default WordPressPost;
