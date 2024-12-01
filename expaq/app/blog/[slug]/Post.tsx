@@ -2,7 +2,6 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Prose } from "../components/Prose";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReadMore } from "../components/ReadMore";
 import "./page.css";
