@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Prose } from "../components/Prose";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReadMore } from "../components/ReadMore";
-
+import "./page.css";
 
 type WordPressPost = {
   id: number;
@@ -45,14 +45,14 @@ export function Post({ post }: { post: WordPressPost }) {
   return (
     <article className="mx-auto grid w-full max-w-screen-xl gap-5 px-0 pt-16 md:grid-cols-4 md:pt-24 lg:gap-4 lg:px-20">
       <main className="md:col-span-3">
-        <Card>
-          <CardContent className="p-10 text-black">
-            <Prose>
+        <div>
+          <div className="p-10 text-black">
+            <div>
               <h1>{post.title.rendered}</h1>
               <div dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
-            </Prose>
-          </CardContent>
-        </Card>
+            </div>
+          </div>
+        </div>
 
         <div className="mt-24">
           <ReadMore />
