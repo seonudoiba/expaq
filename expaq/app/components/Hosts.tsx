@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import React from 'react';
 
 const Hosts: React.FC = () => {
@@ -19,7 +20,7 @@ const Hosts: React.FC = () => {
         {guides.map((guide) => (
           <div key={guide.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="relative overflow-hidden">
-              <img className="w-full" src={guide.image} alt={guide.name} />
+              <Image fill className="w-full" src={guide.image} alt={guide.name} />
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition duration-300">
                 <div className="flex space-x-4">
                   <Link href="#" className="text-white hover:text-purple-700">

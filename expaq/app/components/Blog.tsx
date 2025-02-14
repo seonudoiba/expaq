@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
+import Image from 'next/image';
 
 const Blog: React.FC = () => {
   const blogs = [
@@ -39,7 +40,7 @@ const Blog: React.FC = () => {
         {blogs.map((blog) => (
           <div key={blog.id} className="blog-item shadow-lg rounded-lg overflow-hidden">
             <div className="relative">
-              <img className="w-full h-48 object-cover" src={blog.image} alt={blog.title} />
+              <Image fill className="w-full h-48 object-cover" src={blog.image} alt={blog.title} />
               <div className="absolute top-4 right-4 bg-purple-700 text-white text-center p-2 rounded">
                 <h6 className="font-bold">{blog.date.day}</h6>
                 <small className="text-xs uppercase">{blog.date.month}</small>

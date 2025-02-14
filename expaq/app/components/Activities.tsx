@@ -1,7 +1,8 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import React from 'react';
 import { FaCalendar } from 'react-icons/fa';
-import { FaLocationPinLock, FaLocationArrow, FaMapLocation, FaLocationPin, FaTimeline, FaPerson } from 'react-icons/fa6';
+import { FaLocationPin, FaPerson } from 'react-icons/fa6';
 const Activities: React.FC = () => {
   const activities = [
     {
@@ -77,7 +78,7 @@ const Activities: React.FC = () => {
           {activities.map((pkg, index) => (
             <div key={index} className="col-lg-4 col-md-6 mb-4">
               <div className="package-item bg-white mb-2">
-                <img className="img-fluid w-full" src={pkg.image} alt={pkg.title} />
+                <Image fill className="img-fluid w-full" src={pkg.image} alt={pkg.title} />
                 <div className="p-4">
                   <div className="flex justify-between mb-3">
                     <small className="text-gray-600 flex gap-2">

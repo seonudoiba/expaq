@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Image from 'next/image';
 const Testimonial: React.FC = () => {
   const testimonials = [
     { id: 1, image: '/img/testimonial-1.jpg', name: 'Client Name', profession: 'Profession', comment: 'Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod eos labore diam' },
@@ -18,7 +18,7 @@ const Testimonial: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="text-center">
-              <img className="w-24 h-24 rounded-full mx-auto" src={testimonial.image} alt={testimonial.name} />
+              <Image fill className="w-24 h-24 rounded-full mx-auto" src={testimonial.image} alt={testimonial.name} />
               <div className="bg-white p-6 mt-[-48px] rounded-lg shadow-lg">
                 <p className="text-gray-700 pt-8">{testimonial.comment}</p>
                 <h5 className="text-xl font-semibold mt-4">{testimonial.name}</h5>
