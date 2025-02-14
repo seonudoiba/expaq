@@ -2,21 +2,19 @@
 "use client"
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import img1 from "../../public/img/carousel-1.jpg"
-import img2 from "../../public/img/carousel-2.jpg"
 import Button  from "./Button"
 
 
 
 const carousels = [
     {
-        src: img1,
+        src: "/img/carousel-1.jpg",
         alt: 'Slide 1',
         caption: 'Tours & Travel',
         title: 'Let\'s Discover The World Together',
     },
     {
-        src: img2,
+        src: "/img/carousel-2.jpg",
         alt: 'Slide 2',
         caption: 'Tours & Travel',
         title: 'Discover Amazing Places With Us',
