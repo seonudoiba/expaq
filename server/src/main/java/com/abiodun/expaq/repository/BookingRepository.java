@@ -1,6 +1,6 @@
 package com.abiodun.expaq.repository;
 
-import com.abiodun.expaq.models.BookedActivity;
+import com.abiodun.expaq.model.BookedActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

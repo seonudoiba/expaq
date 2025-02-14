@@ -1,9 +1,6 @@
 package com.abiodun.expaq.repository;
 
-import com.abiodun.expaq.dto.response.ActivityResponse;
-import com.abiodun.expaq.models.Activity;
-import com.abiodun.expaq.models.BookedActivity;
-import org.springframework.data.jpa.repository.EntityGraph;
+import com.abiodun.expaq.model.Activity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,7 +20,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
             "  SELECT br.activity.id FROM BookedActivity br " +
             "  WHERE ((br.checkInDate <= :checkOutDate) AND (br.checkOutDate >= :checkInDate))" +
             ")")
-
     List<Activity> findAvailableActivitiesByDatesAndType(LocalDate checkInDate, LocalDate checkOutDate, String activityType);
 
 }

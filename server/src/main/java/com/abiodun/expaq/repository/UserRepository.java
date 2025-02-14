@@ -1,16 +1,16 @@
 package com.abiodun.expaq.repository;
 
-import com.abiodun.expaq.models.User;
+import com.abiodun.expaq.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
+    User findByUserName(String userName);
+
     boolean existsByEmail(String email);
 
-    void deleteByEmail(String email);
-    List<User> findByHostStatusEquals(String hostStatus);
+    boolean existsByUserName(String email);
+
+    Integer findIdByUserName(String userName);
 
 
-    Optional<User> findByEmail(String email);
 }
