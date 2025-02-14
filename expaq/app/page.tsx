@@ -4,7 +4,6 @@ import Features from "./components/Features";
 import Destinations from "./components/Destinations";
 import Activities from "./components/Activities";
 import Services from "./components/Services";
-import MegaOffer from "./components/MegaOffer";
 import Registration from "./components/Registration";
 import Testimonial from "./components/Testimonial";
 import Hosts from "./components/Hosts";
