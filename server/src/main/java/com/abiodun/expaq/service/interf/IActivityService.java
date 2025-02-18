@@ -30,4 +30,10 @@ public interface IActivityService {
                             String country, int capacity) throws SQLException, IOException;
 
     List<Activity> getAvailableActivities(LocalDate checkInDate, LocalDate checkOutDate, String activityType);
+
+
+    List<Object[]> getAllActivityDestinationCountries();
+
+    List<Object[]> getAllActivityDestinationCities();
+
 }

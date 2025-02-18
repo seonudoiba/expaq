@@ -100,6 +100,18 @@ public class ActivityService implements IActivityService {
     public List<Activity> getAvailableActivities(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
         return activityRepository.findAvailableActivitiesByDatesAndType(checkInDate, checkOutDate, roomType);
     }
+
+    @Override
+    public List<Object[]> getAllActivityDestinationCountries() {
+        return activityRepository.findCountries();
+
+
+    }
+    @Override
+    public List<Object[]> getAllActivityDestinationCities() {
+        return activityRepository.findDistinctCities();
+    }
+
     @Override
     public void deleteActivity(Long activityId) {
         Optional<Activity> theActivity = activityRepository.findById(activityId);

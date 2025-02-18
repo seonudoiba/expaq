@@ -2,10 +2,7 @@ package com.abiodun.expaq.controller;
 
 import com.abiodun.expaq.model.*;
 import com.abiodun.expaq.repository.UserRepository;
-import com.abiodun.expaq.response.ActivityResponse;
-import com.abiodun.expaq.response.BookingResponse;
-import com.abiodun.expaq.response.HostResponse;
-import com.abiodun.expaq.response.RatingResponse;
+import com.abiodun.expaq.response.*;
 import com.abiodun.expaq.service.ActivityService;
 import com.abiodun.expaq.service.UserService;
 import org.springframework.security.access.AccessDeniedException;
@@ -72,6 +69,14 @@ public class ActivityController {
     @GetMapping("/activity/types")
     public List<String> getActivityTypes() {
         return activityService.getAllActivityTypes();
+    }
+    @GetMapping("/activity/destinations/countries")
+    public List<Object[]> getActivityDestinations() {
+        return activityService.getAllActivityDestinationCountries();
+    }
+    @GetMapping("/activity/destinations/cities")
+    public List<Object[]> getActivityDestinationsCities() {
+        return activityService.getAllActivityDestinationCities();
     }
 
 
