@@ -6,6 +6,7 @@ import {
   ClerkProvider,
 } from '@clerk/nextjs'
 import ShowNavLayout from "./components/ShowNavLayout";
+import { NotificationProvider } from "./providers/NotificationContext";
 
 const nuntio = Nunito({
   subsets: ["latin"],
@@ -24,18 +25,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
-
-      <ClerkProvider>
-        <html lang="en">
-          <body className={`bg-white text-primary overflow-x-hidden ${nuntio.variable}`}>
-          
-<ShowNavLayout/>
-
-          {children}
-          </body>
-        </html>
-      </ClerkProvider>  
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`bg-white text-primary overflow-x-hidden ${nuntio.variable}`}>
+          <NotificationProvider>
+            <ShowNavLayout/>
+            {children}
+          </NotificationProvider>
+        </body>
+      </html>
+    </ClerkProvider>  
   );
 }
 
