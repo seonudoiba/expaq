@@ -1,14 +1,20 @@
 package com.abiodun.expaq.model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID; // Import UUID
+import com.abiodun.expaq.model.ActivityCategory; // Import the new enum
 
 @Data
 @Entity
@@ -16,73 +22,52 @@ import java.util.List;
 @NoArgsConstructor
 public class Activity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue // Use default UUID generation
+    @UuidGenerator // Specify UUID generator
+    private UUID id; // Changed type to UUID
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
-    private int capacity;
-    private int booked_capacity;
-    private String activityType;
+
+    // Simple text location for now, consider PostGIS later
+    private String location;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
+
+    @Column(nullable = false)
     private BigDecimal price;
-    private boolean isBooked = false;
-    private String photo;
-    private boolean isFeatured = false;
-    private String address;
-    private String city;
-    private String country;
 
+    @Enumerated(EnumType.STRING) // Added category field
+    @Column(nullable = false)
+    private ActivityCategory category;
 
-    @OneToMany(mappedBy="activity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<BookedActivity> bookings;
-
-    @OneToMany(mappedBy="activity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rating> ratings;
+    // Store image URLs as a JSONB array or a simple delimited string
+    @JdbcTypeCode(SqlTypes.JSON) // Or use @Convert for a custom converter
+    @Column(columnDefinition = "jsonb") // Use jsonb for PostgreSQL
+    private List<String> mediaUrls; // Renamed from images to mediaUrls
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
-    private User host;// Reference to the User entity
+    @JoinColumn(name = "host_id", nullable = false) // host_id is UUID in User entity
+    private User host;
 
+    // Schedule representation - JSONB is flexible
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private String schedule; // Store schedule details as JSON string or map
 
-//    public void addBooking(BookedActivity booking) {
-//        bookings.add(booking);
-//        booking.setActivity(this);
-//        isBooked = true;
-//        String bookingCode = RandomStringUtils.randomNumeric(10);
-//        booking.setBookingConfirmationCode(bookingCode);
-//    }
-    public boolean canAccommodateBooking(int additionalBookings) {
-        return this.booked_capacity + additionalBookings <= this.capacity;
-    }
-    public void addBooking(BookedActivity booking) {
-        if (!canAccommodateBooking(booking.getTotalNumOfGuest())) {
-            throw new RuntimeException("Cannot add booking: Capacity exceeded.");
-        }
+    // Removed capacity, booked_capacity, activityType, isBooked, photo, isFeatured, address, city, country
+    // Removed bookings and ratings relationships (will be mapped from Booking/Review)
 
-        bookings.add(booking);
-        booking.setActivity(this);
-        this.booked_capacity += booking.getTotalNumOfGuest();
-        String bookingCode = RandomStringUtils.randomNumeric(10);
-        booking.setBookingConfirmationCode(bookingCode);
-        if (this.booked_capacity >= this.capacity) {
-            this.isBooked = true;
-        }
-    }
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    public void cancelBooking(BookedActivity booking) {
-        bookings.remove(booking);
-        booking.setActivity(null);
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
-        // Update the booked capacity
-        this.booked_capacity -= booking.getTotalNumOfGuest();
-
-        // Mark the activity as available if necessary
-        if (this.booked_capacity < this.capacity) {
-            this.isBooked = false;
-        }
-    }
-//    public void addRating(Rating rating) {
-//        ratings.add(rating);
-//        rating.setActivity(this);
-//    }
-
+    // Removed addBooking, cancelBooking, canAccommodateBooking methods - booking logic moved
 }
