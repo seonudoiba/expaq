@@ -2,6 +2,8 @@ package com.abiodun.expaq.dto;
 
 import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
+import com.abiodun.expaq.model.ActivitySchedule;
+
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -43,8 +45,7 @@ public class UpdateActivityRequest {
     private String address;
     private String city;
     private String country;
-    private boolean featured = false;
-    private Activity.ActivitySchedule schedule;
+    private ActivitySchedule schedule;
 
 
     @NotNull(message = "Latitude is required")

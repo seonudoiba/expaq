@@ -1,8 +1,6 @@
 package com.abiodun.expaq.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,7 +18,6 @@ import java.util.UUID; // Import UUID
 
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "activities")
 public class Activity {
@@ -42,7 +39,7 @@ public class Activity {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private boolean featured;
+    private Boolean isFeatured;
 
     private String address;
     private String city;
@@ -112,25 +109,6 @@ public class Activity {
         WELLNESS,
         EDUCATION,
         OTHER
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ActivitySchedule {
-        private List<TimeSlot> timeSlots;
-        private List<String> availableDays;
-        private String timeZone;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class TimeSlot {
-            private String startTime;
-            private String endTime;
-            private int maxParticipants;
-            private boolean isAvailable;
-        }
     }
 
     // Methods for booking management

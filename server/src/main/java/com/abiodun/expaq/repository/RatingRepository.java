@@ -10,5 +10,5 @@ import java.util.UUID;
 
 public interface RatingRepository extends JpaRepository<Rating, UUID> {
     List<Rating> findByActivityId(UUID activityId);
-    boolean existsByActivityAndUser(ActivityDTO activity, User user);
+    Boolean existsByActivityAndUser(ActivityDTO activity, User user);
 }

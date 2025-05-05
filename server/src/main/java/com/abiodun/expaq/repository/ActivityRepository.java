@@ -82,8 +82,14 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     @Query("SELECT a FROM Activity a WHERE a.isActive = true AND a.isVerified = true AND a.price BETWEEN :minPrice AND :maxPrice")
     Page<Activity> findByPriceRange(@Param("minPrice") BigDecimal minPrice, @Param("maxPrice") BigDecimal maxPrice, Pageable pageable);
     
-    @Query("SELECT a FROM Activity a WHERE a.isActive = true AND a.isVerified = true AND ST_DWithin(a.location, :point, :distance) = true")
-    Page<Activity> findByLocationWithinDistance(@Param("point") Point point, @Param("distance") double distance, Pageable pageable);
+    @Query(value = "SELECT * FROM activities a WHERE " +
+           "ST_DWithin(a.location, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326), :distance) AND " +
+           "a.is_active = true", 
+           nativeQuery = true)
+    Page<Activity> findByLocationWithinDistance(@Param("longitude") double longitude, 
+                                                @Param("latitude") double latitude, 
+                                                @Param("distance") double distance, 
+                                                Pageable pageable);
     
     @Query("SELECT a FROM Activity a WHERE a.isActive = true AND a.isVerified = true AND a.host.id = :hostId AND a.category = :category")
     Page<Activity> findByHostAndCategory(@Param("hostId") UUID hostId, @Param("category") ActivityCategory category, Pageable pageable);

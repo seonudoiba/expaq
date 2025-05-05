@@ -75,7 +75,7 @@ public class ActivityServiceImpl implements IActivityService {
         activity.setSchedule(request.getSchedule());
         activity.setHost(host);
         activity.setActive(true);
-        activity.setFeatured(false);
+        activity.setIsFeatured(false);
 
         // Save activity
         activity = activityRepository.save(activity);
@@ -111,7 +111,7 @@ public class ActivityServiceImpl implements IActivityService {
         if (request.getCountry() != null) activity.setCountry(request.getCountry()); // Changed from getCountry
         if (request.getSchedule() != null) activity.setSchedule(request.getSchedule());
         if (request.getIsActive() != null) activity.setActive(request.getIsActive()); // Changed from getIsActive
-        if (request.getIsFeatured() != null) activity.setFeatured(request.getIsFeatured()); // Changed from getIsFeatured
+        if (request.getIsFeatured() != null) activity.setIsFeatured(request.getIsFeatured()); // Changed from getIsFeatured
 
         // Save activity
         activity = activityRepository.save(activity);

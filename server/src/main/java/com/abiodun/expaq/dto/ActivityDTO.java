@@ -2,7 +2,8 @@ package com.abiodun.expaq.dto;
 
 import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
-import com.abiodun.expaq.model.Activity.ActivitySchedule;
+import com.abiodun.expaq.model.ActivitySchedule;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

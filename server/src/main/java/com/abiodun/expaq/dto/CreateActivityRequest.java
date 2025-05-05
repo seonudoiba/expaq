@@ -1,7 +1,8 @@
 package com.abiodun.expaq.dto;
 
 import com.abiodun.expaq.model.Activity.ActivityCategory;
-import com.abiodun.expaq.model.Activity.ActivitySchedule;
+import com.abiodun.expaq.model.ActivitySchedule;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -54,7 +55,7 @@ public class CreateActivityRequest {
     private String address;
     private String city;
     private String country;
-    private boolean featured = false;
+    private boolean isFeatured = false;
 
 
     @NotNull(message = "Minimum participants is required")

@@ -30,7 +30,7 @@ public class ActivityResponse {
     private String address;
     private String city;
     private String country;
-    private boolean isFeatured = false;
+    private Boolean isFeatured;
 
     public ActivityResponse(UUID id, String title, String description, String address, int capacity, String activityType,
                             BigDecimal price, boolean isBooked, boolean isFeatured, String photo,
