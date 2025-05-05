@@ -31,7 +31,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     
     // Location-based queries
     @Query(value = "SELECT a FROM Activity a WHERE " +
-           "ST_DWithin(a.location, :point, :distance) = true AND " +
+           "function('ST_DWithin', a.location, :point, :distance) = true AND " +
            "a.isActive = true")
     List<Activity> findNearbyActivities(@Param("point") Point point, @Param("distance") double distance);
     
