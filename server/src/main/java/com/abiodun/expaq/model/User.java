@@ -135,13 +135,20 @@ public class User implements UserDetails {
         this.isVerified = isVerified;
     }
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    private Set<UserRole> roles = new HashSet<>();
+    @ManyToMany
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
     public Collection<User.UserRole> getRoles() {
-        return roles;
+        Set<User.UserRole> userRoles = new HashSet<>();
+        for (Role role : roles) {
+            userRoles.add(User.UserRole.valueOf(role.getName())); // Assuming Role has a getName() method that matches UserRole names
+        }
+        return userRoles;
     }
 
     @CreationTimestamp

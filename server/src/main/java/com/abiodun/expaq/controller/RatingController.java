@@ -33,7 +33,7 @@ public class RatingController {
                                                           ) {
 
         // Fetch the logged-in user (assuming you have a method to get the current user)
-        User loggedInUser = userRepository.findByUserName(currentUser.getUsername())
+        User loggedInUser = userRepository.findByUsername(currentUser.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + currentUser.getUsername()));
 
 

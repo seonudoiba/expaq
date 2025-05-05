@@ -57,7 +57,7 @@ public class UserService {
         );
 
         if (authenticate.isAuthenticated()) {
-            User authenticatedUser = userRepository.findByUserName(user.getUserName())
+            User authenticatedUser = userRepository.findByUsername(user.getUserName())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             String token = jwtService.generateToken(authenticatedUser);
@@ -143,7 +143,7 @@ public class UserService {
     }
 
     public UserDTO getUserByUsername(String username) {
-        User user = userRepository.findByUserName(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return convertToDTO(user);
     }

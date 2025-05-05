@@ -39,7 +39,7 @@ public class AuthServiceImpl implements IAuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email is already in use");
         }
-        if (userRepository.existsByUserName((request.getUserName()))) {
+        if (userRepository.existsByUsername((request.getUserName()))) {
             throw new RuntimeException("Username is already taken");
         }
 

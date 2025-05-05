@@ -19,9 +19,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByEmail(String email);
 
-    boolean existsByUserName(String userName);
+    boolean existsByUsername(String username);
 
-    Optional<User> findByUserName(String userName);
+    Optional<User> findByUsername(String username);
     
     // OAuth2 related queries
     Optional<User> findByProviderAndProviderId(String provider, String providerId);
@@ -50,7 +50,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findActiveHosts();
 
     List<User> findByRoleAndIsVerified(User.UserRole role, boolean isVerified);
-
-    boolean existsByUsername(String username);
 
 }

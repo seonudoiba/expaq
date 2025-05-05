@@ -8,8 +8,6 @@ import lombok.Setter;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -30,33 +28,18 @@ public class Role {
         this.name = name;
     }
 
-//    public void assignRoleToUser(User user){
-//        user.getRoles().add(this);
-//        this.getUsers().add(user);
-//    }
-
-    // public void assignRoleToUser(User user, Role role) {
-    //     if (user.getRoles() != null) {
-    //         // Add the given User.UserRole to the user's roles
-    //         // user.getRoles().add(role);
-    //         user.setRoles(role.getName());
-    //     }
-    //     this.getUsers().add(user);
-    // }
-
     public void removeUserFromRole(User user){
         user.getRoles().remove(this);
         this.getUsers().remove(user);
-
     }
 
     public void removeAllUsersFromRole(){
         if (this.getUsers() != null){
-            List<User> roleUsers = this.getUsers().stream().toList();
-            roleUsers.forEach(this :: removeUserFromRole);
+            this.getUsers().stream().toList().forEach(this::removeUserFromRole);
         }
     }
-    public  String getName(){
-        return name != null? name : "";
+
+    public String getName(){
+        return name != null ? name : "";
     }
 }
