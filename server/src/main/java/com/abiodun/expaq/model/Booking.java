@@ -81,6 +81,9 @@ public class Booking {
     private String paymentStatus;
 
     @Column
+    private String bookingConfirmationCode;
+
+    @Column
     private LocalDateTime paymentDate;
 
     // Additional fields for weather integration
@@ -89,6 +92,9 @@ public class Booking {
 
     @Column
     private LocalDateTime weatherForecastUpdatedAt;
+
+    @Column(nullable = false)
+    private String guestEmail;
 
     // Method to calculate total price
     public void calculateTotalPrice() {

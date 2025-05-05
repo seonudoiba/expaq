@@ -55,8 +55,7 @@ public class CreateActivityRequest {
     private String address;
     private String city;
     private String country;
-    private boolean isFeatured = false;
-
+    private Boolean isFeatured;
 
     @NotNull(message = "Minimum participants is required")
     @Min(value = 1, message = "Minimum participants must be at least 1")

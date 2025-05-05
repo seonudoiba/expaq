@@ -38,7 +38,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     // Category and location combined
     @Query(value = "SELECT a FROM Activity a WHERE " +
            "a.category = :category AND " +
-           "ST_DWithin(a.location, :point, :distance) = true AND " +
+           "function('ST_DWithin', a.location, :point, :distance) = true AND " +
            "a.isActive = true")
     List<Activity> findNearbyActivitiesByCategory(
             @Param("category") ActivityCategory category,

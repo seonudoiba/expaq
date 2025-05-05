@@ -1,5 +1,34 @@
-{"properties": [{
-  "name": "cloudinary.api-secret",
-  "type": "java.lang.String",
-  "description": "A description for 'cloudinary.api-secret'"
-}]}
+{
+  "properties": [
+    {
+      "name": "cloudinary.api.key",
+      "type": "java.lang.String",
+      "description": "Cloudinary API key."
+    },
+    {
+      "name": "cloudinary.api.secret",
+      "type": "java.lang.String",
+      "description": "Cloudinary API secret."
+    },
+    {
+      "name": "cloudinary.cloud.name",
+      "type": "java.lang.String",
+      "description": "Cloudinary cloud name."
+    },
+    {
+      "name": "app.jwt.secret",
+      "type": "java.lang.String",
+      "description": "JWT secret key for signing tokens."
+    },
+    {
+      "name": "app.jwt.expiration",
+      "type": "java.lang.Integer",
+      "description": "JWT expiration time in seconds."
+    },
+    {
+      "name": "app.jwt.expiration-in-ms",
+      "type": "java.lang.Long",
+      "description": "JWT expiration time in milliseconds."
+    }
+  ]
+}

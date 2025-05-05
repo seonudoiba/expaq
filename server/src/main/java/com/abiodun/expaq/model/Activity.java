@@ -40,7 +40,6 @@ public class Activity {
 
     @Column(nullable = false)
     private Boolean isFeatured;
-
     private String address;
     private String city;
     private String country;

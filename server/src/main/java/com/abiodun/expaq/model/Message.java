@@ -40,8 +40,8 @@ public class Message {
     @Column(nullable = false)
     private MessageType type;
 
-    @Column(name = "is_read")
-    private boolean read;
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead;
 
     @Column(name = "read_at")
     private LocalDateTime readAt;
@@ -72,16 +72,16 @@ public class Message {
     private String attachmentType;
 
     public void setIsRead(boolean isRead) {
-        this.read = isRead;
+        this.isRead = isRead;
     }
 
     public boolean isRead() {
-        return read;
+        return isRead;
     }
 
     // Method to mark message as read
     public void markAsRead() {
-        this.read = true;
+        this.isRead = true;
         this.readAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

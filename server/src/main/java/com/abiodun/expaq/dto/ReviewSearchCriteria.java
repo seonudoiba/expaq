@@ -13,8 +13,8 @@ public class ReviewSearchCriteria {
     private UUID hostId;
     private Integer minRating;
     private Integer maxRating;
-    private Boolean isVerified;
-    private Boolean isEdited;
+    private boolean isVerified;
+    private boolean isEdited;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String searchTerm;
