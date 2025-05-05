@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter; // Add import for CorsFilter
 
 @Configuration
 @EnableWebSecurity
@@ -22,11 +23,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CorsFilter corsFilter; // Inject CorsFilter
 
 
-    public WebSecurityConfig(UserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public WebSecurityConfig(UserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter, CorsFilter corsFilter) { // Update constructor signature
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.corsFilter = corsFilter; // Assign injected CorsFilter
     }
 
     @Bean
@@ -40,6 +43,7 @@ public class WebSecurityConfig {
 
                 )
                 .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class) // Add CorsFilter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return httpSecurity.build();

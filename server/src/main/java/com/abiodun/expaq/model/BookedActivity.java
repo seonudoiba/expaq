@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -17,7 +18,7 @@ public class BookedActivity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookingId;
+    private UUID bookingId;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private String guestFullName;

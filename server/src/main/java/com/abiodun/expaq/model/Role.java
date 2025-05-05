@@ -1,8 +1,5 @@
 package com.abiodun.expaq.model;
 
-
-
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,6 +9,8 @@ import lombok.Setter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -20,7 +19,7 @@ import java.util.List;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
     private String name;
 
     @JsonIgnore
@@ -31,10 +30,19 @@ public class Role {
         this.name = name;
     }
 
-    public void assignRoleToUser(User user){
-        user.getRoles().add(this);
-        this.getUsers().add(user);
-    }
+//    public void assignRoleToUser(User user){
+//        user.getRoles().add(this);
+//        this.getUsers().add(user);
+//    }
+
+    // public void assignRoleToUser(User user, Role role) {
+    //     if (user.getRoles() != null) {
+    //         // Add the given User.UserRole to the user's roles
+    //         // user.getRoles().add(role);
+    //         user.setRoles(role.getName());
+    //     }
+    //     this.getUsers().add(user);
+    // }
 
     public void removeUserFromRole(User user){
         user.getRoles().remove(this);

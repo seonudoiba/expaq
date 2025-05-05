@@ -8,11 +8,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class ExpaqUserDetailsService implements UserDetailsService {
-    private  final UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public ExpaqUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -20,11 +20,10 @@ public class ExpaqUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUserName(username);
-        if(Objects.isNull(user)) {
-            System.out.println("user not found");
+        Optional<User> userOptional = userRepository.findByUserName(username);
+        if(userOptional.isEmpty()) {
             throw new UsernameNotFoundException(username);
         }
-        return new ExpaqUserDetails(user);
+        return new ExpaqUserDetails(userOptional.get());
     }
 }

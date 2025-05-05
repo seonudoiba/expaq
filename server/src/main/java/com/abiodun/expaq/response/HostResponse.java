@@ -1,5 +1,7 @@
 package com.abiodun.expaq.response;
 
+import java.util.UUID;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,12 +11,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class HostResponse {
-    private Long id;
+    private UUID id;
     private String email;
     private String firstName;
     private String lastName;
 
-    public HostResponse(Long id, String email, String firstName, String lastName) {
+    public HostResponse(UUID id, String email, String firstName, String lastName) {
         this.id = id;
         this.email = email;
         this.firstName = firstName;

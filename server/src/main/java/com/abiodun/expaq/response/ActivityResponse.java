@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +16,7 @@ public class ActivityResponse {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
     private String title;
     private String description;
     private int capacity; //capacity or maximum number of participants
@@ -31,7 +32,7 @@ public class ActivityResponse {
     private String country;
     private boolean isFeatured = false;
 
-    public ActivityResponse(Long id, String title, String description, String address, int capacity, String activityType,
+    public ActivityResponse(UUID id, String title, String description, String address, int capacity, String activityType,
                             BigDecimal price, boolean isBooked, boolean isFeatured, String photo,
                             List<BookingResponse> bookings, HostResponse host, List<RatingResponse> ratings, String city, String country) {
         this.id = id;
@@ -51,7 +52,7 @@ public class ActivityResponse {
         this.ratings = ratings;
     }
 
-    public ActivityResponse(Long id, String activityType, BigDecimal price) {
+    public ActivityResponse(UUID id, String activityType, BigDecimal price) {
         this.id = id;
         this.activityType = activityType;
         this.price = price;

@@ -5,11 +5,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
-
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ExpaqUserDetails implements UserDetails {
-    private  final User user;
+    private final User user;
 
     public ExpaqUserDetails(User user) {
         this.user = user;
@@ -17,19 +18,19 @@ public class ExpaqUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
+        // Return a single authority based on the User.UserRole enum
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return user.getPassword(); // Use passwordHash field
     }
+
 
     @Override
     public String getUsername() {
-        return user.getUserName();
+        return user.getUsername();
     }
 
     @Override
@@ -50,5 +51,9 @@ public class ExpaqUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public UUID getId() {
+        return this.user.getId();
     }
 }

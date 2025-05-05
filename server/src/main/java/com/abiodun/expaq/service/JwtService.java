@@ -1,8 +1,8 @@
 package com.abiodun.expaq.service;
 
-import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
-import com.abiodun.expaq.service.logout.BlackList;
+import com.abiodun.expaq.model.User.UserRole;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -20,45 +20,18 @@ import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
-    private String SecretKey = null;
-    private final BlackList blackList;
 
-    public JwtService(BlackList blackList) {
-        this.blackList = blackList;
-    }
-
-//    public String generateToken(User user) {
-//        Map<String, Object>  claims = new HashMap<>();
-//        return Jwts
-//                .builder()
-//                .claims()
-//                .add(claims)
-//                .subject(user.getUserName())
-//                .issuer("DCB")
-//                .issuedAt(new Date(System.currentTimeMillis()))
-//                .expiration(new Date(System.currentTimeMillis() + 60*10*1000))
-//                .and()
-//                .signWith(generateKey())
-//                .compact();
-//
-//    }
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", user.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toList())); // Add roles to claims
-//        List<String> roles = userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-
-//        ExpaqUserDetails userPrincipal = (ExpaqUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        roles.put("roles", userPrincipal.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toList())); // Add roles to claims
-
+        claims.put("roles", user.getAuthorities().stream()
+                .map(authority -> User.UserRole.valueOf(authority.getAuthority())) // Convert authority to User.UserRole
+                .map(UserRole::name) // Get the name of the User.UserRole
+                .collect(Collectors.toList()));
         return Jwts
                 .builder()
                 .claims(claims)
-                .subject(user.getUserName())
+                .subject(user.getUsername())
                 .issuer("DCB")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 60 * 10 * 1000))
@@ -66,13 +39,12 @@ public class JwtService {
                 .compact();
     }
 
-
     public SecretKey generateKey(){
         byte[] decode = Decoders.BASE64.decode(getSecretKey());
         return Keys.hmacShaKeyFor(decode);
     }
     public String getSecretKey(){
-        return SecretKey = "36763979244226452948404D635166546A576D5A7134743777217A25432A462D";
+        return "36763979244226452948404D635166546A576D5A7134743777217A25432A462D";
     }
 
     public String extractUserName(String authToken) {
@@ -97,7 +69,7 @@ public class JwtService {
 
     public boolean isTokenValid(String authToken, UserDetails userDetails) {
         final String username = extractUserName(authToken);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(authToken) && !blackList.isBlackListed(authToken));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(authToken));
     }
 
     private boolean isTokenExpired(String authToken) {

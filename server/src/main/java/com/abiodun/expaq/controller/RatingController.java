@@ -6,13 +6,14 @@ import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.response.RatingResponse;
 import com.abiodun.expaq.service.RatingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.abiodun.expaq.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/ratings")
@@ -20,7 +21,6 @@ public class RatingController {
     private final RatingService ratingService;
     private final UserRepository userRepository;
 
-    @Autowired
     public RatingController(RatingService ratingService, UserRepository userRepository) {
         this.ratingService = ratingService;
         this.userRepository = userRepository;
@@ -28,13 +28,13 @@ public class RatingController {
 
 
     @PostMapping("/activity/{activityId}/ratings")
-    public ResponseEntity<RatingResponse> createNewRating(@PathVariable Long activityId, @RequestBody Rating rating,
+    public ResponseEntity<RatingResponse> createNewRating(@PathVariable UUID activityId, @RequestBody Rating rating,
                                                           @AuthenticationPrincipal ExpaqUserDetails currentUser
                                                           ) {
 
         // Fetch the logged-in user (assuming you have a method to get the current user)
-        User loggedInUser = userRepository.findByUserName(currentUser.getUsername());
-
+        User loggedInUser = userRepository.findByUserName(currentUser.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + currentUser.getUsername()));
 
 
         // Set the activity and user for the rating
@@ -43,25 +43,25 @@ public class RatingController {
     }
 
     @GetMapping("/activity/{activityId}/ratings")
-    public List<RatingResponse> getRatingsByActivityId(@PathVariable(value = "activityId") Long activityId) {
+    public List<RatingResponse> getRatingsByActivityId(@PathVariable(value = "activityId") UUID activityId) {
         return ratingService.getRatingsByActivityId(activityId);
     }
 
     @GetMapping("/activity/{activityId}/ratings/{id}")
-    public ResponseEntity<RatingResponse> getRatingById(@PathVariable(value = "activityId") Long activityId, @PathVariable(value = "id") Long ratingId) {
+    public ResponseEntity<RatingResponse> getRatingById(@PathVariable(value = "activityId") UUID activityId, @PathVariable(value = "id") UUID ratingId) {
         RatingResponse ratingResponse = ratingService.getRatingById(activityId, ratingId);
         return new ResponseEntity<>(ratingResponse, HttpStatus.OK);
     }
 
     @PutMapping("/activity/{activityId}/ratings/{id}")
-    public ResponseEntity<RatingResponse> updateRating(@PathVariable(value = "activityId") Long activityId, @PathVariable(value = "id") Long ratingId,
+    public ResponseEntity<RatingResponse> updateRating(@PathVariable(value = "activityId") UUID activityId, @PathVariable(value = "id") UUID ratingId,
                                                   @RequestBody RatingResponse ratingResponse) {
         RatingResponse updatedRating = ratingService.updateRating(activityId, ratingId, ratingResponse);
         return new ResponseEntity<>(updatedRating, HttpStatus.OK);
     }
 
     @DeleteMapping("/activity/{activityId}/ratings/{id}")
-    public ResponseEntity<String> deleteRating(@PathVariable(value = "activityId") Long activityId, @PathVariable(value = "id") Long ratingId) {
+    public ResponseEntity<String> deleteRating(@PathVariable(value = "activityId") UUID activityId, @PathVariable(value = "id") UUID ratingId) {
         ratingService.deleteRating(activityId, ratingId);
         return new ResponseEntity<>("Rating deleted successfully", HttpStatus.OK);
     }

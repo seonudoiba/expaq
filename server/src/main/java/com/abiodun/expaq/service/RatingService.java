@@ -1,5 +1,6 @@
 package com.abiodun.expaq.service;
 
+import com.abiodun.expaq.dto.ActivityDTO;
 import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.response.RatingResponse;
 import com.abiodun.expaq.exception.ActivityNotFoundException;
@@ -8,52 +9,40 @@ import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Rating;
 import com.abiodun.expaq.repository.ActivityRepository;
 import com.abiodun.expaq.repository.RatingRepository;
-import com.abiodun.expaq.service.interf.IRatingService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class RatingService implements IRatingService {
     private final RatingRepository ratingRepository;
     private final ActivityRepository activityRepository;
-    private final ActivityService activityService;
+    private final IActivityService activityService;
 
     @Autowired
-    public RatingService(RatingRepository ratingRepository, ActivityRepository activityRepository, ActivityService activityService) {
+    public RatingService(RatingRepository ratingRepository, ActivityRepository activityRepository, IActivityService activityService) {
         this.ratingRepository = ratingRepository;
         this.activityRepository = activityRepository;
         this.activityService = activityService;
     }
 
-
-//    @Override
-//    public RatingResponse createRating(Long activityId, Rating rating, User loggedInUser) {
-//        // Fetch the activity by ID
-//        Activity activity = activityService.getActivityById(activityId)
-//                .orElseThrow(() -> new RuntimeException("Activity not found"));
-//
-//        // Set the activity for the rating
-//        rating.setActivity(activity);
-//        System.out.println(rating.toString() + " " + activity.toString() + "-----------------------------------------------------------------------------------------");
-//
-//        // Save the rating
-//        return mapToDto(ratingRepository.save(rating));
-//
-//    }
-
-    @Override
     @Transactional
-    public RatingResponse createRating(Long activityId, Rating rating, User loggedInUser) {
+    @Override
+    public RatingResponse createRating(UUID activityId, Rating rating, User loggedInUser) {
         // Fetch the activity by ID
-        Activity activity = activityService.getActivityById(activityId)
-                .orElseThrow(() -> new RuntimeException("Activity not found"));
+        Activity activity = activityRepository.findById(activityId)
+                .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
+
+        // Map Activity to ActivityDTO
+        ActivityDTO activityDTO = activityService.mapToActivityDTO(activity);
 
         // Check if the user has already rated this activity
-        boolean hasUserRated = ratingRepository.existsByActivityAndUser(activity, loggedInUser);
+        boolean hasUserRated = ratingRepository.existsByActivityAndUser(ActivityDTO.fromActivity(activity), loggedInUser);
         if (hasUserRated) {
             throw new RuntimeException("You have already rated this activity.");
         }
@@ -62,38 +51,36 @@ public class RatingService implements IRatingService {
         rating.setActivity(activity);
         rating.setUser(loggedInUser); // Ensure the Rating entity has a reference to the User
 
-
         // Save the rating
         Rating savedRating = ratingRepository.save(rating);
         return mapToDto(savedRating);
     }
 
-
     @Override
-    public List<RatingResponse> getRatingsByActivityId(Long id) {
+    public List<RatingResponse> getRatingsByActivityId(UUID id) {
         List<Rating> ratings = ratingRepository.findByActivityId(id);
 
         return ratings.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
-    public RatingResponse getRatingById(Long activityId, Long ratingId) {
-        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new ActivityNotFoundException("Activity with associated Rating not found"+ activityId + "okay"));
+    public RatingResponse getRatingById(UUID activityId, UUID ratingId) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new ActivityNotFoundException("Activity with associated Rating not found"));
 
-        Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new RatingNotFoundException("Rating with associate activity not found"+ ratingId + "okay"));
+        Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new RatingNotFoundException("Rating with associate activity not found"));
 
         if(rating.getActivity().getId() != activity.getId()) {
-            throw new RatingNotFoundException("This Rating does not belong to a activity"+ rating.getActivity().getId()+" a "+ activity.getId());
+            throw new RatingNotFoundException("This Rating does not belong to a activity");
         }
 
         return mapToDto(rating);
     }
 
     @Override
-    public RatingResponse updateRating(Long activityId, Long ratingId, RatingResponse ratingResponse) {
-        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new ActivityNotFoundException("Activity with associated Rating not found" + activityId + "okay"));
+    public RatingResponse updateRating(UUID activityId, UUID ratingId, RatingResponse ratingResponse) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new ActivityNotFoundException("Activity with associated Rating not found"));
 
-        Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new RatingNotFoundException("Rating with associate activity not found" + ratingId + "okay"));
+        Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new RatingNotFoundException("Rating with associate activity not found"));
 
         if(rating.getActivity().getId() != activity.getId()) {
             throw new RatingNotFoundException("This Rating does not belong to a activity");
@@ -109,7 +96,7 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public void deleteRating(Long activityId, Long ratingId) {
+    public void deleteRating(UUID activityId, UUID ratingId) {
         Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new ActivityNotFoundException("Activity with associated Rating not found"));
 
         Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new RatingNotFoundException("Rating with associate activity not found"));

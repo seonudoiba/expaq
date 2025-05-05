@@ -2,72 +2,171 @@ package com.abiodun.expaq.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
+import org.locationtech.jts.geom.Point; // Import Point
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID; // Import UUID
-import com.abiodun.expaq.model.ActivityCategory; // Import the new enum
+
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "activities")
 public class Activity {
     @Id
-    @GeneratedValue // Use default UUID generation
-    @UuidGenerator // Specify UUID generator
-    private UUID id; // Changed type to UUID
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id", nullable = false)
+    private User host;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
-
-    // Simple text location for now, consider PostGIS later
-    private String location;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
 
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Enumerated(EnumType.STRING) // Added category field
+    @Column(nullable = false)
+    private boolean featured;
+
+    private String address;
+    private String city;
+    private String country;
+
+    @Column(columnDefinition = "geometry(Point,4326)")
+    private Point location;
+
+    @Column(nullable = false)
+    private int capacity;
+
+    @Column(nullable = false)
+    private int bookedCapacity;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ActivityCategory category;
 
-    // Store image URLs as a JSONB array or a simple delimited string
-    @JdbcTypeCode(SqlTypes.JSON) // Or use @Convert for a custom converter
-    @Column(columnDefinition = "jsonb") // Use jsonb for PostgreSQL
-    private List<String> mediaUrls; // Renamed from images to mediaUrls
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id", nullable = false) // host_id is UUID in User entity
-    private User host;
-
-    // Schedule representation - JSONB is flexible
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private String schedule; // Store schedule details as JSON string or map
+    private ActivitySchedule schedule;
 
-    // Removed capacity, booked_capacity, activityType, isBooked, photo, isFeatured, address, city, country
-    // Removed bookings and ratings relationships (will be mapped from Booking/Review)
+    @ElementCollection
+    @CollectionTable(name = "activity_media", joinColumns = @JoinColumn(name = "activity_id"))
+    @Column(name = "media_url")
+    private List<String> mediaUrls = new ArrayList<>();
+
+    @Column(nullable = false)
+    private int maxParticipants;
+
+    @Column(nullable = false)
+    private int minParticipants;
+
+    @Column(nullable = false)
+    private int durationMinutes;
+
+    @Column(nullable = false)
+    private boolean isActive = true;
+
+    @Column(nullable = false)
+    private boolean isVerified = false;
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Booking> bookings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages = new ArrayList<>();
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    // Removed addBooking, cancelBooking, canAccommodateBooking methods - booking logic moved
+    public enum ActivityCategory {
+        OUTDOOR,
+        FOOD,
+        ART,
+        CULTURE,
+        ADVENTURE,
+        SPORTS,
+        WELLNESS,
+        EDUCATION,
+        OTHER
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ActivitySchedule {
+        private List<TimeSlot> timeSlots;
+        private List<String> availableDays;
+        private String timeZone;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class TimeSlot {
+            private String startTime;
+            private String endTime;
+            private int maxParticipants;
+            private boolean isAvailable;
+        }
+    }
+
+    // Methods for booking management
+    public boolean canAccommodateBooking(int numberOfGuests) {
+        return (maxParticipants - bookings.size()) >= numberOfGuests;
+    }
+
+    public void addBooking(Booking booking) {
+        if (canAccommodateBooking(booking.getNumberOfGuests())) {
+            bookings.add(booking);
+            booking.setActivity(this);
+        } else {
+            throw new IllegalStateException("Activity cannot accommodate the requested number of guests");
+        }
+    }
+
+    public void cancelBooking(Booking booking) {
+        if (bookings.remove(booking)) {
+            booking.setActivity(null);
+        }
+    }
+
+    // Method to calculate average rating
+    public double getAverageRating() {
+        if (reviews.isEmpty()) {
+            return 0.0;
+        }
+        return reviews.stream()
+                .mapToDouble(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
+    public void updateAverageRating() {
+        // This method will be implemented by the repository
+        // The actual calculation will be done in the database
+        this.updatedAt = LocalDateTime.now();
+    }
 }

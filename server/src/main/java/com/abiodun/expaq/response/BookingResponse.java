@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingResponse {
-    private Long id;
+    private UUID id;
 
     private LocalDate checkInDate;
 
@@ -30,7 +31,7 @@ public class BookingResponse {
 
     private ActivityResponse activity;
 
-    public BookingResponse(Long id, LocalDate checkInDate, LocalDate checkOutDate,
+    public BookingResponse(UUID id, LocalDate checkInDate, LocalDate checkOutDate,
                            String bookingConfirmationCode) {
         this.id = id;
         this.checkInDate = checkInDate;

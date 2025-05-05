@@ -1,130 +1,112 @@
 package com.abiodun.expaq.controller;
 
-import com.abiodun.expaq.request.BookingRequest;
-import com.abiodun.expaq.response.ActivityResponse;
-import com.abiodun.expaq.response.BookingResponse;
-import com.abiodun.expaq.exception.InvalidBookingRequestException;
-import com.abiodun.expaq.exception.ResourceNotFoundException;
-import com.abiodun.expaq.model.Activity;
-import com.abiodun.expaq.model.BookedActivity;
-import com.abiodun.expaq.service.interf.IActivityService;
-import com.abiodun.expaq.service.interf.IBookingService;
+import com.abiodun.expaq.dto.BookingDTO;
+import com.abiodun.expaq.dto.CreateBookingRequest;
+import com.abiodun.expaq.model.BookingStatus;
+import com.abiodun.expaq.service.IBookingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
-@RequiredArgsConstructor
 @RestController
-@RequestMapping("/bookings")
+@RequestMapping("/api/bookings")
+@RequiredArgsConstructor
+// Add CORS configuration if needed
 public class BookingController {
+
     private final IBookingService bookingService;
-    private final IActivityService activityService;
 
-    @GetMapping("/all-bookings")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<BookingResponse>> getAllBookings(){
-        List<BookedActivity> bookings = bookingService.getAllBookings();
-        List<BookingResponse> bookingResponses = new ArrayList<>();
-        for (BookedActivity booking : bookings){
-            BookingResponse bookingResponse = getBookingResponse(booking);
-            bookingResponses.add(bookingResponse);
-        }
-        return ResponseEntity.ok(bookingResponses);
+    @PostMapping
+    public ResponseEntity<BookingDTO> createBooking(
+            @RequestAttribute("userId") UUID userId,
+            @Valid @RequestBody CreateBookingRequest request) {
+        return ResponseEntity.ok(bookingService.createBooking(request, userId));
     }
 
-    //Add new booking r Booking
-    @PostMapping("/activity/{activityId}/booking")
-    public ResponseEntity<?> saveBooking(@PathVariable Long activityId,
-                                         @RequestParam("checkInDate") LocalDate checkInDate,
-                                         @RequestParam("checkOutDate") LocalDate checkOutDate,
-                                         @RequestParam("guestFullName") String guestFullName,
-                                         @RequestParam("guestEmail") String guestEmail,
-                                         @RequestParam("numOfAdults") int numOfAdults,
-                                         @RequestParam("numOfChildren") int numOfChildren) {
-
-        // Create a BookingRequest object and set the parameters
-        BookingRequest bookingRequest = new BookingRequest();
-        bookingRequest.setCheckInDate(checkInDate);
-        bookingRequest.setCheckOutDate(checkOutDate);
-        bookingRequest.setGuestFullName(guestFullName);
-        bookingRequest.setGuestEmail(guestEmail);
-        bookingRequest.setNumOfAdults(numOfAdults);
-        bookingRequest.setNumOfChildren(numOfChildren);
-
-        // Map BookingRequest to BookedActivity using the mapper
-        BookedActivity bookRequest = toBookedActivity(bookingRequest);
-
-
-        try{
-            String confirmationCode = bookingService.saveBooking(activityId, bookRequest);
-            return ResponseEntity.ok(
-                    "Activity booked successfully, Your booking confirmation code is :"+confirmationCode);
-
-        }catch (InvalidBookingRequestException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PutMapping("/{bookingId}/cancel")
+    public ResponseEntity<Void> cancelBooking(
+            @RequestAttribute("userId") UUID userId,
+            @PathVariable UUID bookingId,
+            @RequestParam String reason) {
+        bookingService.cancelBooking(bookingId, userId, reason);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/confirmation/{confirmationCode}")
-    public ResponseEntity<?> getBookingByConfirmationCode(@PathVariable String confirmationCode){
-        try{
-            BookedActivity booking = bookingService.findByBookingConfirmationCode(confirmationCode);
-            BookingResponse bookingResponse = getBookingResponse(booking);
-            return ResponseEntity.ok(bookingResponse);
-        }catch (ResourceNotFoundException ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }
+    @PutMapping("/{bookingId}/confirm")
+    public ResponseEntity<Void> confirmBooking(
+            @RequestAttribute("userId") UUID hostId,
+            @PathVariable UUID bookingId) {
+        bookingService.confirmBooking(bookingId, hostId);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/user/{email}/bookings")
-    public ResponseEntity<List<BookingResponse>> getBookingsByUserEmail(@PathVariable String email) {
-        List<BookedActivity> bookings = bookingService.getBookingsByUserEmail(email);
-        List<BookingResponse> bookingResponses = new ArrayList<>();
-        for (BookedActivity booking : bookings) {
-            BookingResponse bookingResponse = getBookingResponse(booking);
-            bookingResponses.add(bookingResponse);
-        }
-        return ResponseEntity.ok(bookingResponses);
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<BookingDTO> getBooking(
+            @RequestAttribute("userId") UUID userId,
+            @PathVariable UUID bookingId) {
+        return ResponseEntity.ok(bookingService.getBooking(bookingId, userId));
     }
 
-    @DeleteMapping("/booking/{bookingId}/delete")
-    public void cancelBooking(@PathVariable Long bookingId){
-        bookingService.cancelBooking(bookingId);
+    @GetMapping("/my-bookings")
+    public ResponseEntity<List<BookingDTO>> getUserBookings(
+            @RequestAttribute("userId") UUID userId) {
+        return ResponseEntity.ok(bookingService.getUserBookings(userId));
     }
 
-    private BookingResponse getBookingResponse(BookedActivity booking) {
-        Activity theActivity = activityService.getActivityById(booking.getActivity().getId()).get();
-        ActivityResponse activity = new ActivityResponse(
-                theActivity.getId(),
-                theActivity.getActivityType(),
-                theActivity.getPrice());
-        return new BookingResponse(
-                booking.getBookingId(), booking.getCheckInDate(),
-                booking.getCheckOutDate(),booking.getGuestFullName(),
-                booking.getGuestEmail(), booking.getNumOfAdults(),
-                booking.getNumOfChildren(), booking.getTotalNumOfGuest(),
-                booking.getBookingConfirmationCode(), activity);
+    @GetMapping("/activity/{activityId}")
+    public ResponseEntity<List<BookingDTO>> getActivityBookings(
+            @RequestAttribute("userId") UUID hostId,
+            @PathVariable UUID activityId) {
+        return ResponseEntity.ok(bookingService.getActivityBookings(activityId, hostId));
     }
 
-    public static BookedActivity toBookedActivity(BookingRequest bookingRequest) {
-        BookedActivity bookedActivity = new BookedActivity();
-        bookedActivity.setCheckInDate(bookingRequest.getCheckInDate());
-        bookedActivity.setCheckOutDate(bookingRequest.getCheckOutDate());
-        bookedActivity.setGuestFullName(bookingRequest.getGuestFullName());
-        bookedActivity.setGuestEmail(bookingRequest.getGuestEmail());
-        bookedActivity.setNumOfAdults(bookingRequest.getNumOfAdults());
-        bookedActivity.setNumOfChildren(bookingRequest.getNumOfChildren());
-        bookedActivity.calculateTotalGuest();
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<BookingDTO>> getUpcomingBookings(
+            @RequestAttribute("userId") UUID userId) {
+        return ResponseEntity.ok(bookingService.getUpcomingBookings(userId));
+    }
 
-        // You can set the bookingConfirmationCode here if you have a method to generate it
-        // bookedActivity.setBookingConfirmationCode(generateConfirmationCode());
+    @GetMapping("/past")
+    public ResponseEntity<List<BookingDTO>> getPastBookings(
+            @RequestAttribute("userId") UUID userId) {
+        return ResponseEntity.ok(bookingService.getPastBookings(userId));
+    }
 
-        return bookedActivity;
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<BookingDTO>> getBookingsByStatus(
+            @RequestAttribute("userId") UUID userId,
+            @PathVariable String status) {
+        BookingStatus bookingStatus = BookingStatus.valueOf(status);
+        return ResponseEntity.ok(bookingService.getBookingsByStatus(userId, bookingStatus));
+    }
+
+    @GetMapping("/date-range")
+    public ResponseEntity<List<BookingDTO>> getBookingsByDateRange(
+            @RequestAttribute("userId") UUID userId,
+            @RequestParam LocalDateTime start,
+            @RequestParam LocalDateTime end) {
+        return ResponseEntity.ok(bookingService.getBookingsByDateRange(userId, start, end));
+    }
+
+    @PutMapping("/{bookingId}/payment")
+    public ResponseEntity<Void> updateBookingPayment(
+            @PathVariable UUID bookingId,
+            @RequestParam String paymentId,
+            @RequestParam String paymentStatus) {
+        bookingService.updateBookingPayment(bookingId, paymentId, paymentStatus);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{bookingId}/weather")
+    public ResponseEntity<Void> updateBookingWeather(
+            @PathVariable UUID bookingId,
+            @RequestParam String weatherForecast) {
+        bookingService.updateBookingWeather(bookingId, weatherForecast);
+        return ResponseEntity.ok().build();
     }
 }

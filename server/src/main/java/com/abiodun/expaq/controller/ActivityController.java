@@ -1,248 +1,182 @@
 package com.abiodun.expaq.controller;
 
-import com.abiodun.expaq.model.*;
-import com.abiodun.expaq.repository.UserRepository;
-import com.abiodun.expaq.response.*;
-import com.abiodun.expaq.service.ActivityService;
-import com.abiodun.expaq.service.UserService;
-import org.springframework.security.access.AccessDeniedException;
-import com.abiodun.expaq.exception.ResourceNotFoundException;
-import com.abiodun.expaq.service.interf.IActivityService;
-import com.abiodun.expaq.service.BookingService;
-import jakarta.transaction.Transactional;
-import org.springframework.format.annotation.DateTimeFormat;
+import com.abiodun.expaq.dto.ActivityDTO;
+import com.abiodun.expaq.dto.CreateActivityRequest;
+import com.abiodun.expaq.dto.UpdateActivityRequest;
+import com.abiodun.expaq.model.Activity; // Import Activity for Specification
+import com.abiodun.expaq.model.Activity.ActivityCategory;
+import com.abiodun.expaq.model.ExpaqUserDetails;
+import com.abiodun.expaq.service.IActivityService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize; // For role-based authorization
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/activities")
+@RequestMapping("/api/activities")
+@RequiredArgsConstructor
+// Add CORS configuration if needed
 public class ActivityController {
-    private  final IActivityService activityService;
-    private  final BookingService bookingService;
-    private final UserRepository userRepository;
 
-    public ActivityController(ActivityService activityService, BookingService bookingService, UserService userService, UserRepository userRepository) {
-        this.activityService = activityService;
-        this.bookingService = bookingService;
-        this.userRepository = userRepository;
-    }
+    private final IActivityService activityService;
 
-    @GetMapping("/")
-    public ResponseEntity<List<ActivityResponse>> getAllActivities() throws SQLException {
-        List<Activity> activities = activityService.getAllActivities();
-        List<ActivityResponse> activityResponses = new ArrayList<>();
+    // GET /activities - List activities (publicly accessible, filtering added)
+    @GetMapping
+    public ResponseEntity<List<ActivityDTO>> getAllActivities(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice
+    ) {
+        Specification<Activity> spec = Specification.where(null);
 
-        for (Activity activity : activities) {
-            ActivityResponse activityResponse = getActivityResponse(activity);
-            activityResponses.add(activityResponse);
+        if (location != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("location"), location));
         }
 
-        return ResponseEntity.ok(activityResponses);
-    }
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ActivityResponse>> getAllHostActivities(@PathVariable Long userId) throws SQLException {
-        List<Activity> activities = activityService.getAllActivitiesByUserId(userId);
-        List<ActivityResponse> activityResponses = new ArrayList<>();
-
-        for (Activity activity : activities) {
-            ActivityResponse activityResponse = getActivityResponse(activity);
-            activityResponses.add(activityResponse);
+        if (type != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("type"), type));
         }
 
-        return ResponseEntity.ok(activityResponses);
-    }
-
-    @GetMapping("/activity/types")
-    public List<String> getActivityTypes() {
-        return activityService.getAllActivityTypes();
-    }
-    @GetMapping("/activity/destinations/countries")
-    public List<Object[]> getActivityDestinations() {
-        return activityService.getAllActivityDestinationCountries();
-    }
-    @GetMapping("/activity/destinations/cities")
-    public List<Object[]> getActivityDestinationsCities() {
-        return activityService.getAllActivityDestinationCities();
-    }
-
-
-    @GetMapping("/activity/{activityId}")
-    public ResponseEntity<Optional<ActivityResponse>> getActivityById(@PathVariable Long activityId){
-        Optional<Activity> theActivity = activityService.getActivityById(activityId);
-        return theActivity.map(activity -> {
-            ActivityResponse activityResponse = getActivityResponse(activity);
-            return  ResponseEntity.ok(Optional.of(activityResponse));
-        }).orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
-    }
-    @GetMapping("/featured")
-    public ResponseEntity<List<ActivityResponse>> getFeaturedActivities() throws SQLException {
-        List<Activity> featuredActivities = activityService.getFeaturedActivities();
-        List<ActivityResponse> activityResponses = new ArrayList<>();
-        for (Activity activity : featuredActivities){
-            ActivityResponse activityResponse = getActivityResponse(activity);
-            activityResponses.add(activityResponse);
+        if (minPrice != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
         }
-        return ResponseEntity.ok(activityResponses);
+
+        if (maxPrice != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+        }
+
+        List<ActivityDTO> activities = activityService.getAllActivities(spec);
+        return ResponseEntity.ok(activities);
     }
 
-    @GetMapping("/available-activities")
-    public ResponseEntity<List<ActivityResponse>> getAvailableActivities(
-            @RequestParam("checkInDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
-            @RequestParam("checkOutDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate checkOutDate,
-            @RequestParam("activityType") String activityType) throws SQLException {
-        List<Activity> availableActivities = activityService.getAvailableActivities(checkInDate, checkOutDate, activityType);
-        List<ActivityResponse> activityResponses = new ArrayList<>();
-        for (Activity activity : availableActivities){
-            ActivityResponse activityResponse = getActivityResponse(activity);
-            activityResponses.add(activityResponse);
-        }
-        if(activityResponses.isEmpty()){
-            return ResponseEntity.noContent().build();
-        }else{
-            return ResponseEntity.ok(activityResponses);
-        }
+    // GET /activities/{id} - View one activity (publicly accessible)
+    @GetMapping("/{id}")
+    public ResponseEntity<ActivityDTO> getActivityById(@PathVariable UUID id) {
+        ActivityDTO activity = activityService.getActivityById(id);
+        return ResponseEntity.ok(activity);
     }
 
-    @Transactional
-    @PostMapping( "/new-activity")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HOST')")
-    public ResponseEntity<ActivityResponse> addNewActivity(
+    // POST /activities - Create activity (host only)
+    @PostMapping
+    @PreAuthorize("hasRole('HOST')") // Ensure only users with HOST role can access
+    public ResponseEntity<ActivityDTO> createActivity(
             @AuthenticationPrincipal ExpaqUserDetails currentUser,
-            @RequestParam("photo") MultipartFile photo,
-            @RequestParam("activityType") String activityType,
-            @RequestParam("title") String title,
-            @RequestParam("description") String description,
-            @RequestParam("price") BigDecimal price,
-            @RequestParam("country") String country,
-            @RequestParam("city") String city,
-            @RequestParam("address") String address,
-            @RequestParam("capacity") int capacity) throws SQLException, IOException {
-
-        // Verify authentication
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            throw new RuntimeException("User not authenticated");
-        }
-
-        Activity savedActivity = activityService.addNewActivity(
-                photo, activityType, price, title, description,
-                address, city, country, capacity
-                );
-        ActivityResponse response = getActivityResponse(savedActivity);
-        return ResponseEntity.ok(response);
+            @Valid @RequestBody CreateActivityRequest request) {
+        UUID hostId = currentUser.getId();
+        return ResponseEntity.ok(activityService.createActivity(request, hostId));
     }
 
-
-    @PutMapping("/update/{activityId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HOST')")
-    public ResponseEntity<ActivityResponse> updateActivity(
-            @PathVariable Long activityId,
-            @RequestParam(required = false) MultipartFile photo,
-            @RequestParam(required = false) String activityType,
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) BigDecimal price,
-            @RequestParam(required = false) String country,
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String address,
-            @RequestParam(required = false) int capacity,
-            @AuthenticationPrincipal ExpaqUserDetails currentUser) throws SQLException, IOException {
-
-        User user = convertToUser(currentUser);
-
-        Optional<Activity> activityOptional = activityService.getActivityById(activityId);
-        if (activityOptional.isPresent()) {
-            Activity theActivity = activityOptional.get();
-            if (!theActivity.getHost().getId().equals(user.getId())) {
-                throw new AccessDeniedException("You are not authorized to update this activity");
-            }
-            theActivity = activityService.updateActivity(activityId, photo, activityType, price, title, description,
-                    address, city, country, capacity);
-
-            ActivityResponse response = getActivityResponse(theActivity);
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    // PUT /activities/{id} - Update activity (host only, owner only)
+    @PutMapping("/{activityId}")
+    @PreAuthorize("hasRole('HOST')") // Ensure only users with HOST role can access
+    public ResponseEntity<ActivityDTO> updateActivity(
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
+            @PathVariable UUID activityId,
+            @Valid @RequestBody UpdateActivityRequest request) {
+        UUID hostId = currentUser.getId();
+        return ResponseEntity.ok(activityService.updateActivity(activityId, request, hostId));
     }
 
-    @DeleteMapping("/delete/activity/{activityId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HOST')")
-    public ResponseEntity<Optional<Activity>> deleteActivity(@PathVariable Long activityId,@AuthenticationPrincipal ExpaqUserDetails currentUser){
-
-
-        User user = convertToUser(currentUser);
-
-        Optional<Activity> activityOptional = activityService.getActivityById(activityId);
-        if (activityOptional.isPresent()) {
-            Activity theActivity = activityOptional.get();
-            if (!theActivity.getHost().getId().equals(user.getId())) {
-                throw new AccessDeniedException("You are not authorized to delete this activity");
-            }
-            activityService.deleteActivity(activityId);
-            return new ResponseEntity<>(activityOptional, HttpStatus.OK);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-
+    // DELETE /activities/{id} - Delete activity (host only, owner only)
+    @DeleteMapping("/{activityId}")
+    @PreAuthorize("hasRole('HOST')") // Ensure only users with HOST role can access
+    @ResponseStatus(HttpStatus.NO_CONTENT) // Return 204 No Content on success
+    public void deleteActivity(
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
+            @PathVariable UUID activityId) {
+        UUID hostId = currentUser.getId();
+        activityService.deleteActivity(activityId, hostId);
     }
 
-    public HostResponse mapToHostResponse(User user) {
-        HostResponse hostResponse = new HostResponse();
-        hostResponse.setId(Long.valueOf(user.getId()));
-        hostResponse.setEmail(user.getUserName());
-        hostResponse.setFirstName(user.getFirstName());
-        hostResponse.setLastName(user.getLastName());
-        return hostResponse;
-    }
-    public RatingResponse mapToRatingResponse(Rating rating) {
-        RatingResponse ratingResponse = new RatingResponse();
-        ratingResponse.setId(rating.getId());
-        ratingResponse.setTitle(rating.getTitle());
-        ratingResponse.setContent(rating.getContent());
-        ratingResponse.setStars(rating.getStars());
-
-        return ratingResponse;
+    @GetMapping("/search")
+    public ResponseEntity<Page<ActivityDTO>> searchActivities(
+            @RequestParam String query,
+            Pageable pageable) {
+        return ResponseEntity.ok(activityService.searchActivities(query, pageable));
     }
 
-
-    private ActivityResponse getActivityResponse(Activity activity) {
-        List<BookedActivity> bookings = getAllBookingsByActivityId(activity.getId());
-        HostResponse host = mapToHostResponse(activity.getHost());
-        List<RatingResponse> ratings = activity.getRatings().stream()
-                .map(this::mapToRatingResponse)
-                .toList();
-        List<BookingResponse> bookingInfo = bookings
-                .stream()
-                .map(booking -> new BookingResponse(booking.getBookingId(),
-                        booking.getCheckInDate(),
-                        booking.getCheckOutDate(), booking.getBookingConfirmationCode())).toList();
-        return new ActivityResponse(activity.getId(), activity.getTitle(), activity.getDescription(), activity.getAddress(),
-                activity.getCapacity(), activity.getActivityType(), activity.getPrice(), activity.isBooked(), activity.isFeatured(),
-                activity.getPhoto(), bookingInfo, host, ratings, activity.getCity(), activity.getCountry());
+    @GetMapping("/nearby")
+    public ResponseEntity<List<ActivityDTO>> findNearbyActivities(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam double distance) {
+        return ResponseEntity.ok(activityService.findNearbyActivities(latitude, longitude, distance));
     }
 
-
-    private List<BookedActivity> getAllBookingsByActivityId(Long activityId) {
-        return bookingService.getAllBookingsByActivityId(activityId);
+    @GetMapping("/nearby/{category}")
+    public ResponseEntity<List<ActivityDTO>> findNearbyActivitiesByCategory(
+            @PathVariable String category,
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam double distance) {
+        return ResponseEntity.ok(activityService.findNearbyActivitiesByCategory(
+                ActivityCategory.valueOf(category), latitude, longitude, distance));
     }
-    private User convertToUser(ExpaqUserDetails currentUser) {
-        // Fetch the user from the database using the username
-        return userRepository.findByUserName(currentUser.getUsername());
+
+    @GetMapping("/featured")
+    public ResponseEntity<List<ActivityDTO>> findFeaturedActivities() {
+        return ResponseEntity.ok(activityService.findFeaturedActivities());
     }
 
+    @GetMapping("/host/{hostId}")
+    public ResponseEntity<List<ActivityDTO>> findHostActivities(@PathVariable UUID hostId) {
+        return ResponseEntity.ok(activityService.findHostActivities(hostId));
+    }
+
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<ActivityDTO>> findUpcomingActivities() {
+        return ResponseEntity.ok(activityService.findUpcomingActivities());
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<Page<ActivityDTO>> findPopularActivities(Pageable pageable) {
+        return ResponseEntity.ok(activityService.findPopularActivities(pageable));
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<ActivityDTO>> findActivitiesWithAvailableSlots() {
+        return ResponseEntity.ok(activityService.findActivitiesWithAvailableSlots());
+    }
+
+    @GetMapping("/price-range")
+    public ResponseEntity<List<ActivityDTO>> findActivitiesByPriceRange(
+            @RequestParam BigDecimal minPrice,
+            @RequestParam BigDecimal maxPrice) {
+        return ResponseEntity.ok(activityService.findActivitiesByPriceRange(minPrice, maxPrice));
+    }
+
+    @PostMapping("/{activityId}/images")
+    public ResponseEntity<ActivityDTO> uploadActivityImage(
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
+            @PathVariable UUID activityId,
+            @RequestParam("file") MultipartFile file) {
+        UUID hostId = currentUser.getId();
+        return ResponseEntity.ok(activityService.uploadActivityImage(activityId, file, hostId));
+    }
+
+    @DeleteMapping("/{activityId}/images/{imageUrl}")
+    public ResponseEntity<Void> deleteActivityImage(
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
+            @PathVariable UUID activityId,
+            @PathVariable String imageUrl) {
+        UUID hostId = currentUser.getId();
+        activityService.deleteActivityImage(activityId, imageUrl, hostId);
+        return ResponseEntity.ok().build();
+    }
 }
