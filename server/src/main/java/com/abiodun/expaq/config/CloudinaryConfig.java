@@ -15,23 +15,29 @@ public class CloudinaryConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(CloudinaryConfig.class);
 
-    @Value("${cloudinary.api.key}")
-    private String API_KEY;
+    @Value("${cloudinary.cloud.name:}")
+    private String cloudName;
 
-    @Value("${cloudinary.api.secret}")
-    private String API_SECRET;
+    @Value("${cloudinary.api.key:}")
+    private String apiKey;
 
-    @Value("${cloudinary.cloud.name}")
-    private String CLOUD_NAME;
+    @Value("${cloudinary.api.secret:}")
+    private String apiSecret;
 
     @Bean
     public Cloudinary cloudinary() {
-        logger.info("Cloudinary Configuration: cloud_name={}, api_key={}, api_secret={} (masked)", CLOUD_NAME, API_KEY, "***");
+        if (cloudName == null || cloudName.isEmpty() || 
+            apiKey == null || apiKey.isEmpty() || 
+            apiSecret == null || apiSecret.isEmpty()) {
+            logger.warn("Cloudinary configuration is incomplete. Cloudinary features will be disabled.");
+            return null;
+        }
 
+        logger.info("Initializing Cloudinary with cloud name: {}", cloudName);
         Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", CLOUD_NAME);
-        config.put("api_key", API_KEY);
-        config.put("api_secret", API_SECRET);
+        config.put("cloud_name", cloudName);
+        config.put("api_key", apiKey);
+        config.put("api_secret", apiSecret);
 
         return new Cloudinary(config);
     }

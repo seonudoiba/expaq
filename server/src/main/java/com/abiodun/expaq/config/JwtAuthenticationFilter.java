@@ -1,68 +1,68 @@
-package com.abiodun.expaq.config;
+// package com.abiodun.expaq.config;
 
-import com.abiodun.expaq.service.JwtService;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+// import com.abiodun.expaq.service.JwtService;
+// import jakarta.servlet.FilterChain;
+// import jakarta.servlet.ServletException;
+// import jakarta.servlet.http.HttpServletRequest;
+// import jakarta.servlet.http.HttpServletResponse;
+// import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+// import org.springframework.security.core.Authentication;
+// import org.springframework.security.core.context.SecurityContextHolder;
+// import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+// import org.springframework.stereotype.Component;
+// import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-
-
-@Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-//    private BlacklistedTokenRepository blacklistedTokenRepository;
-
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
-    }
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        final String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        final String authToken = authHeader.substring(7);
-        final String userName = jwtService.extractUserName(authToken);
+// import java.io.IOException;
 
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+// @Component
+// public class JwtAuthenticationFilter extends OncePerRequestFilter {
+//     private final JwtService jwtService;
+//     private final UserDetailsService userDetailsService;
+// //    private BlacklistedTokenRepository blacklistedTokenRepository;
 
-        if(userName != null && authentication == null) {
+//     public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+//         this.jwtService = jwtService;
+//         this.userDetailsService = userDetailsService;
+//     }
 
-//            // Check if the token is blacklisted
-//            if (blacklistedTokenRepository.findByToken(authToken).isPresent()) {
-//                filterChain.doFilter(request, response);
-//                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid");
-//                return;
-//            }
+//     @Override
+//     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+//         final String authHeader = request.getHeader("Authorization");
+//         if (authHeader == null || !authHeader.startsWith("Bearer")) {
+//             filterChain.doFilter(request, response);
+//             return;
+//         }
+//         final String authToken = authHeader.substring(7);
+//         final String userName = jwtService.extractUserName(authToken);
 
-            if(jwtService.isTokenValid(authToken, userDetails)){
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-        }
-        filterChain.doFilter(request, response);
 
-    }
-}
+//         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+//         if(userName != null && authentication == null) {
+
+// //            // Check if the token is blacklisted
+// //            if (blacklistedTokenRepository.findByToken(authToken).isPresent()) {
+// //                filterChain.doFilter(request, response);
+// //                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid");
+// //                return;
+// //            }
+
+//             UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+
+//             if(jwtService.isTokenValid(authToken, userDetails)){
+//                 UsernamePasswordAuthenticationToken authenticationToken =
+//                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//                 authenticationToken.setDetails(
+//                         new WebAuthenticationDetailsSource().buildDetails(request)
+//                 );
+//                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+//             }
+//         }
+//         filterChain.doFilter(request, response);
+
+//     }
+// }

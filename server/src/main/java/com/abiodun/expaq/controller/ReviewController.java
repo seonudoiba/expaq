@@ -1,9 +1,10 @@
 package com.abiodun.expaq.controller;
 
 import com.abiodun.expaq.dto.*;
-import com.abiodun.expaq.service.ReviewService;
+import com.abiodun.expaq.service.IReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,10 +15,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/reviews")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class ReviewController {
 
-    private final ReviewService reviewService;
+    private final IReviewService reviewService;
+
+    public ReviewController(IReviewService reviewService) {
+        this.reviewService = reviewService;
+    }
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")

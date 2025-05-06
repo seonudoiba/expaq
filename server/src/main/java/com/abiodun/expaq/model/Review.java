@@ -1,6 +1,7 @@
 package com.abiodun.expaq.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,24 +10,16 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
 @Data
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 @Table(name = "reviews")
 public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking;
-
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "activity_id", nullable = false)
-    private Activity activity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -36,29 +29,19 @@ public class Review {
     @JoinColumn(name = "host_id", nullable = false)
     private User host;
 
-    @Column(nullable = false)
-    private int rating;
 
-    @Column(length = 1000)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_id", nullable = false)
+    private Activity activity;
+
+    @Column(nullable = false)
+    private int rating; // 1-5 stars
+
+    @Column(columnDefinition = "TEXT")
     private String comment;
 
-    @Column(length = 1000)
-    private String photos;
-
-    @Column(name = "blockchain_tx_hash", length = 100)
-    private String blockchainTxHash;
-
-    @Column(name = "is_verified", nullable = false)
-    private boolean verified;
-
-    @Column(name = "is_edited", nullable = false)
-    private boolean edited;
-
-    @Column(name = "edit_reason", length = 200)
-    private String editReason;
-
-    @Column(name = "edited_at")
-    private LocalDateTime editedAt;
+    @Column(nullable = false)
+    private boolean isVerified = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -68,9 +51,9 @@ public class Review {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // Additional fields for moderation
-    @Column
-    private boolean isFlagged = false;
+    @OneToOne
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
 
     @Column
     private String flagReason;
@@ -78,10 +61,24 @@ public class Review {
     @Column
     private String moderatorNotes;
 
+    // Additional fields for moderation
+    @Column
+    private boolean isFlagged = false;
+
+    private boolean isEdited;
+    private String editReason;
+    private String photos; // URL or path to photos
+    private String ipfsHash; // IPFS hash for photos
+    private String blockchainTxHash; // Blockchain transaction hash for verification
+    private String flaggedBy; // User who flagged the review
+    private String flaggedAt; // Timestamp when the review was flagged
+    private String flaggedByUserId; // User ID of the moderator who flagged the review
+    private String flaggedByUsername; // Username of the moderator who flagged the review
+    private String flaggedByEmail; // Email of the moderator who flagged the review
+    private LocalDateTime EditedAt;
     // Method to verify review
     public void verify(String blockchainTxHash, String ipfsHash) {
-        this.verified = true;
-        this.blockchainTxHash = blockchainTxHash;
+        this.isVerified = true;
         this.updatedAt = LocalDateTime.now();
     }
 
@@ -101,13 +98,13 @@ public class Review {
 
     // Method to verify review (without blockchain)
     public void verify() {
-        this.verified = true;
+        this.isVerified = true;
         this.updatedAt = LocalDateTime.now();
     }
 
     // Method to unverify review
     public void unverify() {
-        this.verified = false;
+        this.isVerified = false;
         this.updatedAt = LocalDateTime.now();
     }
 
@@ -115,10 +112,6 @@ public class Review {
     public void update(int rating, String comment, String photos, String editReason) {
         this.rating = rating;
         this.comment = comment;
-        this.photos = photos;
-        this.editReason = editReason;
-        this.edited = true;
-        this.editedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 }

@@ -47,8 +47,8 @@ public class ActivityDTO {
         dto.setDescription(activity.getDescription());
         dto.setPrice(activity.getPrice());
         if (activity.getLocation() != null) {
-            dto.setLatitude(activity.getLocation().getY());
-            dto.setLongitude(activity.getLocation().getX());
+            dto.setLatitude(activity.getLocationPoint().getY());
+            dto.setLongitude(activity.getLocationPoint().getX());
         }
         dto.setCategory(activity.getCategory());
         dto.setSchedule(activity.getSchedule());

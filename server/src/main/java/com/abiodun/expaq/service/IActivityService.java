@@ -5,6 +5,7 @@ import com.abiodun.expaq.dto.CreateActivityRequest;
 import com.abiodun.expaq.dto.UpdateActivityRequest;
 import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+
 
 public interface IActivityService {
 

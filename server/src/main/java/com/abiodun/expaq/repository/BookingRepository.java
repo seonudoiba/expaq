@@ -87,4 +87,12 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     Optional<Activity> findByUserIdAndBookingDateTimeAfter(UUID userId, LocalDateTime now);
 
     Optional<Activity> findByUserIdAndBookingDateTimeBefore(UUID userId, LocalDateTime now);
+
+    List<Booking> findByActivityIdAndStatus(UUID activityId, Booking.BookingStatus status);
+
+    List<Booking> findByUserIdAndStatus(UUID userId, Booking.BookingStatus status);
+
+    List<Booking> findByBookingDateBetween(LocalDateTime start, LocalDateTime end);
+
+    boolean existsByActivityIdAndUserIdAndStatus(UUID activityId, UUID userId, Booking.BookingStatus status);
 }

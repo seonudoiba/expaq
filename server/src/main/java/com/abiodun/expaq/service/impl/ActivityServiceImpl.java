@@ -59,7 +59,8 @@ public class ActivityServiceImpl implements IActivityService {
         Activity activity = new Activity();
         activity.setTitle(request.getTitle());
         activity.setDescription(request.getDescription());
-        activity.setLocation(location);
+        activity.setLocation(String.valueOf(location));
+        activity.setLocationPoint(location);
         activity.setPrice(request.getPrice());
         activity.setCategory(request.getCategory());
 
@@ -99,7 +100,10 @@ public class ActivityServiceImpl implements IActivityService {
         if (request.getTitle() != null) activity.setTitle(request.getTitle());
         if (request.getDescription() != null) activity.setDescription(request.getDescription());
         if (request.getLongitude() != null && request.getLatitude() != null) {
-            activity.setLocation(geometryFactory.createPoint(
+            activity.setLocation(String.valueOf(geometryFactory.createPoint(
+                    new Coordinate(request.getLongitude(), request.getLatitude())
+            )));
+            activity.setLocationPoint(geometryFactory.createPoint(
                     new Coordinate(request.getLongitude(), request.getLatitude())
             ));
         }

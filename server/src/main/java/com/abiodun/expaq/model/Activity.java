@@ -1,6 +1,7 @@
 package com.abiodun.expaq.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,28 +16,57 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID; // Import UUID
 
-
-@Data
 @Entity
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "activities")
 public class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id", nullable = false)
-    private User host;
-
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
     private BigDecimal price;
+
+    @Column(nullable = false)
+    private String location;
+
+    @Column(nullable = false)
+    private Integer duration; // in hours
+
+    @Column(nullable = false)
+    private Integer maxParticipants;
+
+    private String imageUrl;
+
+    @Column(nullable = false)
+    private boolean isActive = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id", nullable = false)
+    private User host;
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Booking> bookings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    private ActivityCategory category;
 
     @Column(nullable = false)
     private Boolean isFeatured;
@@ -45,7 +75,7 @@ public class Activity {
     private String country;
 
     @Column(columnDefinition = "geometry(Point,4326)")
-    private Point location;
+    private Point locationPoint;
 
     @Column(nullable = false)
     private int capacity;
@@ -53,9 +83,17 @@ public class Activity {
     @Column(nullable = false)
     private int bookedCapacity;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ActivityCategory category;
+    private int minParticipants;
+
+    @Column(nullable = false)
+    private int durationMinutes;
+
+    @Column(nullable = false)
+    private boolean isVerified = false;
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages = new ArrayList<>();
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
@@ -66,48 +104,15 @@ public class Activity {
     @Column(name = "media_url")
     private List<String> mediaUrls = new ArrayList<>();
 
-    @Column(nullable = false)
-    private int maxParticipants;
-
-    @Column(nullable = false)
-    private int minParticipants;
-
-    @Column(nullable = false)
-    private int durationMinutes;
-
-    @Column(nullable = false)
-    private boolean isActive = true;
-
-    @Column(nullable = false)
-    private boolean isVerified = false;
-
-    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Booking> bookings = new ArrayList<>();
-
-    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviews = new ArrayList<>();
-
-    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Message> messages = new ArrayList<>();
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
     public enum ActivityCategory {
-        OUTDOOR,
-        FOOD,
-        ART,
-        CULTURE,
         ADVENTURE,
+        CULTURAL,
+        FOOD_AND_DRINK,
+        NATURE,
         SPORTS,
         WELLNESS,
-        EDUCATION,
-        OTHER
+        SIGHTSEEING,
+        WORKSHOP
     }
 
     // Methods for booking management

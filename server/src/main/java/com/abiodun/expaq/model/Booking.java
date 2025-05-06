@@ -31,26 +31,23 @@ public class Booking {
     private User user;
 
     @Column(nullable = false)
-    private int numberOfGuests;
+    private int numberOfParticipants;
 
     @Column(nullable = false)
-    private LocalDateTime startTime;
-
-    @Column(nullable = false)
-    private LocalDateTime endTime;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private BookingStatus status;
+    private LocalDateTime bookingDate;
 
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BigDecimal price;
+    private BookingStatus status = BookingStatus.PENDING;
 
     @Column
     private String specialRequests;
+
+    @Column
+    private int numberOfGuests;
 
     @Column
     private String cancellationReason;
@@ -64,6 +61,9 @@ public class Booking {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     @CreationTimestamp
     @Column(nullable = false)
@@ -99,7 +99,7 @@ public class Booking {
     // Method to calculate total price
     public void calculateTotalPrice() {
         if (activity != null) {
-            this.totalPrice = activity.getPrice().multiply(BigDecimal.valueOf(numberOfGuests));
+            this.totalPrice = activity.getPrice().multiply(BigDecimal.valueOf(numberOfParticipants));
         }
     }
 
@@ -122,6 +122,6 @@ public class Booking {
         CONFIRMED,
         CANCELLED,
         COMPLETED,
-        NO_SHOW
+        REFUNDED
     }
 }

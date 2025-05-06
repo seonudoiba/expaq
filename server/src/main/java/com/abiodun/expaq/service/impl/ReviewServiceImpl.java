@@ -11,7 +11,7 @@ import com.abiodun.expaq.repository.ActivityRepository;
 import com.abiodun.expaq.repository.BookingRepository;
 import com.abiodun.expaq.repository.ReviewRepository;
 import com.abiodun.expaq.repository.UserRepository;
-import com.abiodun.expaq.service.ReviewService;
+import com.abiodun.expaq.service.IReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ReviewServiceImpl implements ReviewService {
+public class ReviewServiceImpl implements IReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ActivityRepository activityRepository;
@@ -124,7 +124,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewPageResponse getReviewsByActivityId(UUID activityId, Pageable pageable) {
-        Page<Review> reviewPage = reviewRepository.findByActivityId(activityId, pageable);
+        Page<Review> reviewPage = (Page<Review>) reviewRepository.findByActivityId(activityId, pageable);
         List<ReviewResponse> reviews = reviewPage.getContent().stream()
                 .map(reviewMapper::toReviewResponse)
                 .collect(Collectors.toList());
@@ -170,6 +170,11 @@ public class ReviewServiceImpl implements ReviewService {
                 null
         );
     }
+//
+//    @Override
+//    public ReviewPageResponse getReviewsByHostId(UUID hostId, Pageable pageable) {
+//        return null;
+//    }
 
     @Override
     public ReviewPageResponse getReviewsByHostId(UUID hostId, Pageable pageable) {
@@ -214,21 +219,26 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewStatistics getHostReviewStatistics(UUID hostId) {
-        double averageRating = reviewRepository.calculateAverageRatingByHostId(hostId);
-        int totalReviews = reviewRepository.countByHostId(hostId);
-        int fiveStarReviews = reviewRepository.countByHostIdAndRating(hostId, 5);
-        int fourStarReviews = reviewRepository.countByHostIdAndRating(hostId, 4);
-        int threeStarReviews = reviewRepository.countByHostIdAndRating(hostId, 3);
-        int twoStarReviews = reviewRepository.countByHostIdAndRating(hostId, 2);
-        int oneStarReviews = reviewRepository.countByHostIdAndRating(hostId, 1);
-        int verifiedReviews = reviewRepository.countByHostIdAndVerified(hostId, true);
-        int editedReviews = reviewRepository.countByHostIdAndEdited(hostId, true);
-
-        return new ReviewStatistics(
-                averageRating, totalReviews, fiveStarReviews, fourStarReviews,
-                threeStarReviews, twoStarReviews, oneStarReviews, verifiedReviews, editedReviews
-        );
+        return null;
     }
+
+//    @Override
+//    public ReviewStatistics getHostReviewStatistics(UUID hostId) {
+//        double averageRating = reviewRepository.calculateAverageRatingByHostId(hostId);
+//        int totalReviews = reviewRepository.countByHostId(hostId);
+//        int fiveStarReviews = reviewRepository.countByHostIdAndRating(hostId, 5);
+//        int fourStarReviews = reviewRepository.countByHostIdAndRating(hostId, 4);
+//        int threeStarReviews = reviewRepository.countByHostIdAndRating(hostId, 3);
+//        int twoStarReviews = reviewRepository.countByHostIdAndRating(hostId, 2);
+//        int oneStarReviews = reviewRepository.countByHostIdAndRating(hostId, 1);
+//        int verifiedReviews = reviewRepository.countByHostIdAndVerified(hostId, true);
+//        int editedReviews = reviewRepository.countByHostIdAndEdited(hostId, true);
+//
+//        return new ReviewStatistics(
+//                averageRating, totalReviews, fiveStarReviews, fourStarReviews,
+//                threeStarReviews, twoStarReviews, oneStarReviews, verifiedReviews, editedReviews
+//        );
+//    }
 
     @Override
     @Transactional
@@ -259,13 +269,23 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public boolean hasUserReviewedActivity(UUID userId, UUID activityId) {
-        return reviewRepository.findByUserIdAndActivityId(userId, activityId) != null;
+        return false;
     }
 
     @Override
     public boolean hasUserReviewedBooking(UUID userId, UUID bookingId) {
-        return reviewRepository.findByUserIdAndBookingId(userId, bookingId) != null;
+        return false;
     }
+
+//    @Override
+//    public boolean hasUserReviewedActivity(UUID userId, UUID activityId) {
+//        return reviewRepository.findByUserIdAndActivityId(userId, activityId) != null;
+//    }
+//
+//    @Override
+//    public boolean hasUserReviewedBooking(UUID userId, UUID bookingId) {
+//        return reviewRepository.findByUserIdAndBookingId(userId, bookingId) != null;
+//    }
 
     @Override
     public void flagReview(UUID reviewId, UUID userId, String reason) {

@@ -31,6 +31,10 @@ public class ActivityController {
 
     private final IActivityService activityService;
 
+//    @Autowired
+//    public ActivityController(IActivityService activityService) {
+//        this.activityService = activityService;
+//    }
     // GET /activities - List activities (publicly accessible, filtering added)
     @GetMapping
     public ResponseEntity<List<ActivityDTO>> getAllActivities(
