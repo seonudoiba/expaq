@@ -5,7 +5,9 @@ import com.abiodun.expaq.dto.LoginRequest;
 import com.abiodun.expaq.dto.RegisterRequest;
 import com.abiodun.expaq.dto.UserDTO;
 import com.abiodun.expaq.exception.ResourceNotFoundException;
+import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
+import com.abiodun.expaq.repository.RoleRepository;
 import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.security.JwtTokenProvider;
 import com.abiodun.expaq.service.IAuthService;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.UUID;
 
 @Service
@@ -31,6 +34,7 @@ public class AuthServiceImpl implements IAuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailService emailService;
+    private final RoleRepository roleRepository;
 
     @Override
     @Transactional
@@ -50,10 +54,20 @@ public class AuthServiceImpl implements IAuthService {
         user.setEmail(request.getEmail());
         user.setUsername(request.getUserName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(User.UserRole.GUEST);
+        // Find the TOURIST role
+        try{
+            Role guestRole = roleRepository.findByName("GUEST");
+
+            // Set the TOURIST role to the user
+            user.setRoles(Collections.singleton(guestRole));
+        } catch (Exception e) {
+            throw  new RuntimeException("GUEST  role not found in the database");
+
+        }
         user.setVerified(false);
         user.setActive(true);
         user.setCreatedAt(LocalDateTime.now());
+        user.setLastLoginAt(LocalDateTime.now()); // Ensure lastLoginAt is set
 
         // Generate verification token
         String verificationToken = UUID.randomUUID().toString();
@@ -70,7 +84,7 @@ public class AuthServiceImpl implements IAuthService {
         String token = jwtTokenProvider.generateToken(user);
 
 //        return new AuthResponse(token, UserDTO.fromUser(user));
-        return new AuthResponse(token, UserDTO.fromUser(user).getId() , UserDTO.fromUser(user).getUserName(), UserDTO.fromUser(user).getRole());
+        return new AuthResponse(token, UserDTO.fromUser(user).getId() , UserDTO.fromUser(user).getUserName(), UserDTO.fromUser(user).getRoles());
 
     }
 
@@ -103,7 +117,7 @@ public class AuthServiceImpl implements IAuthService {
         // Generate JWT token
         String token = jwtTokenProvider.generateToken(user);
 
-        return new AuthResponse(token, UserDTO.fromUser(user).getId() , UserDTO.fromUser(user).getUserName(), UserDTO.fromUser(user).getRole());
+        return new AuthResponse(token, UserDTO.fromUser(user).getId() , UserDTO.fromUser(user).getUserName(), UserDTO.fromUser(user).getRoles());
     }
 
     @Override
@@ -204,10 +218,20 @@ public class AuthServiceImpl implements IAuthService {
                                 newUser.setFirstName(name);
                                 newUser.setOAuth2Provider(provider);
                                 newUser.setOAuth2ProviderId(providerId);
-                                newUser.setRole(User.UserRole.USER);
+                                // Find the USER role
+                                try{
+                                    Role userRole = roleRepository.findByName("USER");
+
+                                    // Set the USER role to the user
+                                    newUser.setRoles(Collections.singleton(userRole));
+                                } catch (Exception e) {
+                                    throw  new RuntimeException("USER role not found in the database");
+
+                                }
                                 newUser.setEmailVerified(true);
                                 newUser.setActive(true);
                                 newUser.setCreatedAt(LocalDateTime.now());
+                                newUser.setLastLoginAt(LocalDateTime.now()); // Ensure lastLoginAt is set
                                 return newUser;
                             });
                 });
@@ -221,4 +245,4 @@ public class AuthServiceImpl implements IAuthService {
 
         return new AuthResponse(token, UserDTO.fromUser(user));
     }
-} 
+}

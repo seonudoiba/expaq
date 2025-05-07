@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { Providers } from './providers';
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -16,23 +17,25 @@ const poppins = Poppins({
 // });
 
 export const metadata: Metadata = {
-  title: "Expaq - Connecting Travelers with Local Hosts for Authentic Experiences",
-  description: "Discover, Connect, and Explore Culture Like a Local. Expaq is a platform that connects travelers with local hosts for authentic experiences.",
+  title: "Expaq - Experience Activities",
+  description: "Find and create amazing activities in your area",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
         className={`${poppins.className} `}
       >
-        <Header/>
-        {children}
-        <Footer/>
+        <Providers>
+          <Header/>
+          {children}
+          <Footer/>
+        </Providers>
       </body>
     </html>
   );

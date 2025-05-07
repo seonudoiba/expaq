@@ -7,6 +7,7 @@ import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
+import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.repository.ActivityRepository;
 import com.abiodun.expaq.repository.UserRepository;
@@ -278,10 +279,10 @@ public class ActivityServiceImpl implements IActivityService {
 
     // --- Helper Methods ---
 
-    private User findUserByIdAndValidateRole(UUID userId, User.UserRole requiredRole, String roleErrorMessage) {
+    private User findUserByIdAndValidateRole(UUID userId, Role requiredRole, String roleErrorMessage) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-        if (requiredRole != null && !user.getRole().equals(requiredRole)) { // Use equals instead of !=
+        if (requiredRole != null && !user.getRoles().contains(requiredRole)) { // Use equals instead of !=
             throw new UnauthorizedException(roleErrorMessage != null ? roleErrorMessage : "User does not have the required role.");
         }
         return user;

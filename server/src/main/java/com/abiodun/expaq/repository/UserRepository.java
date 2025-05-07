@@ -1,5 +1,6 @@
 package com.abiodun.expaq.repository;
 
+import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,10 +34,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // Password reset related queries
     Optional<User> findByResetPasswordToken(String token);
     List<User> findByResetPasswordTokenExpiryBefore(LocalDateTime expiry);
-    
-    // Role based queries
-    List<User> findByRole(com.abiodun.expaq.model.User.UserRole role);
-    
+
     // Search queries
     @Query("SELECT u FROM User u WHERE " +
            "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
@@ -44,11 +42,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<User> searchUsers(@Param("query") String query, Pageable pageable);
     
-    // Host specific queries
-    @Query("SELECT u FROM User u WHERE u.role = 'HOST' AND u.id IN " +
-           "(SELECT a.host.id FROM Activity a WHERE a.isActive = true)")
-    List<User> findActiveHosts();
+//    // Host specific queries
+//    @Query("SELECT u FROM User u WHERE u.role = 'HOST' AND u.id IN " +
+//           "(SELECT a.host.id FROM Activity a WHERE a.isActive = true)")
+//    List<User> findActiveHosts();
 
-    List<User> findByRoleAndIsVerified(User.UserRole role, boolean isVerified);
+//    List<User> findByRoleAndIsVerified(Role role, boolean isVerified);
+    @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.isVerified = :isVerified")
+    List<User> findByRoleNameAndVerificationStatus(@Param("roleName") String roleName, @Param("isVerified") boolean isVerified);
 
+    List<User> findByRolesName(String name);
 }

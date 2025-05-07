@@ -8,12 +8,14 @@ import lombok.Setter;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "role")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,12 +23,18 @@ public class Role {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "roles")
-    private Collection<User> users = new HashSet<>();
+    @ManyToMany
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> users = new HashSet<>();
 
     public Role(String name) {
         this.name = name;
     }
+
 
     public void removeUserFromRole(User user){
         user.getRoles().remove(this);
@@ -39,7 +47,4 @@ public class Role {
         }
     }
 
-    public String getName(){
-        return name != null ? name : "";
-    }
 }

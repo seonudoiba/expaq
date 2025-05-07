@@ -1,5 +1,6 @@
 package com.abiodun.expaq.dto;
 
+import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
 
 import jakarta.validation.constraints.Email;
@@ -7,6 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import java.util.Set;
 
 @Data
 public class RegisterRequest {
@@ -31,7 +34,7 @@ public class RegisterRequest {
     private String email;
 
     @NotNull(message = "Role cannot be null")
-    private User.UserRole role; // TOURIST or HOST
+    private Set<Role> roles; // TOURIST or HOST
 
     // Optional: Bio can be added during registration or later
     private String bio;

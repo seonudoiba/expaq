@@ -2,7 +2,9 @@ package com.abiodun.expaq.service;
 
 import com.abiodun.expaq.exception.UserAlreadyExistsException;
 import com.abiodun.expaq.model.ExpaqUserDetails;
+import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
+import com.abiodun.expaq.repository.RoleRepository;
 import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.request.LoginRequest;
 import com.abiodun.expaq.response.AuthResponse;
@@ -21,13 +23,16 @@ import java.util.UUID;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+//        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
     }
@@ -41,7 +46,18 @@ public class UserService {
         }
 
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setRoles(Collections.singletonList(User.UserRole.TOURIST));
+//        user.setRoles(Collections.singletonList(Role.TOURIST));
+
+        // Find the TOURIST role
+        try{
+            Role touristRole = roleRepository.findByName("TOURIST");
+
+            // Set the TOURIST role to the user
+            user.setRoles(Collections.singleton(touristRole));
+        } catch (Exception e) {
+            throw  new RuntimeException("TOURIST role not found in the database");
+
+        }
         User savedUser = userRepository.save(user);
 
         String token = jwtService.generateToken(savedUser);
@@ -180,7 +196,7 @@ public class UserService {
                 .lastName(user.getLastName())
                 .bio(user.getBio())
                 .profilePicture(user.getProfilePictureUrl())
-                .roles(Collections.singletonList(User.UserRole.valueOf(user.getRole().name())))
+                .roles(user.getRoles())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();

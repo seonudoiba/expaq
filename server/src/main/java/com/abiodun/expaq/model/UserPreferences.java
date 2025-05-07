@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "user_preferences")
+@Table(name = "account_preferences")
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserPreferences {

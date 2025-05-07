@@ -65,7 +65,7 @@ public class RoleController {
     @PreAuthorize("hasRole('ADMIN')")
     public User assignUserToRole(
             @RequestParam("userId") UUID userId,
-            @RequestParam("role") User.UserRole userRole){
+            @RequestParam("role") Role userRole){
         return roleService.assignRoleToUser(userId, userRole);
     }
 }

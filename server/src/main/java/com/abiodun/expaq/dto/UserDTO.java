@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -24,7 +25,7 @@ public class UserDTO {
     private String profilePicture;
     private String phoneNumber;
     private String bio;
-    private User.UserRole role;
+    private Set<Role> roles;
     private boolean verified;
     private boolean active;
     private String preferredLanguage;
@@ -32,7 +33,6 @@ public class UserDTO {
     private String timeZone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<User.UserRole> roles;
 
     public static UserDTO fromUser(User user) {
         return UserDTO.builder()
@@ -40,10 +40,11 @@ public class UserDTO {
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .userName(user.getUsername())
                 .profilePicture(user.getProfilePicture())
                 .phoneNumber(user.getPhoneNumber())
                 .bio(user.getBio())
-                .role(user.getRole())
+                .roles(user.getRoles())
                 .verified(user.isVerified())
                 .active(user.isActive())
                 .preferredLanguage(user.getPreferredLanguage())

@@ -12,12 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Entity
@@ -32,18 +27,18 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime lastLoginAt;
 
 
     @Column(nullable = false)
-    private String firstName;
+    private String password;
 
     @Column(nullable = true)
     private LocalDateTime passwordUpdatedAt;
+
+    @Column(nullable = false)
+    private String firstName;
 
     @Column(nullable = false)
     private String lastName;
@@ -51,7 +46,7 @@ public class User implements UserDetails {
     @Column
     private String profilePicture;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column
@@ -60,9 +55,9 @@ public class User implements UserDetails {
     @Column
     private String bio;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private User.UserRole role;
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private Role role;
 
     @Column(nullable = false)
     private boolean isVerified = false;
@@ -140,15 +135,16 @@ public class User implements UserDetails {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
-    public Collection<User.UserRole> getRoles() {
-        Set<User.UserRole> userRoles = new HashSet<>();
-        for (Role role : roles) {
-            userRoles.add(User.UserRole.valueOf(role.getName())); // Assuming Role has a getName() method that matches UserRole names
-        }
-        return userRoles;
-    }
+//    public Collection<Role> getRoles() {
+//        Set<Role> userRoles = new HashSet<>();
+//        for (Role role : roles) {
+//            userRoles.add(Role.valueOf(role.getName())); // Assuming Role has a getName() method that matches UserRole names
+//        }
+//        return userRoles;
+//    }
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -165,9 +161,10 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return  roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .toList();
     }
-
 
     @Override
     public String getUsername() {
@@ -176,18 +173,8 @@ public class User implements UserDetails {
 
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
     public boolean isAccountNonLocked() {
         return isActive;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
     }
 
     @Override
@@ -244,8 +231,8 @@ public class User implements UserDetails {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void setRoles(List<UserRole> singletonList) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setRoles'");
-    }
+//    public void setRoles(List<UserRole> singletonList) {
+//        // TODO Auto-generated method stub
+//        throw new UnsupportedOperationException("Unimplemented method 'setRoles'");
+//    }
 }

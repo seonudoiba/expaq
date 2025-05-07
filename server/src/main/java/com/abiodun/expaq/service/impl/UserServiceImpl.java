@@ -39,7 +39,7 @@
 //        user.setPassword(passwordEncoder.encode(request.getPassword()));
 //        user.setFirstName(request.getFirstName());
 //        user.setLastName(request.getLastName());
-//        user.setRole(User.UserRole.USER);
+//        user.setRole(Role
 //        user.setCreatedAt(LocalDateTime.now());
 //        user.setUpdatedAt(LocalDateTime.now());
 //
@@ -198,7 +198,7 @@
 //        User user = userRepository.findById(userId)
 //                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 //
-//        if (user.getRole() != User.UserRole.USER) {
+//        if (user.getRole() != Role
 //            throw new RuntimeException("Only regular users can apply to become hosts");
 //        }
 //
@@ -217,11 +217,11 @@
 //        User admin = userRepository.findById(adminId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
 //
-//        if (admin.getRole() != User.UserRole.ADMIN) {
+//        if (admin.getRole() != Role
 //            throw new UnauthorizedException("Only admins can approve host applications");
 //        }
 //
-//        user.setRole(User.UserRole.HOST);
+//        user.setRole(Role
 //        user.setVerified(true);
 //        userRepository.save(user);
 //    }
@@ -235,7 +235,7 @@
 //        User admin = userRepository.findById(adminId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
 //
-//        if (admin.getRole() != User.UserRole.ADMIN) {
+//        if (admin.getRole() != Role.ADMIN) {
 //            throw new UnauthorizedException("Only admins can reject host applications");
 //        }
 //
@@ -245,7 +245,7 @@
 //
 //    @Override
 //    public List<UserDTO> getPendingHostApplications() {
-//        return userRepository.findByRoleAndIsVerified(User.UserRole.HOST, false)
+//        return userRepository.findByRoleAndIsVerified(Role.HOST, false)
 //                .stream()
 //                .map(UserDTO::fromUser)
 //                .collect(Collectors.toList());
@@ -253,7 +253,7 @@
 //
 //    @Override
 //    public List<UserDTO> getApprovedHosts() {
-//        return userRepository.findByRoleAndIsVerified(User.UserRole.HOST, true)
+//        return userRepository.findByRoleAndIsVerified(Role.HOST, true)
 //                .stream()
 //                .map(UserDTO::fromUser)
 //                .collect(Collectors.toList());
@@ -265,7 +265,7 @@
 //        User admin = userRepository.findById(adminId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
 //
-//        if (admin.getRole() != User.UserRole.ADMIN) {
+//        if (admin.getRole() != Role.ADMIN) {
 //            throw new UnauthorizedException("Only existing admins can create new admins");
 //        }
 //
@@ -274,7 +274,7 @@
 //        newAdmin.setPassword(passwordEncoder.encode(request.getPassword()));
 //        newAdmin.setFirstName(request.getFirstName());
 //        newAdmin.setLastName(request.getLastName());
-//        newAdmin.setRole(User.UserRole.ADMIN);
+//        newAdmin.setRole(Role.ADMIN);
 //        newAdmin.setVerified(true);
 //        newAdmin.setCreatedAt(LocalDateTime.now());
 //        newAdmin.setUpdatedAt(LocalDateTime.now());
@@ -292,7 +292,7 @@
 //        User admin = userRepository.findById(adminId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
 //
-//        if (admin.getRole() != User.UserRole.ADMIN) {
+//        if (admin.getRole() != Role.ADMIN) {
 //            throw new UnauthorizedException("Only admins can deactivate users");
 //        }
 //
@@ -309,7 +309,7 @@
 //        User admin = userRepository.findById(adminId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
 //
-//        if (admin.getRole() != User.UserRole.ADMIN) {
+//        if (admin.getRole() != Role.ADMIN) {
 //            throw new UnauthorizedException("Only admins can activate users");
 //        }
 //
@@ -326,7 +326,7 @@
 //        User admin = userRepository.findById(adminId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
 //
-//        if (admin.getRole() != User.UserRole.ADMIN) {
+//        if (admin.getRole() != Role.ADMIN) {
 //            throw new UnauthorizedException("Only admins can delete users");
 //        }
 //
@@ -359,7 +359,7 @@
 //        User host = userRepository.findById(hostId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
 //
-//        if (host.getRole() != User.UserRole.HOST) {
+//        if (host.getRole() != Role.HOST) {
 //            throw new RuntimeException("User is not a host");
 //        }
 //

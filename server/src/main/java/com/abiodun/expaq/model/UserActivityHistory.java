@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "user_activity_history")
+@Table(name = "account_activity_history")
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserActivityHistory {

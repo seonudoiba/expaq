@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -22,12 +24,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final ExpaqUserDetailsService userDetailsService;
 
+    // List of public endpoints that should bypass authentication
+    private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/activities",
+            "/api/activities/",
+            "/api/auth/**",
+            "/api/public/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+    );
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        final String requestURI = request.getRequestURI();
+
+        // Bypass JWT processing for public endpoints
+        if (isPublicEndpoint(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
@@ -54,5 +74,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPublicEndpoint(String requestURI) {
+        return PUBLIC_ENDPOINTS.stream().anyMatch(requestURI::startsWith);
     }
 }

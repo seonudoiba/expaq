@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "user_verifications")
+@Table(name = "account_verifications")
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserVerification {

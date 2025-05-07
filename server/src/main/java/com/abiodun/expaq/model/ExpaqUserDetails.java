@@ -17,8 +17,8 @@ public class ExpaqUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Return a single authority based on the User.UserRole enum
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        // Return a single authority based on the Role enum
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRoles()));
     }
 
     @Override
