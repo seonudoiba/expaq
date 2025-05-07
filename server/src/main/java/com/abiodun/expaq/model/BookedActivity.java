@@ -17,8 +17,9 @@ import java.util.UUID;
 public class BookedActivity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)  // Use UUID strategy instead of IDENTITY
     private UUID bookingId;
+
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private String guestFullName;

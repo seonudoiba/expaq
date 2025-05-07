@@ -183,7 +183,6 @@ public class User implements UserDetails {
     }
 
 
-
     public enum UserRole {
         USER,
         HOST,

@@ -30,6 +30,10 @@ public class Booking {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id", nullable = false)
+    private User host;
+
     @Column(nullable = false)
     private int numberOfParticipants;
 

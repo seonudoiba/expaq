@@ -1,7 +1,6 @@
 package com.abiodun.expaq.repository;
 
 import com.abiodun.expaq.model.Activity;
-import com.abiodun.expaq.model.BookedActivity;
 import com.abiodun.expaq.model.Booking;
 import com.abiodun.expaq.model.Booking.BookingStatus;
 import org.springframework.data.domain.Page;
@@ -95,4 +94,10 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findByBookingDateBetween(LocalDateTime start, LocalDateTime end);
 
     boolean existsByActivityIdAndUserIdAndStatus(UUID activityId, UUID userId, Booking.BookingStatus status);
+
+    long countByHostId(UUID hostId);
+
+    double getTotalRevenueByHostId(UUID hostId);
+
+    long countByHostIdAndStatus(UUID hostId, BookingStatus attr0);
 }

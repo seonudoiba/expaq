@@ -15,11 +15,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "role")
+@Table(name = "roles")  // Changed to plural for consistency
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)  // Use UUID strategy instead of IDENTITY
     private UUID id;
+
+    @Column(unique = true)  // Add uniqueness constraint
     private String name;
 
     @JsonIgnore
@@ -34,7 +36,6 @@ public class Role {
     public Role(String name) {
         this.name = name;
     }
-
 
     public void removeUserFromRole(User user){
         user.getRoles().remove(this);

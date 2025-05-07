@@ -119,4 +119,10 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
 
     List<Activity> findByTitleContainingIgnoreCase(String title);
     List<Activity> findByLocationContainingIgnoreCase(String location);
+
+    long countByHostId(UUID hostId);
+
+
+
+    long countByHostIdAndIsActive(UUID hostId, boolean enabled);
 }

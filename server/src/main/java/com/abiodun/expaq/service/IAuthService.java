@@ -1,10 +1,9 @@
 package com.abiodun.expaq.service;
 
-import com.abiodun.expaq.dto.AuthResponse;
-import com.abiodun.expaq.dto.LoginRequest;
-import com.abiodun.expaq.dto.RegisterRequest;
-import com.abiodun.expaq.dto.UserDTO; // For getMe
+import com.abiodun.expaq.dto.*;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -18,4 +17,12 @@ public interface IAuthService {
     void requestPasswordReset(String email);
     void resetPassword(String token, String newPassword);
     AuthResponse handleOAuth2Login(String provider, String providerId, String email, String name);
+
+    Page<UserDTO> searchUsers(String query, Pageable pageable);
+
+    void logout(UUID userId);
+
+    UserStatisticsDTO getUserStatistics(UUID userId);
+
+    HostStatisticsDTO getHostStatistics(UUID hostId);
 }

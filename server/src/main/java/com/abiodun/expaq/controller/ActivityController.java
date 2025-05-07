@@ -78,7 +78,6 @@ public class ActivityController {
 
     // POST /activities - Create activity (host only)
     @PostMapping
-    @PreAuthorize("hasRole('HOST')") // Ensure only users with HOST role can access
     public ResponseEntity<ActivityDTO> createActivity(
             @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @Valid @RequestBody CreateActivityRequest request) {

@@ -2,6 +2,8 @@ package com.abiodun.expaq.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class HostStatisticsDTO {
     private int totalActivities;
@@ -14,4 +16,6 @@ public class HostStatisticsDTO {
     private int totalEarnings;
     private int responseRate;
     private int averageResponseTime;
-} 
+    private LocalDateTime lastUpdated;
+
+}

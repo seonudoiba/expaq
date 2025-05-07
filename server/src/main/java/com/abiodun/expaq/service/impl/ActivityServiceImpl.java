@@ -28,6 +28,8 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -44,48 +46,139 @@ public class ActivityServiceImpl implements IActivityService {
     private static final String folder = "activities";
 
 
+//
+//    @Override
+//    @Transactional
+//    public ActivityDTO createActivity(CreateActivityRequest request, UUID hostId) {
+//        User host = userRepository.findById(hostId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
+//
+//        // Create Point for location
+//        Point location = geometryFactory.createPoint(
+//                new Coordinate(request.getLongitude(), request.getLatitude())
+//        );
+//
+//        // Create activity
+//        Activity activity = new Activity();
+//        activity.setTitle(request.getTitle());
+//        activity.setDescription(request.getDescription());
+//        activity.setLocation(String.valueOf(location));
+//        activity.setLocationPoint(location);
+//        activity.setPrice(request.getPrice());
+//        activity.setCategory(request.getCategory());
+//
+//        // Set capacity - adjust method name based on your DTO structure
+//        activity.setCapacity(request.getCapacity()); // Changed from getCapacity
+//        activity.setBookedCapacity(0);
+//
+//        // Address fields - adjust method names based on your DTO structure
+//        activity.setAddress(request.getAddress()); // Changed from getAddress
+//        activity.setCity(request.getCity()); // Changed from getCity
+//        activity.setCountry(request.getCountry()); // Changed from getCountry
+//
+//        activity.setSchedule(request.getSchedule());
+//        activity.setHost(host);
+//        activity.setActive(true);
+//        activity.setIsFeatured(false);
+//
+//        // Save activity
+//        activity = activityRepository.save(activity);
+//
+//        return ActivityDTO.fromActivity(activity);
+//    }
 
     @Override
     @Transactional
     public ActivityDTO createActivity(CreateActivityRequest request, UUID hostId) {
-        User host = userRepository.findById(hostId)
-                .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
+        try {
+            // Validate that the host exists
+            User host = userRepository.findById(hostId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Host not found with ID: " + hostId));
 
-        // Create Point for location
-        Point location = geometryFactory.createPoint(
-                new Coordinate(request.getLongitude(), request.getLatitude())
-        );
+            // Validate that the host has the HOST role
+            boolean isHost = host.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("ROLE_HOST"));
+            if (!isHost) {
+                throw new UnauthorizedException("User does not have HOST privileges");
+            }
 
-        // Create activity
-        Activity activity = new Activity();
-        activity.setTitle(request.getTitle());
-        activity.setDescription(request.getDescription());
-        activity.setLocation(String.valueOf(location));
-        activity.setLocationPoint(location);
-        activity.setPrice(request.getPrice());
-        activity.setCategory(request.getCategory());
+            try {
+                // Create Point for location
+                Point location = geometryFactory.createPoint(
+                        new Coordinate(request.getLongitude(), request.getLatitude())
+                );
 
-        // Set capacity - adjust method name based on your DTO structure
-        activity.setCapacity(request.getCapacity()); // Changed from getCapacity
-        activity.setBookedCapacity(0);
+                // Create activity with validation
+                Activity activity = new Activity();
+                activity.setTitle(request.getTitle());
+                activity.setDescription(request.getDescription());
+                activity.setLocation(String.valueOf(location));
+                activity.setLocationPoint(location);
+                activity.setPrice(request.getPrice());
 
-        // Address fields - adjust method names based on your DTO structure
-        activity.setAddress(request.getAddress()); // Changed from getAddress
-        activity.setCity(request.getCity()); // Changed from getCity
-        activity.setCountry(request.getCountry()); // Changed from getCountry
+                // Validate activity category
+                try {
+                    activity.setCategory(request.getCategory());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid activity category: " + request.getCategory() +
+                            ". Valid categories are: " + String.join(", ",
+                            Arrays.stream(Activity.ActivityCategory.values())
+                                    .map(Enum::name)
+                                    .collect(Collectors.toList())));
+                }
 
-        activity.setSchedule(request.getSchedule());
-        activity.setHost(host);
-        activity.setActive(true);
-        activity.setIsFeatured(false);
+                // Set capacity with validation
+                if (request.getCapacity() != null) {
+                    if (request.getCapacity() <= 0) {
+                        throw new IllegalArgumentException("Capacity must be greater than zero");
+                    }
+                    activity.setCapacity(request.getCapacity());
+                } else {
+                    activity.setCapacity(request.getMaxParticipants()); // Fall back to maxParticipants
+                }
+                activity.setBookedCapacity(0);
 
-        // Save activity
-        activity = activityRepository.save(activity);
+                // Set address fields
+                activity.setAddress(request.getAddress());
+                activity.setCity(request.getCity());
+                activity.setCountry(request.getCountry());
 
-        return ActivityDTO.fromActivity(activity);
+                // Set schedule with validation
+                if (request.getSchedule() == null) {
+                    throw new IllegalArgumentException("Activity schedule is required");
+                }
+                activity.setSchedule(request.getSchedule());
+
+                // Set media URLs with validation
+                if (request.getMediaUrls() == null || request.getMediaUrls().isEmpty()) {
+                    throw new IllegalArgumentException("At least one media URL is required");
+                }
+                activity.setMediaUrls(new ArrayList<>(request.getMediaUrls()));
+
+                // Set host and default values
+                activity.setHost(host);
+                activity.setActive(true);
+                activity.setIsFeatured(request.getIsFeatured() != null ? request.getIsFeatured() : false);
+                activity.setMinParticipants(request.getMinParticipants());
+                activity.setMaxParticipants(request.getMaxParticipants());
+                activity.setDurationMinutes(request.getDurationMinutes());
+
+                // Save activity
+                activity = activityRepository.save(activity);
+
+                return ActivityDTO.fromActivity(activity);
+
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid activity data: " + e.getMessage());
+            } catch (Exception e) {
+                throw new RuntimeException("Error creating activity: " + e.getMessage(), e);
+            }
+        } catch (ResourceNotFoundException | UnauthorizedException e) {
+            throw e; // Let these pass through unchanged
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error creating activity", e);
+        }
     }
-
-
     @Transactional
     @Override
     public ActivityDTO updateActivity(UUID activityId, UpdateActivityRequest request, UUID hostId) {

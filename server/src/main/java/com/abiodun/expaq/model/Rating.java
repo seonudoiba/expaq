@@ -12,7 +12,7 @@ import lombok.Setter;
 
 public class Rating {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)  // Use UUID strategy instead of IDENTITY
     private UUID id;
 
     private String title;

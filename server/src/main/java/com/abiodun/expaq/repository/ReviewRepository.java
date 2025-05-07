@@ -171,4 +171,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     boolean findByUserIdAndActivityId(UUID userId, UUID activityId);
 
     boolean findByUserIdAndBookingId(UUID userId, UUID bookingId);
+
+    double getAverageRatingByHostId(UUID hostId);
 }
