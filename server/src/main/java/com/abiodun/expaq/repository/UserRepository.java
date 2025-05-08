@@ -23,12 +23,13 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByUsername(String username);
 
     Optional<User> findByUsername(String username);
-    
+
     // OAuth2 related queries
     Optional<User> findByProviderAndProviderId(String provider, String providerId);
     
     // Verification related queries
     Optional<User> findByVerificationToken(String token);
+
     List<User> findByIsVerifiedFalseAndVerificationTokenExpiryBefore(LocalDateTime expiry);
     
     // Password reset related queries

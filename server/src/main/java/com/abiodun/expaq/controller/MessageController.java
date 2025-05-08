@@ -2,8 +2,8 @@ package com.abiodun.expaq.controller;
 
 import com.abiodun.expaq.dto.CreateMessageRequest;
 import com.abiodun.expaq.dto.MessageDTO;
+import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.model.MessageType;
-import com.abiodun.expaq.security.ExpaqUserDetails;
 import com.abiodun.expaq.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -41,9 +41,6 @@ public class Activity {
     @Column(nullable = false)
     private Integer duration; // in hours
 
-    @Column(nullable = false)
-    private Integer maxParticipants;
-
     private String imageUrl;
 
     @Column(nullable = false)
@@ -70,8 +67,14 @@ public class Activity {
 
     @Column(nullable = false)
     private Boolean isFeatured;
+
+    @Column
     private String address;
+
+    @Column
     private String city;
+
+    @Column
     private String country;
 
     @Column(columnDefinition = "geometry(Point,4326)")
@@ -85,6 +88,9 @@ public class Activity {
 
     @Column(nullable = false)
     private int minParticipants;
+
+    @Column(nullable = false)
+    private Integer maxParticipants;
 
     @Column(nullable = false)
     private int durationMinutes;

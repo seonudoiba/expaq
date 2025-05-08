@@ -1,3 +1,4 @@
+"use client"
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -45,7 +46,7 @@ export function LoginForm() {
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-xl font-medium text-gray-700"
         >
           Email
         </label>
@@ -53,18 +54,18 @@ export function LoginForm() {
           {...register('email')}
           type="email"
           id="email"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+          className="mt-1 p-2 block w-full rounded-md border-gray-200 shadow-sm focus:border-primary focus:ring-primary sm:text-xl"
           placeholder="Enter your email"
         />
         {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+          <p className="mt-1 text-lg text-red-600">{errors.email.message}</p>
         )}
       </div>
 
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-xl font-medium text-gray-700"
         >
           Password
         </label>
@@ -72,18 +73,19 @@ export function LoginForm() {
           {...register('password')}
           type="password"
           id="password"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+          className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-xl"
           placeholder="Enter your password"
         />
         {errors.password && (
-          <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+          <p className="mt-1 text-lg text-red-600">{errors.password.message}</p>
         )}
       </div>
 
       <Button
         type="submit"
-        className="w-full"
+        className="w-full bg-primary text-xl text-black p-2"
         disabled={isLoading}
+
       >
         {isLoading ? 'Logging in...' : 'Login'}
       </Button>

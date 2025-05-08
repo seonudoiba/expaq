@@ -3,6 +3,7 @@ package com.abiodun.expaq.controller;
 import com.abiodun.expaq.dto.ActivityDTO;
 import com.abiodun.expaq.dto.CreateActivityRequest;
 import com.abiodun.expaq.dto.UpdateActivityRequest;
+import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.model.Activity; // Import Activity for Specification
 import com.abiodun.expaq.model.Activity.ActivityCategory;
 import com.abiodun.expaq.model.ExpaqUserDetails;
@@ -78,9 +79,13 @@ public class ActivityController {
 
     // POST /activities - Create activity (host only)
     @PostMapping
+//    @PreAuthorize("hasRole('HOST')")
     public ResponseEntity<ActivityDTO> createActivity(
             @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @Valid @RequestBody CreateActivityRequest request) {
+        if (currentUser == null) {
+            throw new UnauthorizedException("User not authenticated");
+        }
         UUID hostId = currentUser.getId();
         return ResponseEntity.ok(activityService.createActivity(request, hostId));
     }

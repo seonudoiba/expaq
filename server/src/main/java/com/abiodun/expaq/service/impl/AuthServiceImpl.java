@@ -2,6 +2,7 @@ package com.abiodun.expaq.service.impl;
 
 import com.abiodun.expaq.dto.*;
 import com.abiodun.expaq.exception.ResourceNotFoundException;
+import com.abiodun.expaq.exception.RoleNotFoundException;
 import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.exception.UserAlreadyExistsException;
 import com.abiodun.expaq.model.*;
@@ -10,6 +11,7 @@ import com.abiodun.expaq.security.JwtTokenProvider;
 import com.abiodun.expaq.service.IAuthService;
 import com.abiodun.expaq.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements IAuthService {
@@ -57,6 +60,7 @@ public class AuthServiceImpl implements IAuthService {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setUsername(request.getUserName());
+        System.out.println(user.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         // Find the TOURIST role
         try{
@@ -65,7 +69,7 @@ public class AuthServiceImpl implements IAuthService {
             // Set the TOURIST role to the user
             user.setRoles(Collections.singleton(guestRole));
         } catch (Exception e) {
-            throw  new RuntimeException("GUEST  role not found in the database");
+            throw  new RoleNotFoundException("GUEST  role not found in the database");
 
         }
         user.setVerified(false);
@@ -95,9 +99,6 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     @Transactional
     public AuthResponse login(LoginRequest request) {
-
-
-
         // Authenticate user
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
