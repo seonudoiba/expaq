@@ -1,7 +1,7 @@
 package com.abiodun.expaq.config;
 
 import com.abiodun.expaq.security.JwtAuthenticationFilter;
-import com.abiodun.expaq.security.ExpaqUserDetailsService;
+//import com.abiodun.expaq.security.ExpaqUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,17 +32,20 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final ExpaqUserDetailsService userDetailsService;
+//    private final ExpaqUserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
         "/",
         "/api/auth/**",
-        "/api/activities",
-        "/api/activities/",
         "/api/public/**",
         "/swagger-ui/**",
         "/v3/api-docs/**",
-        "/error"
+        "/error",
+        "/api/activities",
+        "/api/activities/{id}",
+            "/api/activities/*"
+
     );
 
     @Bean
@@ -57,6 +61,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider())
+            .anonymous(AbstractHttpConfigurer::disable)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -16,9 +16,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize; // For role-based authorization
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,6 +36,7 @@ import java.util.UUID;
 public class ActivityController {
 
     private final IActivityService activityService;
+    private static final Logger log = LoggerFactory.getLogger(ActivityController.class);
 
 //    @Autowired
 //    public ActivityController(IActivityService activityService) {
@@ -79,13 +85,26 @@ public class ActivityController {
 
     // POST /activities - Create activity (host only)
     @PostMapping
-//    @PreAuthorize("hasRole('HOST')")
+    @PreAuthorize("hasRole('HOST')")
     public ResponseEntity<ActivityDTO> createActivity(
             @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @Valid @RequestBody CreateActivityRequest request) {
+        log.info("Creating activity with user: {} and authorities: {}", 
+            currentUser.getUsername(), 
+            currentUser.getAuthorities());
+            
         if (currentUser == null) {
             throw new UnauthorizedException("User not authenticated");
         }
+        
+        // Check if user has HOST role
+        boolean hasHostRole = currentUser.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_HOST") || auth.getAuthority().equals("HOST"));
+        log.info("User has HOST role: {}", hasHostRole);
+        if (!hasHostRole) {
+            throw new UnauthorizedException("User does not have HOST privileges");
+        }
+        
         UUID hostId = currentUser.getId();
         return ResponseEntity.ok(activityService.createActivity(request, hostId));
     }

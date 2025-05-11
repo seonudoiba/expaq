@@ -7,9 +7,9 @@ import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.exception.UserAlreadyExistsException;
 import com.abiodun.expaq.model.*;
 import com.abiodun.expaq.repository.*;
-import com.abiodun.expaq.security.JwtTokenProvider;
 import com.abiodun.expaq.service.IAuthService;
 import com.abiodun.expaq.service.EmailService;
+import com.abiodun.expaq.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,7 +34,7 @@ public class AuthServiceImpl implements IAuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtService jwtService;
     private final EmailService emailService;
     private final RoleRepository roleRepository;
     private final ActivityRepository activityRepository;
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements IAuthService {
         emailService.sendVerificationEmail(user.getEmail(), verificationToken);
 
         // Generate JWT token
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtService.generateToken(user);
 
 //        return new AuthResponse(token, UserDTO.fromUser(user));
         return new AuthResponse(token, UserDTO.fromUser(user).getId() , UserDTO.fromUser(user).getUserName(), UserDTO.fromUser(user).getRoles());
@@ -128,7 +128,7 @@ public class AuthServiceImpl implements IAuthService {
         userRepository.save(user);
 
         // Generate JWT token
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtService.generateToken(user);
 
         return new AuthResponse(token, UserDTO.fromUser(user).getId() , UserDTO.fromUser(user).getUserName(), UserDTO.fromUser(user).getRoles());
     }
@@ -253,7 +253,7 @@ public class AuthServiceImpl implements IAuthService {
         user = userRepository.save(user);
 
         // Generate JWT token
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtService.generateToken(user);
 
         return new AuthResponse(token, UserDTO.fromUser(user));
     }
@@ -280,7 +280,7 @@ public class AuthServiceImpl implements IAuthService {
         TokenBlacklist blacklistToken = new TokenBlacklist();
         blacklistToken.setToken(currentToken);
         blacklistToken.setUserId(userId);
-        blacklistToken.setExpirationDate(jwtTokenProvider.getExpirationDateFromToken(currentToken));
+        blacklistToken.setExpirationDate(jwtService.getExpirationDateFromToken(currentToken));
         blacklistToken.setBlacklistedAt(LocalDateTime.now());
 
         tokenBlacklistRepository.save(blacklistToken);

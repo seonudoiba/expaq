@@ -53,4 +53,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findByRoleNameAndVerificationStatus(@Param("roleName") String roleName, @Param("isVerified") boolean isVerified);
 
     List<User> findByRolesName(String name);
+
 }

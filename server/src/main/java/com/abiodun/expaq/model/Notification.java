@@ -1,10 +1,8 @@
 package com.abiodun.expaq.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,8 +10,6 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "notifications")
-@AllArgsConstructor
-@NoArgsConstructor
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,30 +25,29 @@ public class Notification {
     @Column(nullable = false)
     private String message;
 
-    @Column(nullable = false)
-    private boolean isRead = false;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private NotificationType type;
 
-    @Column
-    private String actionUrl;
+    @Column(columnDefinition = "jsonb")
+    private Object data;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(nullable = false)
+    private boolean read = false;
+
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public enum NotificationType {
-        SYSTEM,
-        BOOKING,
-        REVIEW,
-        HOST_APPLICATION,
-        MESSAGE,
-        PAYMENT
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 
     public void markAsRead() {
-        this.isRead = true;
+        this.read = true;
+        this.readAt = LocalDateTime.now();
     }
 } 

@@ -1,24 +1,18 @@
+// "use client"
+
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import { Providers } from './providers';
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/hooks/use-auth";
+import { Navbar } from "@/components/layout/navbar";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ['100','200','300','400','500', '600', '700','800', '900'],
-
-});
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Expaq - Experience Activities",
-  description: "Find and create amazing activities in your area",
+  title: "Expaq - Your Tour Guide Marketplace",
+  description: "Find and book local tour guides for authentic travel experiences",
+  keywords: ["tour guide", "travel", "local experiences", "tourism", "adventure"],
 };
 
 export default function RootLayout({
@@ -27,15 +21,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body
-        className={`${poppins.className} `}
-      >
-        <Providers>
-          <Header/>
-          {children}
-          <Footer/>
-        </Providers>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <AuthProvider>
+          <Navbar />
+          <main className="min-h-screen pt-16">{children}</main>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

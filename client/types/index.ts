@@ -2,9 +2,10 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role: 'USER' | 'HOST' | 'ADMIN';
+  avatar?: string;
+  roles: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Activity {
@@ -13,24 +14,72 @@ export interface Activity {
   description: string;
   location: string;
   price: number;
-  category: string;
+  duration: number;
   maxParticipants: number;
-  startDate: string;
-  endDate: string;
-  hostId: string;
+  category: string;
   images: string[];
+  host: User;
   rating: number;
-  reviewCount: number;
+  reviews: Review[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Review {
   id: string;
-  activityId: string;
-  userId: string;
+  content: string;
   rating: number;
-  comment: string;
+  user: User;
+  activity: Activity;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Booking {
+  id: string;
+  activity: Activity;
+  user: User;
+  status: BookingStatus;
+  startDate: string;
+  endDate: string;
+  participants: number;
+  totalPrice: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum BookingStatus {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  CANCELLED = "CANCELLED",
+  COMPLETED = "COMPLETED"
+}
+
+export interface Message {
+  id: string;
+  content: string;
+  sender: User;
+  receiver: User;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  content: string;
+  user: User;
+  read: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum NotificationType {
+  BOOKING_CONFIRMED = "BOOKING_CONFIRMED",
+  BOOKING_CANCELLED = "BOOKING_CANCELLED",
+  NEW_MESSAGE = "NEW_MESSAGE",
+  REVIEW_RECEIVED = "REVIEW_RECEIVED",
+  SYSTEM = "SYSTEM"
 }
 
 export interface AuthResponse {

@@ -97,7 +97,7 @@ public class ActivityServiceImpl implements IActivityService {
 
             // Validate that the host has the HOST role
             boolean isHost = host.getRoles().stream()
-                    .anyMatch(role -> role.getName().equals("ROLE_HOST"));
+                    .anyMatch(role -> role.getName().equals("HOST") || role.getName().equals("ROLE_HOST"));
             if (!isHost) {
                 throw new UnauthorizedException("User does not have HOST privileges");
             }
@@ -162,6 +162,8 @@ public class ActivityServiceImpl implements IActivityService {
                 activity.setMinParticipants(request.getMinParticipants());
                 activity.setMaxParticipants(request.getMaxParticipants());
                 activity.setDurationMinutes(request.getDurationMinutes());
+                // Convert minutes to hours for the duration field
+                activity.setDuration((int) Math.ceil(request.getDurationMinutes() / 60.0));
 
                 // Save activity
                 activity = activityRepository.save(activity);

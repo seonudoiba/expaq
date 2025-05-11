@@ -1,0 +1,12 @@
+package com.abiodun.expaq.model;
+
+public enum NotificationType {
+    BOOKING_CREATED,
+    BOOKING_UPDATED,
+    BOOKING_CANCELLED,
+    BOOKING_CONFIRMED,
+    MESSAGE_RECEIVED,
+    REVIEW_RECEIVED,
+    ACTIVITY_UPDATED,
+    SYSTEM_NOTIFICATION
+} 
