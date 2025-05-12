@@ -28,10 +28,7 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -128,14 +125,14 @@ public class ActivityServiceImpl implements IActivityService {
                 }
 
                 // Set capacity with validation
-                if (request.getCapacity() != null) {
-                    if (request.getCapacity() <= 0) {
-                        throw new IllegalArgumentException("Capacity must be greater than zero");
-                    }
-                    activity.setCapacity(request.getCapacity());
-                } else {
-                    activity.setCapacity(request.getMaxParticipants()); // Fall back to maxParticipants
-                }
+//                if (request.getCapacity() != null) {
+//                    if (request.getCapacity() <= 0) {
+//                        throw new IllegalArgumentException("Capacity must be greater than zero");
+//                    }
+//                    activity.setCapacity(request.getCapacity());
+//                } else {
+//                    activity.setCapacity(request.getMaxParticipants()); // Fall back to maxParticipants
+//                }
                 activity.setBookedCapacity(0);
 
                 // Set address fields
@@ -149,16 +146,16 @@ public class ActivityServiceImpl implements IActivityService {
                 }
                 activity.setSchedule(request.getSchedule());
 
-                // Set media URLs with validation
-                if (request.getMediaUrls() == null || request.getMediaUrls().isEmpty()) {
-                    throw new IllegalArgumentException("At least one media URL is required");
-                }
-                activity.setMediaUrls(new ArrayList<>(request.getMediaUrls()));
+//                // Set media URLs with validation
+//                if (request.getMediaUrls() == null || request.getMediaUrls().isEmpty()) {
+//                    throw new IllegalArgumentException("At least one media URL is required");
+//                }
+//                activity.setMediaUrls(new ArrayList<>(request.getMediaUrls()));
 
                 // Set host and default values
                 activity.setHost(host);
                 activity.setActive(true);
-                activity.setIsFeatured(request.getIsFeatured() != null ? request.getIsFeatured() : false);
+                activity.setIsFeatured( false);
                 activity.setMinParticipants(request.getMinParticipants());
                 activity.setMaxParticipants(request.getMaxParticipants());
                 activity.setDurationMinutes(request.getDurationMinutes());
@@ -303,11 +300,12 @@ public class ActivityServiceImpl implements IActivityService {
     }
 
     @Override
-    public List<ActivityDTO> findUpcomingActivities() {
-        return activityRepository.findUpcomingActivities(LocalDateTime.now())
-                .stream()
-                .map(ActivityDTO::fromActivity)
-                .collect(Collectors.toList());
+    public Page<ActivityDTO> findUpcomingActivities(Pageable pageable) {
+        return activityRepository.findUpcomingActivities( LocalDateTime.now(), pageable)
+                .map(ActivityDTO::fromActivity);
+//                .stream()
+//                .map(ActivityDTO::fromActivity)
+//                .collect(Collectors.toList());
     }
 
     @Override
@@ -345,7 +343,7 @@ public class ActivityServiceImpl implements IActivityService {
 
         // Upload image to Cloudinary
         String imageUrl = cloudinaryService.uploadImage(file, folder); // Check correct method name
-
+        imageUrl = "https://res.cloudinary.com/do0rdj8oj/image/upload/v1747010925/" + imageUrl;
         // Add image URL to activity
         activity.getMediaUrls().add(imageUrl);
         activity = activityRepository.save(activity);
@@ -416,6 +414,17 @@ public class ActivityServiceImpl implements IActivityService {
     public ActivityDTO mapToActivityDTO(Activity activity) {
         return ActivityDTO.fromActivity(activity);
     }
+
+    @Override
+    public Set<String> findAllDistinctCities() {
+        return activityRepository.findAllDistinctCities();
+    }
+
+    @Override
+    public Set<String> findAllDistinctCountries() {
+        return activityRepository.findAllDistinctCountries();
+    }
+
 
     // TODO: Implement methods for parsing location/schedule if complex types are used
     // private Point parseLocation(String locationString) { ... }

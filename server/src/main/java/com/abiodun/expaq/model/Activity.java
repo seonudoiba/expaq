@@ -65,7 +65,7 @@ public class Activity {
     @Enumerated(EnumType.STRING)
     private ActivityCategory category;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private Boolean isFeatured;
 
     @Column
@@ -80,7 +80,6 @@ public class Activity {
     @Column(columnDefinition = "geometry(Point,4326)")
     private Point locationPoint;
 
-    @Column(nullable = false)
     private int capacity;
 
     @Column(nullable = false)

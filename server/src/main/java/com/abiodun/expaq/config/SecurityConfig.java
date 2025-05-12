@@ -5,6 +5,7 @@ import com.abiodun.expaq.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -36,17 +37,15 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
     private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
-        "/",
-        "/api/auth/**",
-        "/api/public/**",
-        "/swagger-ui/**",
-        "/v3/api-docs/**",
-        "/error",
-        "/api/activities",
-        "/api/activities/{id}",
-            "/api/activities/*"
-
+            "/api/auth/**",
+            "/api/public/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/error"
     );
+    private static final String[] PUBLIC_GET_ENDPOINTS = {
+            "/api/activities/**"
+    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -54,7 +53,8 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                    .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll() // Allow GET requests to specific endpoints
+                    .requestMatchers(PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

@@ -16,10 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize; // For role-based authorization
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
@@ -27,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -92,11 +90,7 @@ public class ActivityController {
         log.info("Creating activity with user: {} and authorities: {}", 
             currentUser.getUsername(), 
             currentUser.getAuthorities());
-            
-        if (currentUser == null) {
-            throw new UnauthorizedException("User not authenticated");
-        }
-        
+
         // Check if user has HOST role
         boolean hasHostRole = currentUser.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_HOST") || auth.getAuthority().equals("HOST"));
@@ -146,6 +140,19 @@ public class ActivityController {
         return ResponseEntity.ok(activityService.findNearbyActivities(latitude, longitude, distance));
     }
 
+    @GetMapping("/categories")
+    public ResponseEntity<ActivityCategory[]> findActivitiesCategories() {
+        return ResponseEntity.ok(ActivityCategory.values());
+    }
+    @GetMapping("/cities")
+    public ResponseEntity<Set<String>> findActivitiesCities() {
+        return ResponseEntity.ok(activityService.findAllDistinctCities());
+    }
+    @GetMapping("/countries")
+    public ResponseEntity<Set<String>> findActivitiesCountries() {
+        return ResponseEntity.ok(activityService.findAllDistinctCountries());
+    }
+
     @GetMapping("/nearby/{category}")
     public ResponseEntity<List<ActivityDTO>> findNearbyActivitiesByCategory(
             @PathVariable String category,
@@ -167,8 +174,8 @@ public class ActivityController {
     }
 
     @GetMapping("/upcoming")
-    public ResponseEntity<List<ActivityDTO>> findUpcomingActivities() {
-        return ResponseEntity.ok(activityService.findUpcomingActivities());
+    public ResponseEntity<Page<ActivityDTO>> findUpcomingActivities(Pageable pageable) {
+        return ResponseEntity.ok(activityService.findUpcomingActivities(pageable));
     }
 
     @GetMapping("/popular")
@@ -197,13 +204,14 @@ public class ActivityController {
         return ResponseEntity.ok(activityService.uploadActivityImage(activityId, file, hostId));
     }
 
-    @DeleteMapping("/{activityId}/images/{imageUrl}")
-    public ResponseEntity<Void> deleteActivityImage(
+    @DeleteMapping("/{activityId}/images")
+    public ResponseEntity<ActivityDTO> deleteActivityImage(
             @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @PathVariable UUID activityId,
-            @PathVariable String imageUrl) {
+            @RequestParam String imageUrl) {
         UUID hostId = currentUser.getId();
         activityService.deleteActivityImage(activityId, imageUrl, hostId);
-        return ResponseEntity.ok().build();
+//        return ResponseEntity.ok("Activity image" + imageUrl + "has been deleted successfully");
+        return ResponseEntity.ok(activityService.getActivityById(activityId));
     }
 }

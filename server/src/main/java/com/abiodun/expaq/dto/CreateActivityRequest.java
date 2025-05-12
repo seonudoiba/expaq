@@ -6,6 +6,7 @@ import com.abiodun.expaq.model.ActivitySchedule;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,8 +42,11 @@ public class CreateActivityRequest {
     @NotNull(message = "Schedule is required")
     private ActivitySchedule schedule;
 
-    @NotEmpty(message = "At least one media URL is required")
-    private List<String> mediaUrls;
+//    @NotEmpty(message = "At least one media URL is required")
+//    private List<String> mediaUrls;
+//
+//    @NotEmpty(message = " Add file")
+//    private MultipartFile file;
 
     @NotNull(message = "Maximum participants is required")
     @Min(value = 1, message = "Maximum participants must be at least 1")
@@ -50,12 +54,18 @@ public class CreateActivityRequest {
 
 //    @NotNull(message = "Capacity should ")
 //    @Min(value = 1, message = "Maximum participants must be at least 1")
-    private Integer capacity;
+//    private Integer capacity;
     private Integer bookedCapacity;
+
+    @NotEmpty( message = " Address is required")
     private String address;
+
+
+    @NotEmpty( message = " City is required")
     private String city;
+
+    @NotEmpty( message = " Country is required")
     private String country;
-    private Boolean isFeatured;
 
     @NotNull(message = "Minimum participants is required")
     @Min(value = 1, message = "Minimum participants must be at least 1")

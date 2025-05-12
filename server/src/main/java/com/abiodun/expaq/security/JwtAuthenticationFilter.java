@@ -15,13 +15,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -30,20 +27,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final ExpaqUserDetailsService userDetailsService;
-
-
-    // List of public endpoints that should bypass authentication
-    private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/auth/**",
-            "/api/public/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/error",
-            "/api/activities",
-            "/api/activities/{id}",
-            "/api/activities/*"
-    );
     private final UserRepository userRepository;
+
+    // Public endpoints for specific HTTP methods
+    private static final String[] PUBLIC_GET_ENDPOINTS = {
+            "/api/activities/**",
+            "/api/funactivities/**"
+    };
+
+    private static final String[] PUBLIC_POST_ENDPOINTS = {
+            "/api/anonymous/comment"
+    };
+
+    private final AntPathMatcher pathMatcher = new AntPathMatcher(); // Instantiate AntPathMatcher
 
     @Override
     protected void doFilterInternal(
@@ -51,6 +47,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        String httpMethod = request.getMethod();
+
+        // Check if the request matches any of the public GET endpoints
+        if ("GET".equalsIgnoreCase(httpMethod) && isPublicEndpoint(requestURI, PUBLIC_GET_ENDPOINTS)) {
+            log.info("Skipping authentication for public GET endpoint: {}", requestURI);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Check if the request matches any of the public POST endpoints
+        if ("POST".equalsIgnoreCase(httpMethod) && isPublicEndpoint(requestURI, PUBLIC_POST_ENDPOINTS)) {
+            log.info("Skipping authentication for public POST endpoint: {}", requestURI);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
@@ -65,11 +78,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userEmail = jwtService.extractEmail(jwt);
             log.info("Extracted email from token: {}", userEmail);
-            
+
             if (userEmail != null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
                 log.info("Loaded user details with authorities: {}", userDetails.getAuthorities());
-                
+
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     log.info("Token is valid for user: {}", userEmail);
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -79,8 +92,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    log.info("Authentication set in context for user: {} with authorities: {}", 
-                        userEmail, userDetails.getAuthorities());
+                    log.info("Authentication set in context for user: {} with authorities: {}",
+                            userEmail, userDetails.getAuthorities());
                 } else {
                     log.warn("Token validation failed for user: {}", userEmail);
                     SecurityContextHolder.clearContext();
@@ -105,7 +118,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPublicEndpoint(String requestURI) {
-        return PUBLIC_ENDPOINTS.stream().anyMatch(requestURI::startsWith);
+    private boolean isPublicEndpoint(String requestURI, String[] publicEndpoints) {
+        for (String endpoint : publicEndpoints) {
+            if (pathMatcher.match(endpoint, requestURI)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

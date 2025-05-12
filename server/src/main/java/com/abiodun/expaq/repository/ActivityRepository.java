@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -57,7 +58,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     @Query("SELECT a FROM Activity a WHERE " +
            "a.isActive = true AND " +
            "EXISTS (SELECT 1 FROM a.bookings b WHERE b.bookingDateTime > :now)")
-    List<Activity> findUpcomingActivities(@Param("now") LocalDateTime now);
+    Page<Activity> findUpcomingActivities(@Param("now") LocalDateTime now, Pageable pageable);
     
     // Popular activities (by number of bookings)
     @Query("SELECT a FROM Activity a WHERE a.isActive = true " +
@@ -125,4 +126,11 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
 
 
     long countByHostIdAndIsActive(UUID hostId, boolean enabled);
+
+    @Query("SELECT DISTINCT a.city FROM Activity a")
+    Set<String> findAllDistinctCities();
+
+    @Query("SELECT DISTINCT a.country FROM Activity a")
+    Set<String> findAllDistinctCountries();
+
 }

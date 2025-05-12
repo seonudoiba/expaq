@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -42,7 +43,7 @@ public interface IActivityService {
 
     List<ActivityDTO> findHostActivities(UUID hostId);
 
-    List<ActivityDTO> findUpcomingActivities();
+    Page<ActivityDTO> findUpcomingActivities(Pageable pageable);
 
     Page<ActivityDTO> findPopularActivities(Pageable pageable);
 
@@ -55,4 +56,8 @@ public interface IActivityService {
     void deleteActivityImage(UUID activityId, String imageUrl, UUID hostId);
 
     ActivityDTO mapToActivityDTO(Activity activity);
+
+    Set<String> findAllDistinctCities();
+
+    Set<String> findAllDistinctCountries();
 }
