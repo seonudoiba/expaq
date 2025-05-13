@@ -5,12 +5,14 @@ import com.abiodun.expaq.dto.LoginRequest;
 import com.abiodun.expaq.dto.RegisterRequest;
 import com.abiodun.expaq.dto.UserDTO;
 import com.abiodun.expaq.exception.ErrorResponse;
+import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.service.IAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -57,7 +59,14 @@ public class AuthController {
         }
     }
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getMe(@RequestAttribute("userId") UUID userId) {
+    public ResponseEntity<UserDTO> getMe(
+//            @RequestAttribute("userId") UUID userId
+            @AuthenticationPrincipal ExpaqUserDetails currentUser
+            ) {
+        if (currentUser == null ) {
+            return null;
+        }
+        UUID userId = currentUser.getId();
         return ResponseEntity.ok(authService.getMe(userId));
     }
 

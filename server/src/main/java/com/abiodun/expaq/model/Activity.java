@@ -59,6 +59,9 @@ public class Activity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 

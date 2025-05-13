@@ -6,7 +6,9 @@ import com.abiodun.expaq.model.ActivitySchedule;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
+import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,11 +33,18 @@ public class ActivityDTO {
     private int minParticipants;
     private int durationMinutes;
     private boolean isActive;
+    private boolean isFeatured;
     private boolean isVerified;
     private double averageRating;
     private int totalReviews;
+    private Point locationPoint;
+    private  String address;
+    private String city;
+    private String country;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     public static ActivityDTO fromActivity(Activity activity) {
         ActivityDTO dto = new ActivityDTO();
@@ -58,8 +67,19 @@ public class ActivityDTO {
         dto.setDurationMinutes(activity.getDurationMinutes());
         dto.setActive(activity.isActive());
         dto.setVerified(activity.isVerified());
+        dto.setFeatured(false);
+        dto.setTotalReviews(activity.getReviews().size());
+        dto.setAverageRating(activity.getAverageRating());
         dto.setCreatedAt(activity.getCreatedAt());
         dto.setUpdatedAt(activity.getUpdatedAt());
+        dto.setStartDate(activity.getStartDate());
+        dto.setEndDate(activity.getEndDate());
+//        dto.setLocationPoint(activity.getLocationPoint());
+        dto.setAddress(activity.getAddress());
+        dto.setCity(activity.getCity());
+        dto.setCountry(activity.getCountry());
+
+
         return dto;
     }
 

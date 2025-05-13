@@ -42,15 +42,18 @@ public interface UserRepository extends JpaRepository<User, UUID> {
            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<User> searchUsers(@Param("query") String query, Pageable pageable);
-    
-//    // Host specific queries
-//    @Query("SELECT u FROM User u WHERE u.role = 'HOST' AND u.id IN " +
-//           "(SELECT a.host.id FROM Activity a WHERE a.isActive = true)")
-//    List<User> findActiveHosts();
 
-//    List<User> findByRoleAndIsVerified(Role role, boolean isVerified);
+//@Query("SELECT u FROM User u WHERE u.role.name = :roleName AND u.id IN " +
+//        "(SELECT a.host.id FROM Activity a WHERE a.isActive = true)")
+//List<User> findActiveHosts(@Param("roleName") String roleName);
+
+
+    List<User> findByRolesAndIsVerified(Role role, boolean isVerified);
+
     @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.isVerified = :isVerified")
     List<User> findByRoleNameAndVerificationStatus(@Param("roleName") String roleName, @Param("isVerified") boolean isVerified);
+
+
 
     List<User> findByRolesName(String name);
 

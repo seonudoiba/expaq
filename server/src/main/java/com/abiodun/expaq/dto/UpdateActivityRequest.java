@@ -60,4 +60,7 @@ public class UpdateActivityRequest {
 
     private Boolean isActive;
     private Boolean isFeatured;
+
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 } 

@@ -6,6 +6,8 @@ interface ActivityCardProps {
   id: string;
   title: string;
   description: string;
+  city: string;
+  country: string;
   location: string;
   price: string;
   startDate: string;
@@ -19,7 +21,8 @@ export function ActivityCard({
   id,
   title,
   description,
-  location,
+  city,
+  country,
   price,
   startDate,
   endDate,
@@ -62,7 +65,7 @@ export function ActivityCard({
                 clipRule="evenodd"
               />
             </svg>
-            {location}
+            {city}, {country}
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <svg
@@ -83,7 +86,7 @@ export function ActivityCard({
             <div className="flex items-center">
               <StarIcon className="h-5 w-5 text-yellow-400" />
               <span className="ml-1 text-sm text-gray-600">
-                {rating.toFixed(1)} ({reviewCount} reviews)
+                {typeof rating === "number" ? rating.toFixed(1) : "N/A"} ({reviewCount} reviews)
               </span>
             </div>
             <p className="text-sm font-medium text-gray-900">{price}</p>
@@ -92,4 +95,4 @@ export function ActivityCard({
       </div>
     </Link>
   );
-} 
+}

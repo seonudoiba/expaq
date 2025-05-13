@@ -45,6 +45,7 @@ export const activityService = {
     maxPrice?: number;
   }): Promise<Activity[]> => {
     const response = await apiClient.get<Activity[]>('/api/activities', { params });
+    console.log('Activities:', response.data);
     return response.data;
   },
 

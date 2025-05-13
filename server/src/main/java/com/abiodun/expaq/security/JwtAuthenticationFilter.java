@@ -1,8 +1,6 @@
 package com.abiodun.expaq.security;
 
-import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.repository.UserRepository;
-import com.abiodun.expaq.service.ExpaqUserDetailsService;
 import com.abiodun.expaq.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // Public endpoints for specific HTTP methods
     private static final String[] PUBLIC_GET_ENDPOINTS = {
             "/api/activities/**",
-            "/api/funactivities/**"
+            "/"
     };
 
     private static final String[] PUBLIC_POST_ENDPOINTS = {

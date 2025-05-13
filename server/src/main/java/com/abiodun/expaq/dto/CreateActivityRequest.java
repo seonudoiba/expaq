@@ -9,6 +9,7 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -42,12 +43,6 @@ public class CreateActivityRequest {
     @NotNull(message = "Schedule is required")
     private ActivitySchedule schedule;
 
-//    @NotEmpty(message = "At least one media URL is required")
-//    private List<String> mediaUrls;
-//
-//    @NotEmpty(message = " Add file")
-//    private MultipartFile file;
-
     @NotNull(message = "Maximum participants is required")
     @Min(value = 1, message = "Maximum participants must be at least 1")
     private Integer maxParticipants;
@@ -75,4 +70,7 @@ public class CreateActivityRequest {
     @Min(value = 15, message = "Duration must be at least 15 minutes")
     @Max(value = 1440, message = "Duration cannot exceed 24 hours (1440 minutes)")
     private Integer durationMinutes;
+
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 } 

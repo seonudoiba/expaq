@@ -112,6 +112,8 @@ public class ActivityServiceImpl implements IActivityService {
                 activity.setLocation(String.valueOf(location));
                 activity.setLocationPoint(location);
                 activity.setPrice(request.getPrice());
+                activity.setStartDate(request.getStartDate());
+                activity.setEndDate(request.getEndDate());
 
                 // Validate activity category
                 try {
@@ -123,16 +125,6 @@ public class ActivityServiceImpl implements IActivityService {
                                     .map(Enum::name)
                                     .collect(Collectors.toList())));
                 }
-
-                // Set capacity with validation
-//                if (request.getCapacity() != null) {
-//                    if (request.getCapacity() <= 0) {
-//                        throw new IllegalArgumentException("Capacity must be greater than zero");
-//                    }
-//                    activity.setCapacity(request.getCapacity());
-//                } else {
-//                    activity.setCapacity(request.getMaxParticipants()); // Fall back to maxParticipants
-//                }
                 activity.setBookedCapacity(0);
 
                 // Set address fields
@@ -145,12 +137,6 @@ public class ActivityServiceImpl implements IActivityService {
                     throw new IllegalArgumentException("Activity schedule is required");
                 }
                 activity.setSchedule(request.getSchedule());
-
-//                // Set media URLs with validation
-//                if (request.getMediaUrls() == null || request.getMediaUrls().isEmpty()) {
-//                    throw new IllegalArgumentException("At least one media URL is required");
-//                }
-//                activity.setMediaUrls(new ArrayList<>(request.getMediaUrls()));
 
                 // Set host and default values
                 activity.setHost(host);
@@ -209,7 +195,8 @@ public class ActivityServiceImpl implements IActivityService {
         if (request.getSchedule() != null) activity.setSchedule(request.getSchedule());
         if (request.getIsActive() != null) activity.setActive(request.getIsActive()); // Changed from getIsActive
         if (request.getIsFeatured() != null) activity.setIsFeatured(request.getIsFeatured()); // Changed from getIsFeatured
-
+        if (request.getStartDate() != null) activity.setStartDate(request.getStartDate());
+        if (request.getEndDate() != null) activity.setEndDate(request.getEndDate());
         // Save activity
         activity = activityRepository.save(activity);
 

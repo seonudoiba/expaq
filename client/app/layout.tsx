@@ -5,14 +5,25 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
-import { Navbar } from "@/components/layout/navbar";
+// import { Navbar } from "@/components/layout/navbar";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Expaq - Your Tour Guide Marketplace",
-  description: "Find and book local tour guides for authentic travel experiences",
-  keywords: ["tour guide", "travel", "local experiences", "tourism", "adventure"],
+  title: "Expaq - Discover Unforgettable Experiences",
+  description:
+    "Connect with local hosts and find unique activities anywhere in the world",
+  applicationName: "Expaq",
+  keywords: [
+    "tour guide",
+    "travel",
+    "local experiences",
+    "tourism",
+    "adventure",
+  ],
 };
 
 export default function RootLayout({
@@ -24,9 +35,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <AuthProvider>
-          <Navbar />
-          <main className="min-h-screen pt-16">{children}</main>
-          <Toaster />
+          <Providers>
+            {/* Uncomment the Navbar component if needed */}
+            {/* <Navbar /> */}
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+            <Toaster />
+          </Providers>
         </AuthProvider>
       </body>
     </html>

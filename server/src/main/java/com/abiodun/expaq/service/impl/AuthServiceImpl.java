@@ -91,9 +91,8 @@ public class AuthServiceImpl implements IAuthService {
         // Generate JWT token
         String token = jwtService.generateToken(user);
 
-//        return new AuthResponse(token, UserDTO.fromUser(user));
-        return new AuthResponse(token, UserDTO.fromUser(user).getId() , UserDTO.fromUser(user).getUserName(), UserDTO.fromUser(user).getRoles());
-
+        // Use the constructor that includes the full UserDTO
+        return new AuthResponse(token, UserDTO.fromUser(user));
     }
 
     @Override
@@ -118,6 +117,11 @@ public class AuthServiceImpl implements IAuthService {
             throw new UnauthorizedException("Account is deactivated");
         }
 
+        // Check if account is verified
+        if (!user.isVerified()){
+            throw new UnauthorizedException("Account is not verified");
+        }
+
         // Check if password is correct
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new UnauthorizedException("Invalid credentials");
@@ -130,7 +134,8 @@ public class AuthServiceImpl implements IAuthService {
         // Generate JWT token
         String token = jwtService.generateToken(user);
 
-        return new AuthResponse(token, UserDTO.fromUser(user).getId() , UserDTO.fromUser(user).getUserName(), UserDTO.fromUser(user).getRoles());
+        // Use the constructor that includes the full UserDTO
+        return new AuthResponse(token, UserDTO.fromUser(user));
     }
 
     @Override

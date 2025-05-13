@@ -8,21 +8,40 @@ export interface User {
   updatedAt: string;
 }
 
+export interface Schedule {
+  timeSlots: string[] | null;
+  availableDays: string[] | null;
+  timeZone: string | null;
+}
+
 export interface Activity {
   id: string;
+  hostId: string;
+  hostName: string;
+  hostProfilePicture: string | null;
   title: string;
   description: string;
-  location: string;
   price: number;
-  duration: number;
-  maxParticipants: number;
+  latitude: number;
+  longitude: number;
   category: string;
-  images: string[];
-  host: User;
-  rating: number;
-  reviews: Review[];
+  schedule: Schedule;
+  mediaUrls: string[];
+  maxParticipants: number;
+  minParticipants: number;
+  durationMinutes: number;
+  averageRating: number;
+  totalReviews: number;
   createdAt: string;
   updatedAt: string;
+  active: boolean;
+  verified: boolean;
+  startDate: string;
+  endDate: string;
+  locationPoint: string;
+  address: string;
+  city: string;
+  country: string;
 }
 
 export interface Review {
@@ -115,4 +134,4 @@ export interface CreateReviewRequest {
   activityId: string;
   rating: number;
   comment: string;
-} 
+}

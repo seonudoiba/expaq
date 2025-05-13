@@ -5,7 +5,10 @@ import com.abiodun.expaq.model.Review;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 
+@Service
 @Mapper(componentModel = "spring")
 public interface ReviewMapper {
     ReviewMapper INSTANCE = Mappers.getMapper(ReviewMapper.class);

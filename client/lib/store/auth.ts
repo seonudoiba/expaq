@@ -23,7 +23,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -34,6 +34,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           const response = await authService.login({ email, password });
+          // Set token as a cookie
+          if (response.token) {
+            document.cookie = `token=${response.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`; // Expires in 7 days
+          }
           set({
             user: response.user,
             token: response.token,
@@ -53,6 +57,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           const response = await authService.register(data);
+          // Set token as a cookie
+          if (response.token) {
+            document.cookie = `token=${response.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`; // Expires in 7 days
+          }
           set({
             user: response.user,
             token: response.token,
@@ -69,16 +77,25 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        // Remove the cookie
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           error: null,
         });
-        localStorage.removeItem('token');
       },
 
       getCurrentUser: async () => {
+        const token = get().token;
+        if (!token && typeof window !== 'undefined') {
+          const cookieToken = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+          if (cookieToken) {
+            set({ token: cookieToken });
+          }
+        }
+
         try {
           set({ isLoading: true, error: null });
           const user = await authService.getCurrentUser();
@@ -93,6 +110,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             isAuthenticated: false,
           });
+          document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+          set({ token: null, user: null });
         }
       },
     }),
@@ -105,4 +124,4 @@ export const useAuthStore = create<AuthState>()(
       }),
     }
   )
-); 
+);

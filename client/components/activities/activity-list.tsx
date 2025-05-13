@@ -1,3 +1,4 @@
+"use client"
 import { useQuery } from '@tanstack/react-query';
 import { activityService } from '@/lib/api/services';
 import { ActivityCard } from './activity-card';
@@ -62,15 +63,17 @@ export function ActivityList() {
           id={activity.id}
           title={activity.title}
           description={activity.description}
-          location={activity.location}
+          city={activity.city}
+          country={activity.country}
+          location={activity.locationPoint}
           price={formatPrice(activity.price)}
           startDate={formatDate(activity.startDate)}
           endDate={formatDate(activity.endDate)}
-          image={activity.images[0]}
-          rating={activity.rating}
-          reviewCount={activity.reviewCount}
+          image={activity.mediaUrls?.[0] || "/default-image.jpg"}
+          rating={activity.averageRating}
+          reviewCount={activity.totalReviews}
         />
       ))}
     </div>
   );
-} 
+}
