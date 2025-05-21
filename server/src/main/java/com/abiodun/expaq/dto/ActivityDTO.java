@@ -1,8 +1,7 @@
 package com.abiodun.expaq.dto;
 
-import com.abiodun.expaq.model.Activity;
+import com.abiodun.expaq.model.*;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
-import com.abiodun.expaq.model.ActivitySchedule;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,7 @@ public class ActivityDTO {
     private BigDecimal price;
     private double latitude;
     private double longitude;
-    private ActivityCategory category;
+    private ActivityType activityType;
     private ActivitySchedule schedule;
     private List<String> mediaUrls;
     private int maxParticipants;
@@ -39,8 +38,8 @@ public class ActivityDTO {
     private int totalReviews;
     private Point locationPoint;
     private  String address;
-    private String city;
-    private String country;
+    private CityDTO city;
+    private CountryDTO country;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime startDate;
@@ -59,7 +58,7 @@ public class ActivityDTO {
             dto.setLatitude(activity.getLocationPoint().getY());
             dto.setLongitude(activity.getLocationPoint().getX());
         }
-        dto.setCategory(activity.getCategory());
+        dto.setActivityType(activity.getActivityType());
         dto.setSchedule(activity.getSchedule());
         dto.setMediaUrls(activity.getMediaUrls());
         dto.setMaxParticipants(activity.getMaxParticipants());
@@ -76,8 +75,9 @@ public class ActivityDTO {
         dto.setEndDate(activity.getEndDate());
 //        dto.setLocationPoint(activity.getLocationPoint());
         dto.setAddress(activity.getAddress());
-        dto.setCity(activity.getCity());
-        dto.setCountry(activity.getCountry());
+        dto.setCity(CityDTO.fromCity(activity.getCity()));
+        dto.setCountry(CountryDTO.fromCountry(activity.getCountry()));
+
 
 
         return dto;

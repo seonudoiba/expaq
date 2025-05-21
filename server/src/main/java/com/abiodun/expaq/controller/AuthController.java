@@ -6,9 +6,12 @@ import com.abiodun.expaq.dto.RegisterRequest;
 import com.abiodun.expaq.dto.UserDTO;
 import com.abiodun.expaq.exception.ErrorResponse;
 import com.abiodun.expaq.model.ExpaqUserDetails;
+import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.service.IAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -76,6 +79,10 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/users-by-role")
+    public Page<UserDTO> getUsersByRole(@RequestParam Role role, Pageable pageable) {
+        return authService.getHosts(role, pageable);
+    }
     @PostMapping("/resend-verification")
     public ResponseEntity<Void> resendVerificationEmail(@RequestParam String email) {
         authService.resendVerificationEmail(email);

@@ -30,7 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // Public endpoints for specific HTTP methods
     private static final String[] PUBLIC_GET_ENDPOINTS = {
             "/api/activities/**",
-            "/"
+            "/",
+            "/api/cities/**",
+            "/api/countries/**",
+            "/api/activity-types/**"
     };
 
     private static final String[] PUBLIC_POST_ENDPOINTS = {

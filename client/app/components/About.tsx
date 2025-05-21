@@ -3,19 +3,21 @@ import Link from "next/link";
 
 const About = () => {
     return (
-        <div className="py-10 bg-gray-100 max-w-[100vw] ">
-            <div className="w-11/12 mx-auto">
+        <section className="relative w-8/12 mx-auto h-[800px] flex items-center justify-center">
+            {/* <div className="w-9/12 mx-auto"> */}
                 <div className="grid md:grid-cols-2 items-center ">
-                    <div className="relative min-h-[100vw] md:min-h-[120vh]">
+                    <div className="relative min-h-[75vw] md:min-h-[75vh]">
                         <Image
                             src="/img/about.jpg"
                             alt="About Us"
                             layout="fill"
                             objectFit="cover"
-                            className="rounded-lg"
+                            className="rounded-lg object-cover brightness-[0.7]"
+                                        fill
+                                        priority
                         />
                     </div>
-                    <div className="bg-white md:h-[90vh] md:w-[55vw] px-8 md:px-10 md:py-6 ml-[-8vw] z-10 shadow-lg ">
+                    <div className="bg-white  px-8 md:px-10 md:py-6 ml-[-8vw] z-10 shadow-lg ">
                         <h6 className="text-purple-700 uppercase tracking-widest">About Us</h6>
                         <h1 className="md:text-3xl font-semibold my-4">
                         Connecting Travelers with <br/> Local Hosts for Authentic Experiences
@@ -48,8 +50,8 @@ const About = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            {/* </div> */}
+        </section>
     );
 };
 

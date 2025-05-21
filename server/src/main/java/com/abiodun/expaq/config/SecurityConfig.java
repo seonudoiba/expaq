@@ -45,7 +45,11 @@ public class SecurityConfig {
             "/error"
     );
     private static final String[] PUBLIC_GET_ENDPOINTS = {
-            "/api/activities/**"
+            "/api/activities/**",
+            "/",
+            "/api/cities/**",
+            "/api/countries/**",
+            "/api/activity-types/**"
     };
 
     @Bean

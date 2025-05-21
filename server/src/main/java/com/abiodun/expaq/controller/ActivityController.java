@@ -2,6 +2,7 @@ package com.abiodun.expaq.controller;
 
 import com.abiodun.expaq.dto.ActivityDTO;
 import com.abiodun.expaq.dto.CreateActivityRequest;
+import com.abiodun.expaq.dto.LocationStatsDTO;
 import com.abiodun.expaq.dto.UpdateActivityRequest;
 import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.model.Activity; // Import Activity for Specification
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize; // For role-based authorization
@@ -140,27 +142,34 @@ public class ActivityController {
         return ResponseEntity.ok(activityService.findNearbyActivities(latitude, longitude, distance));
     }
 
-    @GetMapping("/categories")
-    public ResponseEntity<ActivityCategory[]> findActivitiesCategories() {
-        return ResponseEntity.ok(ActivityCategory.values());
-    }
-    @GetMapping("/cities")
-    public ResponseEntity<Set<String>> findActivitiesCities() {
-        return ResponseEntity.ok(activityService.findAllDistinctCities());
-    }
-    @GetMapping("/countries")
-    public ResponseEntity<Set<String>> findActivitiesCountries() {
-        return ResponseEntity.ok(activityService.findAllDistinctCountries());
+        @GetMapping("/by-type/{typeId}")
+    public ResponseEntity<Page<ActivityDTO>> getActivitiesByType(
+            @PathVariable UUID typeId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(activityService.findActivitiesByActivityType(typeId, pageable));
     }
 
-    @GetMapping("/nearby/{category}")
-    public ResponseEntity<List<ActivityDTO>> findNearbyActivitiesByCategory(
-            @PathVariable String category,
+    @GetMapping("/by-city/{city}")
+    public ResponseEntity<Page<ActivityDTO>> getActivitiesByCity(
+            @PathVariable String city,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(activityService.findActivitiesByCity(city, pageable));
+    }
+
+    @GetMapping("/by-country/{country}")
+    public ResponseEntity<Page<ActivityDTO>> getActivitiesByCountry(
+            @PathVariable String country,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(activityService.findActivitiesByCountry(country, pageable));
+    }
+        @GetMapping("/nearby/{type}")
+    public ResponseEntity<List<ActivityDTO>> findNearbyActivitiesByActivityType(
+            @PathVariable String type,
             @RequestParam double latitude,
             @RequestParam double longitude,
             @RequestParam double distance) {
-        return ResponseEntity.ok(activityService.findNearbyActivitiesByCategory(
-                ActivityCategory.valueOf(category), latitude, longitude, distance));
+        return ResponseEntity.ok(activityService.findNearbyActivitiesByActivityType(
+                type, latitude, longitude, distance));
     }
 
     @GetMapping("/featured")

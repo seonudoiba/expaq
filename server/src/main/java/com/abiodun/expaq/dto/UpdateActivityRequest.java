@@ -1,8 +1,7 @@
 package com.abiodun.expaq.dto;
 
-import com.abiodun.expaq.model.Activity;
+import com.abiodun.expaq.model.*;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
-import com.abiodun.expaq.model.ActivitySchedule;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -18,8 +17,6 @@ public class UpdateActivityRequest {
     @NotBlank(message = "Description is required")
     private String description;
 
-    @NotNull(message = "Category is required")
-    private ActivityCategory category;
 
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", message = "Price must be greater than or equal to 0")
@@ -37,14 +34,18 @@ public class UpdateActivityRequest {
     @Min(value = 1, message = "Maximum participants must be at least 1")
     private Integer maxParticipants;
 
-    @NotBlank(message = "Location is required")
     private String location;
 
     private Integer capacity;
     private Integer bookedCapacity;
     private String address;
-    private String city;
-    private String country;
+
+    private City city;
+
+    private Country country;
+
+    private ActivityType activityType;
+
     private ActivitySchedule schedule;
 
 

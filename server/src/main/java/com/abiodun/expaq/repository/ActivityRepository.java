@@ -1,7 +1,10 @@
 package com.abiodun.expaq.repository;
 
+import com.abiodun.expaq.dto.ActivityDTO;
+import com.abiodun.expaq.dto.LocationStatsDTO;
 import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
+import com.abiodun.expaq.model.ActivityType;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -24,7 +28,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     List<Activity> findByHostId(UUID hostId);
 
     // Find activities by category
-    List<Activity> findByCategory(ActivityCategory category);
+    List<Activity> findByActivityType(ActivityType activityType);
     
     // Search and filter methods
     @Query("SELECT a FROM Activity a WHERE " +
@@ -37,16 +41,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
            "function('ST_DWithin', a.location, :point, :distance) = true AND " +
            "a.isActive = true")
     List<Activity> findNearbyActivities(@Param("point") Point point, @Param("distance") double distance);
-    
-    // Category and location combined
-    @Query(value = "SELECT a FROM Activity a WHERE " +
-           "a.category = :category AND " +
-           "function('ST_DWithin', a.location, :point, :distance) = true AND " +
-           "a.isActive = true")
-    List<Activity> findNearbyActivitiesByCategory(
-            @Param("category") ActivityCategory category,
-            @Param("point") Point point,
-            @Param("distance") double distance);
+
     
     // Featured activities
     List<Activity> findByIsFeaturedTrueAndIsActiveTrue();
@@ -127,10 +122,21 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
 
     long countByHostIdAndIsActive(UUID hostId, boolean enabled);
 
-    @Query("SELECT DISTINCT a.city FROM Activity a")
-    Set<String> findAllDistinctCities();
 
-    @Query("SELECT DISTINCT a.country FROM Activity a")
-    Set<String> findAllDistinctCountries();
+    Page<Activity> findByCity_NameIgnoreCase(String cityName, Pageable pageable);
+       Page<Activity> findByCountry_NameIgnoreCase(String countryName, Pageable pageable);
+       Page<Activity> findByActivityType_Id(UUID typeId, Pageable pageable);
 
+
+
+    @Query(value = "SELECT a FROM Activity a WHERE " +
+            "a.activityType = :activityType AND " +
+            "function('ST_DWithin', a.location, :point, :distance) = true AND " +
+            "a.isActive = true")
+    List<Activity> findNearbyActivitiesByActivityType(
+            @Param("activityType") String activityType,
+            @Param("point") Point point,
+            @Param("distance") double distance);
+
+//    Collection<Object> findNearbyActivitiesByActivityType(String type, Point point, double distance);
 }

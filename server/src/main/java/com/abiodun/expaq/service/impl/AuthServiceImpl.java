@@ -269,6 +269,15 @@ public class AuthServiceImpl implements IAuthService {
                 .map(UserDTO::fromUser);
     }
 
+    @Override
+    public Page<UserDTO> getHosts(Role role) {
+        return null;
+    }
+
+    @Override
+    public Page<UserDTO> getHosts(Role role, Pageable pageable){
+        return userRepository.findByRole(role, pageable);
+    }
 
 
     @Override

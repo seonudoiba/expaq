@@ -1,5 +1,6 @@
 package com.abiodun.expaq.repository;
 
+import com.abiodun.expaq.dto.UserDTO;
 import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
 import org.springframework.data.domain.Page;
@@ -47,6 +48,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 //        "(SELECT a.host.id FROM Activity a WHERE a.isActive = true)")
 //List<User> findActiveHosts(@Param("roleName") String roleName);
 
+    @Query("SELECT u FROM User u JOIN u.roles r WHERE r = :role")
+    Page<UserDTO> findByRole(@Param("role") Role role, Pageable pageable);
 
     List<User> findByRolesAndIsVerified(Role role, boolean isVerified);
 

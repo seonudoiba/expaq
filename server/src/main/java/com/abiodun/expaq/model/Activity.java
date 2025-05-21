@@ -74,11 +74,22 @@ public class Activity {
     @Column
     private String address;
 
-    @Column
-    private String city;
+//    @Column
+//    private String city;
 
-    @Column
-    private String country;
+//    @Column
+//    private String country;
+
+    @ManyToOne
+    @JoinColumn(name = "city_id")
+    private City city;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
+
+//    @Column
+//    private String countryImageUrl;
 
     @Column(columnDefinition = "geometry(Point,4326)")
     private Point locationPoint;
@@ -111,6 +122,10 @@ public class Activity {
     @CollectionTable(name = "activity_media", joinColumns = @JoinColumn(name = "activity_id"))
     @Column(name = "media_url")
     private List<String> mediaUrls = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_type_id")
+    private ActivityType activityType;
 
     public enum ActivityCategory {
         ADVENTURE,

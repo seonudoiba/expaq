@@ -1,6 +1,7 @@
 package com.abiodun.expaq.service;
 
 import com.abiodun.expaq.dto.*;
+import com.abiodun.expaq.model.Role;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,10 @@ public interface IAuthService {
     AuthResponse handleOAuth2Login(String provider, String providerId, String email, String name);
 
     Page<UserDTO> searchUsers(String query, Pageable pageable);
+
+    Page<UserDTO> getHosts(Role role);
+
+    Page<UserDTO> getHosts(Role role, Pageable pageable);
 
     void logout(UUID userId);
 

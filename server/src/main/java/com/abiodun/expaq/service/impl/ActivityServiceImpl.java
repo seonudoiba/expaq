@@ -2,6 +2,7 @@ package com.abiodun.expaq.service.impl;
 
 import com.abiodun.expaq.dto.ActivityDTO;
 import com.abiodun.expaq.dto.CreateActivityRequest;
+import com.abiodun.expaq.dto.LocationStatsDTO;
 import com.abiodun.expaq.dto.UpdateActivityRequest;
 import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.exception.UnauthorizedException;
@@ -43,47 +44,6 @@ public class ActivityServiceImpl implements IActivityService {
     private static final String folder = "activities";
 
 
-//
-//    @Override
-//    @Transactional
-//    public ActivityDTO createActivity(CreateActivityRequest request, UUID hostId) {
-//        User host = userRepository.findById(hostId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
-//
-//        // Create Point for location
-//        Point location = geometryFactory.createPoint(
-//                new Coordinate(request.getLongitude(), request.getLatitude())
-//        );
-//
-//        // Create activity
-//        Activity activity = new Activity();
-//        activity.setTitle(request.getTitle());
-//        activity.setDescription(request.getDescription());
-//        activity.setLocation(String.valueOf(location));
-//        activity.setLocationPoint(location);
-//        activity.setPrice(request.getPrice());
-//        activity.setCategory(request.getCategory());
-//
-//        // Set capacity - adjust method name based on your DTO structure
-//        activity.setCapacity(request.getCapacity()); // Changed from getCapacity
-//        activity.setBookedCapacity(0);
-//
-//        // Address fields - adjust method names based on your DTO structure
-//        activity.setAddress(request.getAddress()); // Changed from getAddress
-//        activity.setCity(request.getCity()); // Changed from getCity
-//        activity.setCountry(request.getCountry()); // Changed from getCountry
-//
-//        activity.setSchedule(request.getSchedule());
-//        activity.setHost(host);
-//        activity.setActive(true);
-//        activity.setIsFeatured(false);
-//
-//        // Save activity
-//        activity = activityRepository.save(activity);
-//
-//        return ActivityDTO.fromActivity(activity);
-//    }
-
     @Override
     @Transactional
     public ActivityDTO createActivity(CreateActivityRequest request, UUID hostId) {
@@ -117,9 +77,9 @@ public class ActivityServiceImpl implements IActivityService {
 
                 // Validate activity category
                 try {
-                    activity.setCategory(request.getCategory());
+                    activity.setActivityType(request.getActivityType());
                 } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid activity category: " + request.getCategory() +
+                    throw new IllegalArgumentException("Invalid activity activity type: " + request.getActivityType() +
                             ". Valid categories are: " + String.join(", ",
                             Arrays.stream(Activity.ActivityCategory.values())
                                     .map(Enum::name)
@@ -187,7 +147,7 @@ public class ActivityServiceImpl implements IActivityService {
             ));
         }
         if (request.getPrice() != null) activity.setPrice(request.getPrice());
-        if (request.getCategory() != null) activity.setCategory(request.getCategory());
+        if (request.getActivityType() != null) activity.setActivityType(request.getActivityType());
         if (request.getCapacity() != null) activity.setCapacity(request.getCapacity()); // Changed from getCapacity
         if (request.getAddress() != null) activity.setAddress(request.getAddress()); // Changed from getAddress
         if (request.getCity() != null) activity.setCity(request.getCity()); // Changed from getCity
@@ -260,11 +220,11 @@ public class ActivityServiceImpl implements IActivityService {
     }
 
     @Override
-    public List<ActivityDTO> findNearbyActivitiesByCategory(
-            ActivityCategory category, double latitude, double longitude, double distance) {
+    public List<ActivityDTO> findNearbyActivitiesByActivityType(
+            String type, double latitude, double longitude, double distance) {
         Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        return activityRepository.findNearbyActivitiesByCategory(
-                        (Activity.ActivityCategory) category, point, distance) // Cast to correct type
+        return activityRepository.findNearbyActivitiesByActivityType(
+                        type, point, distance) // Cast to correct type
                 .stream()
                 .map(ActivityDTO::fromActivity)
                 .collect(Collectors.toList());
@@ -290,9 +250,6 @@ public class ActivityServiceImpl implements IActivityService {
     public Page<ActivityDTO> findUpcomingActivities(Pageable pageable) {
         return activityRepository.findUpcomingActivities( LocalDateTime.now(), pageable)
                 .map(ActivityDTO::fromActivity);
-//                .stream()
-//                .map(ActivityDTO::fromActivity)
-//                .collect(Collectors.toList());
     }
 
     @Override
@@ -403,17 +360,20 @@ public class ActivityServiceImpl implements IActivityService {
     }
 
     @Override
-    public Set<String> findAllDistinctCities() {
-        return activityRepository.findAllDistinctCities();
+    public Page<ActivityDTO> findActivitiesByCity(String cityName, Pageable pageable) {
+        return activityRepository.findByCity_NameIgnoreCase(cityName, pageable)
+            .map(ActivityDTO::fromActivity);
     }
 
     @Override
-    public Set<String> findAllDistinctCountries() {
-        return activityRepository.findAllDistinctCountries();
+    public Page<ActivityDTO> findActivitiesByCountry(String countryName, Pageable pageable) {
+        return activityRepository.findByCountry_NameIgnoreCase(countryName, pageable)
+            .map(ActivityDTO::fromActivity);
     }
 
-
-    // TODO: Implement methods for parsing location/schedule if complex types are used
-    // private Point parseLocation(String locationString) { ... }
-    // private Object parseSchedule(Object scheduleObject) { ... }
+    @Override
+    public Page<ActivityDTO> findActivitiesByActivityType(UUID typeId, Pageable pageable) {
+        return activityRepository.findByActivityType_Id(typeId, pageable)
+            .map(ActivityDTO::fromActivity);
+    }
 }

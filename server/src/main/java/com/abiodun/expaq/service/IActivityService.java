@@ -2,10 +2,10 @@ package com.abiodun.expaq.service;
 
 import com.abiodun.expaq.dto.ActivityDTO;
 import com.abiodun.expaq.dto.CreateActivityRequest;
+import com.abiodun.expaq.dto.LocationStatsDTO;
 import com.abiodun.expaq.dto.UpdateActivityRequest;
 import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
-import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,7 +37,7 @@ public interface IActivityService {
 
     List<ActivityDTO> findNearbyActivities(double latitude, double longitude, double distance);
 
-    List<ActivityDTO> findNearbyActivitiesByCategory(ActivityCategory category, double latitude, double longitude, double distance);
+//    List<ActivityDTO> findNearbyActivitiesByCategory(ActivityCategory category, double latitude, double longitude, double distance);
 
     List<ActivityDTO> findFeaturedActivities();
 
@@ -57,7 +57,9 @@ public interface IActivityService {
 
     ActivityDTO mapToActivityDTO(Activity activity);
 
-    Set<String> findAllDistinctCities();
+    Page<ActivityDTO> findActivitiesByCity(String cityName, Pageable pageable);
+    Page<ActivityDTO> findActivitiesByCountry(String countryName, Pageable pageable);
+    Page<ActivityDTO> findActivitiesByActivityType(UUID typeId, Pageable pageable);
 
-    Set<String> findAllDistinctCountries();
+    List<ActivityDTO> findNearbyActivitiesByActivityType(String activityType, double latitude, double longitude, double distance);
 }

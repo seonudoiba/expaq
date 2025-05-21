@@ -3,6 +3,9 @@ package com.abiodun.expaq.dto;
 import com.abiodun.expaq.model.Activity.ActivityCategory;
 import com.abiodun.expaq.model.ActivitySchedule;
 
+import com.abiodun.expaq.model.ActivityType;
+import com.abiodun.expaq.model.City;
+import com.abiodun.expaq.model.Country;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -36,8 +39,8 @@ public class CreateActivityRequest {
     @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
     private Double longitude;
 
-    @NotNull(message = "Category is required")
-    private ActivityCategory category;
+//    @NotNull(message = "Category is required")
+//    private ActivityCategory category;
 
     @Valid
     @NotNull(message = "Schedule is required")
@@ -56,11 +59,14 @@ public class CreateActivityRequest {
     private String address;
 
 
-    @NotEmpty( message = " City is required")
-    private String city;
+    @NotNull( message = " City is required")
+    private City city;
 
-    @NotEmpty( message = " Country is required")
-    private String country;
+    @NotNull( message = " Country is required")
+    private Country country;
+
+    @NotNull(message = "Type is required")
+    private ActivityType activityType;
 
     @NotNull(message = "Minimum participants is required")
     @Min(value = 1, message = "Minimum participants must be at least 1")

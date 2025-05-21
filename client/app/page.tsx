@@ -73,6 +73,7 @@ export default function Home() {
         </div>
         <CategorySelector />
       </section>
+      <Destinations/>
 
       <section className="bg-muted py-12 md:py-16 lg:py-20">
         <div className="container px-4 md:px-6">
@@ -157,18 +158,18 @@ export default function Home() {
         </div>
       </section>
 
-      <HostCta />
     </div>
     {/* <CarouselBooking/> */}
     <About/>
-    <Features/>
-    <Destinations/>
+    {/* <Features/> */}
+    {/* <Destinations/> */}
     {/* <Services/> */}
-    <Activities/>
-    <Registration/>
+    {/* <Activities/> */}
+    {/* <Registration/> */}
     <Hosts/>
     {/* <Testimonial /> */}
     <Blog/>
+    <HostCta />
     </>
   );
 }
