@@ -64,11 +64,11 @@ export default function Home() {
       <section className="container px-4 md:px-6 py-12 md:py-16 lg:py-20">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Popular Categories</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Popular Activity Types</h2>
             <p className="text-muted-foreground mt-2">Find activities that match your interests</p>
           </div>
           <Link href="/activities" className="flex items-center text-primary mt-4 md:mt-0">
-            View all categories <ChevronRight className="ml-1 h-4 w-4" />
+            View all Activity Types <ChevronRight className="ml-1 h-4 w-4" />
           </Link>
         </div>
         <CategorySelector />

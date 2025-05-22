@@ -31,6 +31,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.abiodun.expaq.exception.ServiceException;
 
 @Service
 @RequiredArgsConstructor
@@ -183,94 +186,126 @@ public class ActivityServiceImpl implements IActivityService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ActivityDTO getActivityById(UUID activityId) {
         return activityRepository.findById(activityId)
-                .map(ActivityDTO::fromActivity)
-                .orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
+                .map(this::mapToActivityDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Activity not found with id: " + activityId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityDTO> getAllActivities(Specification<Activity> spec) {
         List<Activity> activities = activityRepository.findAll(spec);
         return activities.stream()
-                .map(ActivityDTO::fromActivity)
+                .map(this::mapToActivityDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ActivityDTO getActivity(UUID activityId) {
-        Activity activity = activityRepository.findById(activityId)
-                .orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
-        return ActivityDTO.fromActivity(activity);
+        return getActivityById(activityId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ActivityDTO> searchActivities(String query, Pageable pageable) {
         return activityRepository.searchActivities(query, pageable)
-                .map(ActivityDTO::fromActivity);
+                .map(this::mapToActivityDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityDTO> findNearbyActivities(double latitude, double longitude, double distance) {
-        Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        return activityRepository.findNearbyActivities(point, distance)
-                .stream()
-                .map(ActivityDTO::fromActivity)
+        Point point = createPoint(latitude, longitude);
+        return activityRepository.findNearbyActivities(point, distance).stream()
+                .map(this::mapToActivityDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityDTO> findNearbyActivitiesByActivityType(
             String type, double latitude, double longitude, double distance) {
-        Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        return activityRepository.findNearbyActivitiesByActivityType(
-                        type, point, distance) // Cast to correct type
+        Point point = createPoint(latitude, longitude);
+        return activityRepository.findNearbyActivitiesByActivityType(type, point, distance)
                 .stream()
-                .map(ActivityDTO::fromActivity)
+                .map(this::mapToActivityDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityDTO> findFeaturedActivities() {
         return activityRepository.findByIsFeaturedTrueAndIsActiveTrue()
                 .stream()
-                .map(ActivityDTO::fromActivity)
+                .map(this::mapToActivityDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityDTO> findHostActivities(UUID hostId) {
         return activityRepository.findByHostIdAndIsActiveTrue(hostId)
                 .stream()
-                .map(ActivityDTO::fromActivity)
+                .map(this::mapToActivityDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ActivityDTO> findUpcomingActivities(Pageable pageable) {
-        return activityRepository.findUpcomingActivities( LocalDateTime.now(), pageable)
-                .map(ActivityDTO::fromActivity);
+        return activityRepository.findUpcomingActivities(LocalDateTime.now(), pageable)
+                .map(this::mapToActivityDTO);
     }
 
+    private static final Logger log = LoggerFactory.getLogger(ActivityServiceImpl.class);
+    
+    /**
+     * Retrieves a page of activities ordered by booked capacity in descending order.
+     *
+     * @param pageable pagination information (page number, size, sort)
+     * @return Page of ActivityDTOs representing popular activities
+     * @throws IllegalArgumentException if pageable is null
+     * @throws ServiceException if an error occurs while retrieving activities
+     */
     @Override
+    @Transactional(readOnly = true)
     public Page<ActivityDTO> findPopularActivities(Pageable pageable) {
-        return activityRepository.findPopularActivities(pageable)
-                .map(ActivityDTO::fromActivity);
+        log.debug("Finding popular activities with pageable: {}", pageable);
+        
+        try {
+            Objects.requireNonNull(pageable, "Pageable must not be null");
+            
+            Page<Activity> activities = activityRepository.findAllByOrderByBookedCapacityDesc(pageable);
+            log.debug("Found {} popular activities", activities.getNumberOfElements());
+            
+            return activities.map(this::mapToActivityDTO);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid input parameter: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving popular activities", e);
+            throw new ServiceException("Failed to retrieve popular activities", e);
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityDTO> findActivitiesWithAvailableSlots() {
         return activityRepository.findActivitiesWithAvailableSlots()
                 .stream()
-                .map(ActivityDTO::fromActivity)
+                .map(this::mapToActivityDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityDTO> findActivitiesByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
-        return activityRepository.findByPriceBetweenAndIsActiveTrue(minPrice, maxPrice)
+        return activityRepository.findByPriceRange(minPrice, maxPrice, Pageable.unpaged()).getContent()
                 .stream()
-                .map(ActivityDTO::fromActivity)
+                .map(this::mapToActivityDTO)
                 .collect(Collectors.toList());
     }
 
@@ -355,25 +390,28 @@ public class ActivityServiceImpl implements IActivityService {
         return geometryFactory.createPoint(new Coordinate(longitude, latitude));
     }
     @Override
+    @Transactional(readOnly = true)
     public ActivityDTO mapToActivityDTO(Activity activity) {
+        if (activity == null) {
+            return null;
+        }
         return ActivityDTO.fromActivity(activity);
     }
 
     @Override
     public Page<ActivityDTO> findActivitiesByCity(String cityName, Pageable pageable) {
-        return activityRepository.findByCity_NameIgnoreCase(cityName, pageable)
-            .map(ActivityDTO::fromActivity);
+        return null;
     }
 
     @Override
     public Page<ActivityDTO> findActivitiesByCountry(String countryName, Pageable pageable) {
-        return activityRepository.findByCountry_NameIgnoreCase(countryName, pageable)
-            .map(ActivityDTO::fromActivity);
+        return null;
     }
 
     @Override
     public Page<ActivityDTO> findActivitiesByActivityType(UUID typeId, Pageable pageable) {
-        return activityRepository.findByActivityType_Id(typeId, pageable)
-            .map(ActivityDTO::fromActivity);
+        return null;
     }
+
+
 }

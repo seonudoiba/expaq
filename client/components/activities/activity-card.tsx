@@ -1,13 +1,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { StarIcon } from '@heroicons/react/20/solid';
+import {Location} from '../../types/index'
+
 
 interface ActivityCardProps {
   id: string;
   title: string;
   description: string;
-  city: string;
-  country: string;
+  city: Location;
+  country: Location;
   location: string;
   price: string;
   startDate: string;
@@ -65,7 +67,7 @@ export function ActivityCard({
                 clipRule="evenodd"
               />
             </svg>
-            {city}, {country}
+            {city.name}, {country.name}
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <svg

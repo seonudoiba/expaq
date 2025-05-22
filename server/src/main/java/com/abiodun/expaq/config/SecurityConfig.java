@@ -49,7 +49,8 @@ public class SecurityConfig {
             "/",
             "/api/cities/**",
             "/api/countries/**",
-            "/api/activity-types/**"
+            "/api/activity-types/**",
+            "/api/auth/users-by-role?role=HOST"
     };
 
     @Bean

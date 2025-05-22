@@ -8,6 +8,7 @@ import type {
   RegisterRequest,
   Review,
   User,
+  ActivityType,
 } from '@/types';
 
 // Auth Services
@@ -69,6 +70,34 @@ export const activityService = {
   },
 };
 
+// Activity Type Services
+export const activityTypeService = {
+  getAll: async (): Promise<ActivityType[]> => {
+    const response = await apiClient.get<ActivityType[]>('/api/activity-types');
+    console.log('Activity types:', response.data);
+    return response.data;
+  },
+
+  // getById: async (id: string): Promise<Activity> => {
+  //   const response = await apiClient.get<Activity>(`/api/activities/${id}`);
+  //   return response.data;
+  // },
+
+  // create: async (data: CreateActivityRequest): Promise<Activity> => {
+  //   const response = await apiClient.post<Activity>('/api/activities', data);
+  //   return response.data;
+  // },
+
+  // update: async (id: string, data: Partial<CreateActivityRequest>): Promise<Activity> => {
+  //   const response = await apiClient.put<Activity>(`/api/activities/${id}`, data);
+  //   return response.data;
+  // },
+
+  // delete: async (id: string): Promise<void> => {
+  //   await apiClient.delete(`/api/activities/${id}`);
+  // },
+};
+
 // Review Services
 export const reviewService = {
   create: async (data: CreateReviewRequest): Promise<Review> => {
@@ -105,4 +134,20 @@ export const fileService = {
     });
     return response.data;
   },
-}; 
+};
+
+// Country Services
+export const countryService = {
+  getAll: async () => {
+    const response = await apiClient.get('/api/countries');
+    return response.data;
+  },
+};
+
+// City Services
+export const cityService = {
+  getAll: async () => {
+    const response = await apiClient.get('/api/cities');
+    return response.data;
+  },
+};

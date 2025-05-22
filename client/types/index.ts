@@ -7,13 +7,25 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+export interface Location {
+  id: string;
+  name: string;
+  image: string;
+  countryId: string;    
+}
+
 
 export interface Schedule {
   timeSlots: string[] | null;
   availableDays: string[] | null;
   timeZone: string | null;
 }
-
+export interface ActivityType {
+  id: string;
+  name: string;
+  image: string;
+  activityCount: number;
+}
 export interface Activity {
   id: string;
   hostId: string;
@@ -40,8 +52,8 @@ export interface Activity {
   endDate: string;
   locationPoint: string;
   address: string;
-  city: string;
-  country: string;
+  city: Location;
+  country: Location;
 }
 
 export interface Review {

@@ -63,8 +63,11 @@ export function ActivityList() {
           id={activity.id}
           title={activity.title}
           description={activity.description}
-          city={activity.city}
+          city ={activity.city}
           country={activity.country}
+          
+          // city={activity.city }
+          // country={{ name: activity.country }}
           location={activity.locationPoint}
           price={formatPrice(activity.price)}
           startDate={formatDate(activity.startDate)}

@@ -33,7 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/",
             "/api/cities/**",
             "/api/countries/**",
-            "/api/activity-types/**"
+            "/api/activity-types/**",
+            "/api/auth/users-by-role?role=HOST"
     };
 
     private static final String[] PUBLIC_POST_ENDPOINTS = {

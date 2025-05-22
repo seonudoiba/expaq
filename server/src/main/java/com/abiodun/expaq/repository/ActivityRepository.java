@@ -8,6 +8,7 @@ import com.abiodun.expaq.model.ActivityType;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -137,6 +138,8 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
             @Param("activityType") String activityType,
             @Param("point") Point point,
             @Param("distance") double distance);
+
+    Page<Activity>  findAllByOrderByBookedCapacityDesc(Pageable pageable);
 
 //    Collection<Object> findNearbyActivitiesByActivityType(String type, Point point, double distance);
 }

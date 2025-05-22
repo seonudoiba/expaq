@@ -9,68 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { activityService } from "@/lib/api/services";
 
 export function FeaturedActivities() {
-  // const activities = [
-  //   {
-  //     id: 1,
-  //     title: "Guided Hiking Tour in the Alps",
-  //     location: "Chamonix, France",
-  //     price: 89,
-  //     rating: 4.9,
-  //     reviews: 128,
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Outdoor",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Traditional Pasta Making Class",
-  //     location: "Rome, Italy",
-  //     price: 65,
-  //     rating: 4.8,
-  //     reviews: 94,
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Food",
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Street Art Tour with Local Artist",
-  //     location: "Berlin, Germany",
-  //     price: 35,
-  //     rating: 4.7,
-  //     reviews: 76,
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Culture",
-  //   },
-  //   {
-  //     id: 4,
-  //     title: "Sunset Sailing Experience",
-  //     location: "Santorini, Greece",
-  //     price: 120,
-  //     rating: 4.9,
-  //     reviews: 152,
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Outdoor",
-  //   },
-  //   {
-  //     id: 5,
-  //     title: "Craft Beer Tasting Tour",
-  //     location: "Prague, Czech Republic",
-  //     price: 45,
-  //     rating: 4.6,
-  //     reviews: 68,
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Food",
-  //   },
-  //   {
-  //     id: 6,
-  //     title: "Flamenco Dance Workshop",
-  //     location: "Seville, Spain",
-  //     price: 55,
-  //     rating: 4.8,
-  //     reviews: 87,
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Culture",
-  //   },
-  // ]
+
   function formatDateShort(dateString: string | number | Date) {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -155,7 +94,7 @@ export function FeaturedActivities() {
             <CardContent className="p-4">
               <div className="flex items-center text-sm text-muted-foreground mb-2">
                 <MapPin className="h-4 w-4 mr-1" />
-                {activity.city}, {activity.country}
+                {activity.city.name}, {activity.country.name}
               </div>
               <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                 {activity.title}
