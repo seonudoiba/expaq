@@ -8,7 +8,7 @@ http://localhost:8081
 ## Authentication
 All endpoints except those marked as "Public" require a JWT token in the Authorization header:
 ```
-Authorization: Bearer <your_jwt_token>
+Authorization: Bearer my_jwt_token
 ```
 
 ## Public Endpoints
