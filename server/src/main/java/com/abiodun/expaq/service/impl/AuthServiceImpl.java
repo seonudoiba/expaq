@@ -270,13 +270,8 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public Page<UserDTO> getHosts(Role role) {
-        return null;
-    }
-
-    @Override
     public Page<UserDTO> getHosts(Role role, Pageable pageable){
-        return userRepository.findByRole(role, pageable);
+        return userRepository.findByRole(role, pageable).map(UserDTO::fromUser);
     }
 
 

@@ -21,8 +21,6 @@ public interface IAuthService {
 
     Page<UserDTO> searchUsers(String query, Pageable pageable);
 
-    Page<UserDTO> getHosts(Role role);
-
     Page<UserDTO> getHosts(Role role, Pageable pageable);
 
     void logout(UUID userId);

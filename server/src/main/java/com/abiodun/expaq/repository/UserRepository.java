@@ -48,8 +48,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 //        "(SELECT a.host.id FROM Activity a WHERE a.isActive = true)")
 //List<User> findActiveHosts(@Param("roleName") String roleName);
 
+    // Query by Role entity (if you have the Role object)
     @Query("SELECT u FROM User u JOIN u.roles r WHERE r = :role")
-    Page<UserDTO> findByRole(@Param("role") Role role, Pageable pageable);
+    Page<User> findByRole(@Param("role") Role role, Pageable pageable);
 
     List<User> findByRolesAndIsVerified(Role role, boolean isVerified);
 

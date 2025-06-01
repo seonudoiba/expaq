@@ -9,6 +9,7 @@ import type {
   Review,
   User,
   ActivityType,
+  PaginatedUsersResponse,
 } from '@/types';
 
 // Auth Services
@@ -35,6 +36,11 @@ export const authService = {
   verifyEmail: async (token: string): Promise<void> => {
     await apiClient.get(`/api/auth/verify-email?token=${token}`);
   },
+
+  getHosts: async (): Promise<PaginatedUsersResponse> => {
+    const response = await apiClient.get<PaginatedUsersResponse>('/api/auth/users-by-role?roleName=HOST');
+    return response.data;
+  }
 };
 
 // Activity Services
