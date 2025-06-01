@@ -6,6 +6,7 @@ import { authService } from '@/lib/api/services';
 interface AuthState {
   user: User | null;
   token: string | null;
+  roles: string[];
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -19,6 +20,7 @@ interface AuthState {
   }) => Promise<void>;
   logout: () => void;
   getCurrentUser: () => Promise<void>;
+  hasRole: (role: string | string[]) => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -26,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       token: null,
+      roles: [],
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -41,9 +44,19 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: response.user,
             token: response.token,
+            roles: response.user.roles || [],
             isAuthenticated: true,
             isLoading: false,
           });
+          
+          // Check for redirectTo in localStorage
+          if (typeof window !== 'undefined') {
+            const redirectTo = localStorage.getItem('redirectTo');
+            if (redirectTo) {
+              localStorage.removeItem('redirectTo');
+              window.location.href = redirectTo;
+            }
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'An error occurred',
@@ -113,6 +126,15 @@ export const useAuthStore = create<AuthState>()(
           document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
           set({ token: null, user: null });
         }
+      },
+
+      hasRole: (role: string | string[]) => {
+        const state = get();
+        if (Array.isArray(role)) {
+          // Check if user has ANY of the provided roles
+          return role.some(r => state.roles.includes(r));
+        }
+        return state.roles.includes(role);
       },
     }),
     {

@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/lib/store/auth";
 import toast from "react-hot-toast";
 

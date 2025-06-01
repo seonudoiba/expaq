@@ -1,13 +1,6 @@
-import CarouselBooking from "./components/CarouselBooking";
-import About from "./components/About";
-import Features from "./components/Features";
-import Destinations from "./components/Destinations";
-import Activities from "./components/Activities";
-import Services from "./components/Services";
-import Registration from "./components/Registration";
-import Testimonial from "./components/Testimonial";
-import Hosts from "./components/Hosts";
-import Blog from "./components/Blog";
+import About from "../components/home/About";
+import Hosts from "../components/home/Hosts";
+import Blog from "../components/home/Blog";
 
 import Link from "next/link"
 import Image from "next/image"
@@ -73,8 +66,6 @@ export default function Home() {
         </div>
         <CategorySelector />
       </section>
-      <Destinations/>
-
       <section className="bg-muted py-12 md:py-16 lg:py-20">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8">
@@ -159,15 +150,8 @@ export default function Home() {
       </section>
 
     </div>
-    {/* <CarouselBooking/> */}
     <About/>
-    {/* <Features/> */}
-    {/* <Destinations/> */}
-    {/* <Services/> */}
-    {/* <Activities/> */}
-    {/* <Registration/> */}
     <Hosts/>
-    {/* <Testimonial /> */}
     <Blog/>
     <HostCta />
     </>

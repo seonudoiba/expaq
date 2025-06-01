@@ -50,6 +50,18 @@ export const activityService = {
     return response.data;
   },
 
+
+  getAllHostActivities: async (host:string ,params?: {
+    location?: string;
+    type?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<Activity[]> => {
+    const response = await apiClient.get<Activity[]>(`/api/activities/host/${host}`, { params });
+    console.log('Activities:', response.data);
+    return response.data;
+  },
+
   getById: async (id: string): Promise<Activity> => {
     const response = await apiClient.get<Activity>(`/api/activities/${id}`);
     return response.data;

@@ -7,6 +7,7 @@ import com.abiodun.expaq.dto.UserDTO;
 import com.abiodun.expaq.exception.ErrorResponse;
 import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.model.Role;
+import com.abiodun.expaq.repository.RoleRepository;
 import com.abiodun.expaq.service.IAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class AuthController {
 
     private final IAuthService authService;
+    private final RoleRepository roleRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
@@ -80,7 +82,8 @@ public class AuthController {
     }
 
     @GetMapping("/users-by-role")
-    public Page<UserDTO> getUsersByRole(@RequestParam Role role, Pageable pageable) {
+    public Page<UserDTO> getUsersByRole(@RequestParam String roleName, Pageable pageable) {
+        Role role = roleRepository.findByName(roleName);
         return authService.getHosts(role, pageable);
     }
     @PostMapping("/resend-verification")

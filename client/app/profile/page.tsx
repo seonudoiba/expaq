@@ -1,15 +1,24 @@
 "use client"
 
-import { useAuth } from "@/hooks/use-auth"
+// import { useAuth } from "@/hooks/use-auth"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Calendar, MapPin, Star, Clock } from "lucide-react"
+import { Calendar, MapPin, Star } from "lucide-react"
+
+import { useAuthStore } from "@/lib/store/auth";
+
+
+import { Suspense } from 'react';
+import { HostActivityList } from '@/components/activities/host-activity-list';
 
 export default function ProfilePage() {
-  const { user } = useAuth()
-
+  // const { user } = useAuth()
+    const { user } = useAuthStore();
+    // const { user, isAuthenticated, logout } = useAuthStore();
+  
+console.log("User in ProfilePage:", user);
   if (!user) {
     return null
   }
@@ -23,7 +32,7 @@ export default function ProfilePage() {
             <CardHeader className="text-center">
               <Avatar className="w-32 h-32 mx-auto mb-4">
                 <AvatarImage src={user.avatar} alt={user.username} />
-                <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <CardTitle className="text-2xl">{user.username}</CardTitle>
               <CardDescription>{user.email}</CardDescription>
@@ -35,8 +44,8 @@ export default function ProfilePage() {
                   <span>{new Date(user.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Role</span>
-                  <span className="capitalize">{user.roles[0]}</span>
+                  <span className="text-muted-foreground">Roles</span>
+                  <span className="capitalize">{user.roles.map(role => role.name).join(', ')}</span>
                 </div>
                 <Button className="w-full" variant="outline">
                   Edit Profile
@@ -47,7 +56,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Main Content */}
-        <div className="md:col-span-2">
+        {user.roles.some(role => role.name === 'HOST')  ?(
+ <div className="md:col-span-2">
           <Tabs defaultValue="activities" className="space-y-4">
             <TabsList>
               <TabsTrigger value="activities">My Activities</TabsTrigger>
@@ -59,33 +69,12 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>My Activities</CardTitle>
-                  <CardDescription>Activities you've created</CardDescription>
+                  <CardDescription>Activities you&apos;ve created</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Sample Activity Card */}
-                    <div className="flex items-center space-x-4 p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">City Tour Experience</h3>
-                        <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            <span>New York</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
-                            <span>3 hours</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Star className="w-4 h-4 mr-1" />
-                            <span>4.8 (120 reviews)</span>
-                          </div>
-                        </div>
-                      </div>
-                      <Button variant="outline">View Details</Button>
-                    </div>
-                  </div>
-                </CardContent>
+                <Suspense fallback={<div>Loading activities...</div>}>
+                            <HostActivityList hostId={user.id}/>
+                          </Suspense>
+                
               </Card>
             </TabsContent>
 
@@ -146,7 +135,25 @@ export default function ProfilePage() {
             </TabsContent>
           </Tabs>
         </div>
+        ) : (
+          <div className="md:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Welcome to Your Profile</CardTitle>
+                <CardDescription>
+                  You can view your activities, bookings, and reviews here.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  As a regular user, you can explore activities and manage your bookings.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        ) }
+       
       </div>
     </div>
   )
-} 
+}

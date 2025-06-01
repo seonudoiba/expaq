@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/hooks/use-auth";
+// import { AuthProvider } from "@/hooks/use-auth"; // Import AuthProvider
 // import { Navbar } from "@/components/layout/navbar";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -34,16 +34,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <AuthProvider>
+        {/* <AuthProvider> Wrap Providers with AuthProvider */}
           <Providers>
-            {/* Uncomment the Navbar component if needed */}
-            {/* <Navbar /> */}
             <Header />
             <main className="min-h-screen">{children}</main>
             <Footer />
             <Toaster />
           </Providers>
-        </AuthProvider>
+        {/* </AuthProvider> */}
       </body>
     </html>
   );

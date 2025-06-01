@@ -7,12 +7,20 @@ export function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/register') ||
     request.nextUrl.pathname.startsWith('/forgot-password');
 
+  // Authentication check
   if (!token && !isAuthPage) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    // Store intended URL to redirect back after login
+    const url = new URL('/login', request.url);
+    url.searchParams.set('redirectTo', request.nextUrl.pathname);
+    return NextResponse.redirect(url);
   }
 
+  // Authorization for admin pages is handled by the RequireAdmin component
+  // This middleware just ensures the user is authenticated
+
+  // Prevent authenticated users from accessing login pages
   if (token && isAuthPage) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();
@@ -23,8 +31,9 @@ export const config = {
     '/dashboard/:path*',
     '/activities/:path*',
     '/profile/:path*',
+    '/admin/:path*',
     '/login',
     '/register',
     '/forgot-password',
   ],
-}; 
+};
