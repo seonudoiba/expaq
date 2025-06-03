@@ -31,7 +31,7 @@ export function BecomeHostForm() {
   
 
   const {
-    becomeHost: becomeHostField,
+    register: becomeHostField,
     handleSubmit,
     formState: { errors },
   } = useForm<BecomeHostFormData>({
