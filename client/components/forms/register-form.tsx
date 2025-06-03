@@ -153,6 +153,29 @@ export function RegisterForm() {
               {errors.password.message}
             </p>
           )}
+          <input
+            type="file"
+            id="profilePicture"
+            className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+            onChange={onFileChange}
+            disabled={uploading}
+          />
+          {uploading && (
+            <p className="mt-1 text-sm text-gray-600">Uploading profile picture...</p>
+          )}
+          
+          <textarea
+            {...registerField("bio")}
+            id="bio"
+            rows={4}
+            className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white resize-none"
+            placeholder="Tell us about yourself and what makes your hosting special..."
+          />
+          {errors.bio && (
+            <p className="mt-1 text-sm text-red-600">{errors.bio.message}</p>
+          )}
+
+
           <button
             className="mt-5 tracking-wide font-semibold bg-indigo-500
          text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 
