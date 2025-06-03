@@ -34,6 +34,10 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
+       if (!uploadedImageUrl) {
+        toast.error("Please upload a profile picture");
+        return;
+      }
       setIsLoading(true);
       await register(data);
       toast.success("Registration successful!");
