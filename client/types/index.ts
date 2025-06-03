@@ -7,14 +7,53 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Role {
+  id: string;
+  name: "GUEST" | "ADMIN" | "HOST";
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  firstName: string;
+  userName: string;
+  lastName: string;
+  profilePicture: string | "/default-avatar.png";
+  bio: string | "";
+  roles: Role[];
+  verified: boolean;
+  active: boolean;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+}
 export interface Location {
   id: string;
   name: string;
   image: string;
   countryId: string;    
 }
+export interface activityType {
+  id: string;
+  name: string;
+  image: string;
+  countryId: string;    
+}
 
-
+export interface City {
+  id: string;
+  name: string;
+  image: string;
+  countryId: string;
+  activityCount: number;
+}
+export interface Country {
+  id: string;
+  name: string;
+  image: string;
+  cityCount: number;
+  activityCount: number;
+}
 export interface Schedule {
   timeSlots: string[] | null;
   availableDays: string[] | null;
@@ -36,7 +75,7 @@ export interface Activity {
   price: number;
   latitude: number;
   longitude: number;
-  category: string;
+  activityType: string;
   schedule: Schedule;
   mediaUrls: string[];
   maxParticipants: number;
@@ -129,6 +168,15 @@ export interface RegisterRequest {
   password: string;
   firstName: string;
   lastName: string;
+}
+export interface becomeHostRequest {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  profilePictureUrl: string,
+  bio: string,
 }
 
 export interface CreateActivityRequest {

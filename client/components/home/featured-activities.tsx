@@ -24,7 +24,7 @@ export function FeaturedActivities() {
     error,
   } = useQuery({
     queryKey: ["activities"],
-    queryFn: () => activityService.getAll(),
+    queryFn: () => activityService.getAllFeaturedActivities(),
   });
 
   if (isLoading) {

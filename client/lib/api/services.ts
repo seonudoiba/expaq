@@ -10,6 +10,7 @@ import type {
   User,
   ActivityType,
   PaginatedUsersResponse,
+  becomeHostRequest,
 } from '@/types';
 
 // Auth Services
@@ -21,6 +22,10 @@ export const authService = {
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
+    return response.data;
+  },
+  becomeHost: async (data: becomeHostRequest): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/api/auth/become-host', data);
     return response.data;
   },
 
@@ -53,6 +58,16 @@ export const activityService = {
   }): Promise<Activity[]> => {
     const response = await apiClient.get<Activity[]>('/api/activities', { params });
     console.log('Activities:', response.data);
+    return response.data;
+  },
+  getAllFeaturedActivities: async (params?: {
+    location?: string;
+    type?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<Activity[]> => {
+    const response = await apiClient.get<Activity[]>('/api/activities/featured', { params });
+    console.log('Featured Activities:', response.data);
     return response.data;
   },
 
@@ -156,8 +171,9 @@ export const fileService = {
 
 // Country Services
 export const countryService = {
-  getAll: async () => {
+  getAllCountries: async () => {
     const response = await apiClient.get('/api/countries');
+    console.log('Countries:', response.data);
     return response.data;
   },
 };

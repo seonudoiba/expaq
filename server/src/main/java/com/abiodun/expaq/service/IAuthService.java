@@ -28,4 +28,6 @@ public interface IAuthService {
     UserStatisticsDTO getUserStatistics(UUID userId);
 
     HostStatisticsDTO getHostStatistics(UUID hostId);
+
+    AuthResponse becomeHost(@Valid RegisterRequest request);
 }

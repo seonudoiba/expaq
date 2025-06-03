@@ -6,7 +6,10 @@ import { authService } from '@/lib/api/services';
 interface AuthState {
   user: User | null;
   token: string | null;
-  roles: string[];
+  roles: {
+    name: string;
+    id: string;
+  }[];
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -17,6 +20,15 @@ interface AuthState {
     password: string;
     firstName: string;
     lastName: string;
+  }) => Promise<void>;
+  becomeHost: (data: {
+    username: string;
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    profilePictureUrl: string,
+    bio: string;
   }) => Promise<void>;
   logout: () => void;
   getCurrentUser: () => Promise<void>;
@@ -44,7 +56,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: response.user,
             token: response.token,
-            roles: response.user.roles || [],
+            roles: (response.user.roles || []).map(role => ({ name: role, id: role })),
             isAuthenticated: true,
             isLoading: false,
           });
@@ -70,6 +82,28 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           const response = await authService.register(data);
+          // Set token as a cookie
+          if (response.token) {
+            document.cookie = `token=${response.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`; // Expires in 7 days
+          }
+          set({
+            user: response.user,
+            token: response.token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : 'An error occurred',
+            isLoading: false,
+          });
+          throw error;
+        }
+      },
+      becomeHost: async (data) => {
+        try {
+          set({ isLoading: true, error: null });
+          const response = await authService.becomeHost(data);
           // Set token as a cookie
           if (response.token) {
             document.cookie = `token=${response.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`; // Expires in 7 days
@@ -132,9 +166,9 @@ export const useAuthStore = create<AuthState>()(
         const state = get();
         if (Array.isArray(role)) {
           // Check if user has ANY of the provided roles
-          return role.some(r => state.roles.includes(r));
+          return role.some(r => state.roles.some(userRole => userRole.name === r));
         }
-        return state.roles.includes(role);
+        return state.roles.some(userRole => userRole.name === role);
       },
     }),
     {

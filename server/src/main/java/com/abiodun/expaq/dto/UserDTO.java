@@ -41,7 +41,7 @@ public class UserDTO {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .userName(user.getUsername())
-                .profilePicture(user.getProfilePicture())
+                .profilePicture(user.getProfilePictureUrl())
                 .phoneNumber(user.getPhoneNumber())
                 .bio(user.getBio())
                 .roles(user.getRoles())

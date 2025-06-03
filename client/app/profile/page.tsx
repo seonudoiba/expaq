@@ -12,6 +12,7 @@ import { useAuthStore } from "@/lib/store/auth";
 
 import { Suspense } from 'react';
 import { HostActivityList } from '@/components/activities/host-activity-list';
+import { HostList } from "@/components/home/host-list"
 
 export default function ProfilePage() {
   // const { user } = useAuth()
@@ -82,7 +83,7 @@ console.log("User in ProfilePage:", user);
               <Card>
                 <CardHeader>
                   <CardTitle>My Bookings</CardTitle>
-                  <CardDescription>Activities you've booked</CardDescription>
+                  <CardDescription>Activities you&apos;ve booked</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -112,7 +113,7 @@ console.log("User in ProfilePage:", user);
               <Card>
                 <CardHeader>
                   <CardTitle>My Reviews</CardTitle>
-                  <CardDescription>Reviews you've written</CardDescription>
+                  <CardDescription>Reviews you&apos;ve written</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -148,6 +149,13 @@ console.log("User in ProfilePage:", user);
                 <p className="text-muted-foreground">
                   As a regular user, you can explore activities and manage your bookings.
                 </p>
+                <div className="mt-4 mb-8">
+                  <Button variant="outline" className="w-full">
+                    Explore Hosts
+                  </Button>
+                </div>
+                <HostList/>
+                
               </CardContent>
             </Card>
           </div>

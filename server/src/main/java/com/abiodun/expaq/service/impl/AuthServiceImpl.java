@@ -95,6 +95,57 @@ public class AuthServiceImpl implements IAuthService {
         return new AuthResponse(token, UserDTO.fromUser(user));
     }
 
+    public AuthResponse becomeHost(RegisterRequest request) {
+        // Check if email or username already exists
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new UserAlreadyExistsException("Email already in use");
+
+        }
+        if (userRepository.existsByUsername((request.getUserName()))) {
+            throw new UserAlreadyExistsException("Username already taken");
+        }
+
+        // Create new user
+        User user = new User();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setUsername(request.getUserName());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setProfilePictureUrl(request.getProfilePictureUrl());
+        // Find the TOURIST role
+        try{
+            Role hostRole = roleRepository.findByName("HOST");
+
+            // Set the HOST role to the user
+            user.setRoles(Collections.singleton(hostRole));
+        } catch (Exception e) {
+            throw  new RoleNotFoundException("HOST  role not found in the database");
+
+        }
+        user.setVerified(false);
+        user.setActive(true);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setLastLoginAt(LocalDateTime.now()); // Ensure lastLoginAt is set
+
+        // Generate verification token
+        String verificationToken = UUID.randomUUID().toString();
+        user.setVerificationToken(verificationToken);
+        user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
+
+        // Save user
+        user = userRepository.save(user);
+
+        // Send verification email
+        emailService.sendVerificationEmail(user.getEmail(), verificationToken);
+
+        // Generate JWT token
+        String token = jwtService.generateToken(user);
+
+        // Use the constructor that includes the full UserDTO
+        return new AuthResponse(token, UserDTO.fromUser(user));
+    }
+
     @Override
     @Transactional
     public AuthResponse login(LoginRequest request) {

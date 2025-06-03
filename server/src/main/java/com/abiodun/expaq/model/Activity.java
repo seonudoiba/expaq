@@ -29,7 +29,7 @@ public class Activity {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
     @Column(nullable = false)
@@ -40,8 +40,6 @@ public class Activity {
 
     @Column(nullable = false)
     private Integer duration; // in hours
-
-    private String imageUrl;
 
     @Column(nullable = false)
     private boolean isActive = true;
@@ -59,7 +57,10 @@ public class Activity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
     private LocalDateTime startDate;
+
+    @Column(nullable = false)
     private LocalDateTime endDate;
 
     @UpdateTimestamp
@@ -71,14 +72,8 @@ public class Activity {
 //    @Column(nullable = false)
     private Boolean isFeatured;
 
-    @Column
+    @Column(nullable = false)
     private String address;
-
-//    @Column
-//    private String city;
-
-//    @Column
-//    private String country;
 
     @ManyToOne
     @JoinColumn(name = "city_id")
@@ -87,9 +82,6 @@ public class Activity {
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
-
-//    @Column
-//    private String countryImageUrl;
 
     @Column(columnDefinition = "geometry(Point,4326)")
     private Point locationPoint;

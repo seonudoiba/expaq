@@ -65,6 +65,7 @@ export function ActivityList() {
           description={activity.description}
           city ={activity.city}
           country={activity.country}
+          activityType={activity.activityType}
           
           // city={activity.city }
           // country={{ name: activity.country }}

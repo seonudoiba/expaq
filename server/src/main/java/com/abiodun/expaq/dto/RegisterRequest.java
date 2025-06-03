@@ -36,7 +36,10 @@ public class RegisterRequest {
     @NotNull(message = "Role cannot be null")
     private Set<Role> roles; // TOURIST or HOST
 
-    // Optional: Bio can be added during registration or later
+    @NotBlank(message = "Profile Picture cannot be blank")
+    private String profilePictureUrl;
+
+    @NotBlank(message = "Bio cannot be blank")
     private String bio;
 
 }

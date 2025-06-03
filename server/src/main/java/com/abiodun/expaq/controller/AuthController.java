@@ -45,6 +45,22 @@ public class AuthController {
                             "Authentication failed: " + e.getMessage()));
         }
     }
+    @PostMapping("/become-host")
+    public ResponseEntity<?> becomeHost(@Valid @RequestBody RegisterRequest request) {
+        try {
+            AuthResponse response = authService.becomeHost(request);
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "Authentication failed: " + e.getMessage()));
+        }
+    }
 
 
     @PostMapping("/login")
