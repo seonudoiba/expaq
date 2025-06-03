@@ -8,12 +8,14 @@ import { useAuthStore } from "@/lib/store/auth";
 import toast from "react-hot-toast";
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  username: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-});
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  firstName: z.string().min(1, "First name cannot be blank"),
+  lastName: z.string().min(1, "Last name cannot be blank"),
+  profilePictureUrl: z.string().url("Please enter a valid URL").min(1, "Profile picture URL cannot be blank"),
+  bio: z.string().min(1, "Bio cannot be blank"),
+});});
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
