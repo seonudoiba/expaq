@@ -47,6 +47,27 @@ export function RegisterForm() {
     }
   };
 
+  const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const userId = user?.id; // Assuming user ID is available in the auth store
+      if (!userId) throw new Error("User ID is required for file upload");
+
+      const imageUrl = await fileService.upload(file, userId);
+      setUploadedImageUrl(imageUrl);
+      toast.success("Profile picture uploaded successfully!");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to upload profile picture"
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+  
   return (
     <div className="w-full flex-1 mt-8">
       <div className="flex flex-col items-center">
