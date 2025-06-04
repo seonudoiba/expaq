@@ -8,12 +8,14 @@ import { useAuthStore } from "@/lib/store/auth";
 import toast from "react-hot-toast";
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  username: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-});
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  firstName: z.string().min(1, "First name cannot be blank"),
+  lastName: z.string().min(1, "Last name cannot be blank"),
+  profilePictureUrl: z.string().url("Please enter a valid URL").min(1, "Profile picture URL cannot be blank"),
+  bio: z.string().min(1, "Bio cannot be blank"),
+});});
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -32,6 +34,10 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
+       if (!uploadedImageUrl) {
+        toast.error("Please upload a profile picture");
+        return;
+      }
       setIsLoading(true);
       await register(data);
       toast.success("Registration successful!");
@@ -45,6 +51,27 @@ export function RegisterForm() {
     }
   };
 
+  const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const userId = user?.id; // Assuming user ID is available in the auth store
+      if (!userId) throw new Error("User ID is required for file upload");
+
+      const imageUrl = await fileService.upload(file, userId);
+      setUploadedImageUrl(imageUrl);
+      toast.success("Profile picture uploaded successfully!");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to upload profile picture"
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+  
   return (
     <div className="w-full flex-1 mt-8">
       <div className="flex flex-col items-center">
@@ -151,6 +178,29 @@ export function RegisterForm() {
               {errors.password.message}
             </p>
           )}
+          <input
+            type="file"
+            id="profilePicture"
+            className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+            onChange={onFileChange}
+            disabled={uploading}
+          />
+          {uploading && (
+            <p className="mt-1 text-sm text-gray-600">Uploading profile picture...</p>
+          )}
+          
+          <textarea
+            {...registerField("bio")}
+            id="bio"
+            rows={4}
+            className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white resize-none"
+            placeholder="Tell us about yourself and what makes your hosting special..."
+          />
+          {errors.bio && (
+            <p className="mt-1 text-sm text-red-600">{errors.bio.message}</p>
+          )}
+
+
           <button
             className="mt-5 tracking-wide font-semibold bg-indigo-500
          text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 
