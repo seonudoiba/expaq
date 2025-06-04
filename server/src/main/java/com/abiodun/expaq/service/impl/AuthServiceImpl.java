@@ -5,10 +5,13 @@ import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.exception.RoleNotFoundException;
 import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.exception.UserAlreadyExistsException;
-import com.abiodun.expaq.model.*;
+import com.abiodun.expaq.model.Booking;
+import com.abiodun.expaq.model.Role;
+import com.abiodun.expaq.model.TokenBlacklist;
+import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.repository.*;
-import com.abiodun.expaq.service.IAuthService;
 import com.abiodun.expaq.service.EmailService;
+import com.abiodun.expaq.service.IAuthService;
 import com.abiodun.expaq.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,6 +44,293 @@ public class AuthServiceImpl implements IAuthService {
     private final BookingRepository bookingRepository;
     private final ReviewRepository reviewRepository;
     private final TokenBlacklistRepository tokenBlacklistRepository;
+    
+    // Role names
+    private static final String ROLE_USER = "USER";
+    private static final String ROLE_HOST = "HOST";
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_GUEST = "GUEST";
+    private static final String ROLE_MODERATOR = "MODERATOR";
+
+    @Override
+    @Transactional
+    public void updateUserPassword(UUID userId, UpdatePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Verify current password
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new UnauthorizedException("Current password is incorrect");
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setPasswordUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        // Invalidate all user's tokens
+        tokenBlacklistRepository.invalidateAllUserTokens(userId);
+
+        // Send email notification
+        emailService.sendPasswordChangeNotification(user.getEmail(), user.getFullName());
+    }
+
+    @Override
+    @Transactional
+    public void updateUserPreferences(UUID userId, UpdatePreferencesRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Update user preferences
+        user.setPreferredLanguage(request.getPreferredLanguage());
+        user.setPreferredCurrency(request.getPreferredCurrency());
+        user.setTimeZone(request.getTimeZone());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        // Log the preference update
+        log.info("User {} updated preferences: language={}, currency={}, timezone={}",
+                user.getEmail(), request.getPreferredLanguage(), 
+                request.getPreferredCurrency(), request.getTimeZone());
+    }
+
+    @Override
+    @Transactional
+    public void uploadProfilePicture(UUID userId, String imageUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Update profile picture URL
+        user.setProfilePictureUrl(imageUrl);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.info("Profile picture updated for user: {}", user.getEmail());
+    }
+
+    @Override
+    @Transactional
+    public void deleteProfilePicture(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Remove profile picture URL
+        user.setProfilePictureUrl(null);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.info("Profile picture removed for user: {}", user.getEmail());
+    }
+
+    @Transactional
+    @Override
+    public UserDTO updateProfile(UUID userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Update basic profile information if provided
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+        if (request.getBio() != null) {
+            user.setBio(request.getBio());
+        }
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+        User updatedUser = userRepository.save(user);
+        
+        log.info("Profile updated for user: {}", user.getEmail());
+        return mapToUserDTO(updatedUser);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<String> getUserRoles() {
+        return roleRepository.findAll().stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserDTO getUserById(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        return mapToUserDTO(user);
+    }
+
+//    @Override
+//    @Transactional(readOnly = true)
+//    public Page<UserDTO> searchUsers(String query, Pageable pageable) {
+//        // Search users by email, username, first name, or last name
+//        return userRepository.findByEmailContainingIgnoreCaseOrUsernameContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+//                query, query, query, query, pageable)
+//                .map(this::mapToUserDTO);
+//    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UserDTO> getAllUsers(Pageable pageable) {
+        // In a real application, you might want to add filtering, sorting, and access control
+        return userRepository.findAll(pageable)
+                .map(this::mapToUserDTO);
+    }
+
+
+    // Helper method to check if a user has admin role
+    private boolean isAdmin(User user) {
+        return user.getRoles().stream()
+                .anyMatch(role -> ROLE_ADMIN.equals(role.getName()));
+    }
+
+    @Override
+    @Transactional
+    public void activateUser(UUID userId, UUID adminId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + adminId));
+
+        if (!isAdmin(admin)) {
+            throw new UnauthorizedException("Only admins can activate users");
+        }
+
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Check if user is already active
+        if (user.isActive()) {
+            throw new IllegalStateException("User is already active");
+        }
+
+        // Activate the user
+        user.setActive(true);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        // Send activation notification
+        emailService.sendAccountActivatedNotification(
+            user.getEmail(),
+            user.getFullName(),
+            admin.getFullName()
+        );
+
+        log.info("User {} activated by admin {}", user.getEmail(), admin.getEmail());
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(UUID userId, UUID adminId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + adminId));
+
+        if (!isAdmin(admin)) {
+            throw new UnauthorizedException("Only admins can delete users");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Prevent deleting self or other admins
+        if (user.getId().equals(adminId)) {
+            throw new IllegalArgumentException("Cannot delete your own account");
+        }
+        
+        if (isAdmin(user) && !isSuperAdmin(admin)) {
+            throw new UnauthorizedException("Only super admins can delete other admins");
+        }
+
+        // Log the deletion (you might want to archive instead of delete)
+        log.warn("User {} deleted by admin {}", user.getEmail(), admin.getEmail());
+        
+        // In a real application, you might want to soft delete or archive the user
+        // For this example, we'll do a hard delete
+        userRepository.delete(user);
+        
+        // Send account deletion notification (optional)
+        emailService.sendAccountDeletedNotification(
+            user.getEmail(),
+            user.getFullName()
+        );
+    }
+
+    // Helper method to check if a user is a super admin
+    private boolean isSuperAdmin(User user) {
+        return user.getRoles().stream()
+                .anyMatch(role -> "SUPER_ADMIN".equals(role.getName()));
+    }
+
+    /**
+     * Converts a User entity to a UserDTO
+     * @param user the User entity to convert
+     * @return the converted UserDTO
+     */
+    private UserDTO mapToUserDTO(User user) {
+        if (user == null) {
+            return null;
+        }
+
+        return UserDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .fullName(user.getFullName())
+                .profilePictureUrl(user.getProfilePictureUrl())
+                .bio(user.getBio())
+                .phoneNumber(user.getPhoneNumber())
+                .dateOfBirth(user.getDateOfBirth())
+                .gender(user.getGender())
+                .address(user.getAddress())
+                .city(user.getCity())
+                .state(user.getState())
+                .country(user.getCountry())
+                .postalCode(user.getPostalCode())
+                .preferredLanguage(user.getPreferredLanguage())
+                .preferredCurrency(user.getPreferredCurrency())
+                .timeZone(user.getTimeZone())
+                .hostApplicationStatus(user.getHostApplicationStatus())
+                .hostApplicationDate(user.getHostApplicationDate())
+                .hostApprovalDate(user.getHostApprovalDate())
+                .hostRejectionDate(user.getHostRejectionDate())
+                .hostRejectionReason(user.getHostRejectionReason())
+                .hostExperience(user.getHostExperience())
+                .hostDocumentUrl(user.getHostDocumentUrl())
+                .isVerified(user.isVerified())
+                .isActive(user.isActive())
+                .lastLoginAt(user.getLastLoginAt())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .roles(user.getRoles().stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
+    /**
+     * Helper method to generate a username from an email address
+     * @param email the email address to generate a username from
+     * @return a unique username based on the email address
+     */
+    private String generateUsername(String email) {
+        String baseUsername = email.split("@")[0];
+        String username = baseUsername;
+        int counter = 1;
+        
+        while (userRepository.existsByUsername(username)) {
+            username = baseUsername + counter;
+            counter++;
+        }
+        
+        return username;
+    }
 
     @Override
     @Transactional
@@ -96,55 +386,24 @@ public class AuthServiceImpl implements IAuthService {
         return new AuthResponse(token, UserDTO.fromUser(user));
     }
 
-    public AuthResponse becomeHost(RegisterRequest request) {
-        // Check if email or username already exists
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new UserAlreadyExistsException("Email already in use");
+    public User becomeHost(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        // Check if user is the host
+        boolean isHost = user.getRoles().stream()
+                .anyMatch(role -> "HOST".equals(role.getName()));
+        if (!isHost) {
+            try{
+                Role hostRole = roleRepository.findByName("HOST");
+                // Set the HOST role to the user
+                user.setRoles(Collections.singleton(hostRole));
+            } catch (Exception e) {
+                throw  new RoleNotFoundException("HOST  role not found in the database");
+            }
+        } else {
+            throw new UnauthorizedException("User is already a host");
         }
-        if (userRepository.existsByUsername((request.getUserName()))) {
-            throw new UserAlreadyExistsException("Username already taken");
-        }
-
-        // Create new user
-        User user = new User();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setEmail(request.getEmail());
-        user.setUsername(request.getUserName());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setProfilePictureUrl(request.getProfilePictureUrl());
-        // Find the TOURIST role
-        try{
-            Role hostRole = roleRepository.findByName("HOST");
-
-            // Set the HOST role to the user
-            user.setRoles(Collections.singleton(hostRole));
-        } catch (Exception e) {
-            throw  new RoleNotFoundException("HOST  role not found in the database");
-
-        }
-        user.setVerified(false);
-        user.setActive(true);
-        user.setCreatedAt(LocalDateTime.now());
-        user.setLastLoginAt(LocalDateTime.now()); // Ensure lastLoginAt is set
-
-        // Generate verification token
-        String verificationToken = UUID.randomUUID().toString();
-        user.setVerificationToken(verificationToken);
-        user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
-
-        // Save user
-        user = userRepository.save(user);
-
-        // Send verification email
-        emailService.sendVerificationEmail(user.getEmail(), verificationToken);
-
-        // Generate JWT token
-        String token = jwtService.generateToken(user);
-
-        // Use the constructor that includes the full UserDTO
-        return new AuthResponse(token, UserDTO.fromUser(user));
+        return user;
     }
 
     @Override
@@ -315,11 +574,11 @@ public class AuthServiceImpl implements IAuthService {
         return new AuthResponse(token, UserDTO.fromUser(user));
     }
 
-    @Override
-    public Page<UserDTO> searchUsers(String query, Pageable pageable) {
-        return userRepository.searchUsers(query, pageable)
-                .map(UserDTO::fromUser);
-    }
+//    @Override
+//    public Page<UserDTO> searchUsers(String query, Pageable pageable) {
+//        return userRepository.searchUsers(query, pageable)
+//                .map(UserDTO::fromUser);
+//    }
 
     @Override
     public Page<UserDTO> getHosts(Role role, Pageable pageable){
@@ -365,269 +624,7 @@ public class AuthServiceImpl implements IAuthService {
 //        ));
     }
 
-//    @Override
-//    @Transactional
-//    public void verifyEmail(String token) {
-//        User user = userRepository.findByVerificationToken(token)
-//                .orElseThrow(() -> new ResourceNotFoundException("Invalid verification token"));
-//
-//        if (user.getVerificationTokenExpiry().isBefore(LocalDateTime.now())) {
-//            throw new RuntimeException("Verification token expired");
-//        }
-//
-//        user.verify();
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void requestPasswordReset(String email) {
-//        User user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        user.setResetPasswordToken(UUID.randomUUID().toString());
-//        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(1));
-//        userRepository.save(user);
-//
-//        // TODO: Send password reset email
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void resetPassword(ResetPasswordRequest request) {
-//        User user = userRepository.findByResetPasswordToken(request.getToken())
-//                .orElseThrow(() -> new ResourceNotFoundException("Invalid reset token"));
-//
-//        if (user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
-//            throw new RuntimeException("Reset token expired");
-//        }
-//
-//        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-//        user.setResetPasswordToken(null);
-//        user.setResetPasswordTokenExpiry(null);
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    public UserDTO getUserById(UUID userId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//        return UserDTO.fromUser(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public UserDTO updateUserProfile(UUID userId, UpdateProfileRequest request) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        user.updateProfile(
-//            request.getFirstName(),
-//            request.getLastName(),
-//            request.getPhoneNumber(),
-//            request.getBio()
-//        );
-//
-//        user = userRepository.save(user);
-//        return UserDTO.fromUser(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void updateUserPassword(UUID userId, UpdatePasswordRequest request) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-//            throw new UnauthorizedException("Current password is incorrect");
-//        }
-//
-//        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void updateUserPreferences(UUID userId, UpdatePreferencesRequest request) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        user.updatePreferences(
-//            request.getPreferredLanguage(),
-//            request.getPreferredCurrency(),
-//            request.getTimeZone()
-//        );
-//
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void uploadProfilePicture(UUID userId, String imageUrl) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        user.setProfilePicture(imageUrl);
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void deleteProfilePicture(UUID userId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        user.setProfilePicture(null);
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public UserDTO applyForHost(UUID userId, HostApplicationRequest request) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        if (user.getRole() != Role
-//            throw new RuntimeException("Only regular users can apply to become hosts");
-//        }
-//
-//        // TODO: Implement host application logic
-//        // This might involve additional verification steps, document uploads, etc.
-//
-//        return UserDTO.fromUser(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void approveHost(UUID userId, UUID adminId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        User admin = userRepository.findById(adminId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
-//
-//        if (admin.getRole() != Role
-//            throw new UnauthorizedException("Only admins can approve host applications");
-//        }
-//
-//        user.setRole(Role
-//        user.setVerified(true);
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void rejectHost(UUID userId, UUID adminId, String reason) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        User admin = userRepository.findById(adminId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
-//
-//        if (admin.getRole() != Role.ADMIN) {
-//            throw new UnauthorizedException("Only admins can reject host applications");
-//        }
-//
-//        // TODO: Implement host rejection logic
-//        // This might involve sending a notification to the user with the rejection reason
-//    }
-//
-//    @Override
-//    public List<UserDTO> getPendingHostApplications() {
-//        return userRepository.findByRoleAndIsVerified(Role.HOST, false)
-//                .stream()
-//                .map(UserDTO::fromUser)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public List<UserDTO> getApprovedHosts() {
-//        return userRepository.findByRoleAndIsVerified(Role.HOST, true)
-//                .stream()
-//                .map(UserDTO::fromUser)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    @Transactional
-//    public UserDTO createAdmin(UUID adminId, CreateAdminRequest request) {
-//        User admin = userRepository.findById(adminId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
-//
-//        if (admin.getRole() != Role.ADMIN) {
-//            throw new UnauthorizedException("Only existing admins can create new admins");
-//        }
-//
-//        User newAdmin = new User();
-//        newAdmin.setEmail(request.getEmail());
-//        newAdmin.setPassword(passwordEncoder.encode(request.getPassword()));
-//        newAdmin.setFirstName(request.getFirstName());
-//        newAdmin.setLastName(request.getLastName());
-//        newAdmin.setRole(Role.ADMIN);
-//        newAdmin.setVerified(true);
-//        newAdmin.setCreatedAt(LocalDateTime.now());
-//        newAdmin.setUpdatedAt(LocalDateTime.now());
-//
-//        newAdmin = userRepository.save(newAdmin);
-//        return UserDTO.fromUser(newAdmin);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void deactivateUser(UUID userId, UUID adminId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        User admin = userRepository.findById(adminId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
-//
-//        if (admin.getRole() != Role.ADMIN) {
-//            throw new UnauthorizedException("Only admins can deactivate users");
-//        }
-//
-//        user.deactivate();
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void activateUser(UUID userId, UUID adminId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        User admin = userRepository.findById(adminId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
-//
-//        if (admin.getRole() != Role.ADMIN) {
-//            throw new UnauthorizedException("Only admins can activate users");
-//        }
-//
-//        user.activate();
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void deleteUser(UUID userId, UUID adminId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        User admin = userRepository.findById(adminId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
-//
-//        if (admin.getRole() != Role.ADMIN) {
-//            throw new UnauthorizedException("Only admins can delete users");
-//        }
-//
-//        userRepository.delete(user);
-//    }
-//
-//    @Override
-//    public Page<UserDTO> getAllUsers(Pageable pageable) {
-//        return userRepository.findAll(pageable)
-//                .map(UserDTO::fromUser);
-//    }
-//
+
     @Override
     public UserStatisticsDTO getUserStatistics(UUID userId) {
         User user = userRepository.findById(userId)
@@ -671,6 +668,55 @@ public class AuthServiceImpl implements IAuthService {
 
         return statistics;
     }
-}
+    
+    @Override
+    @Transactional
+    public UserDTO updateUserProfile(UUID userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        // Update user details if provided
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+        if (request.getBio() != null) {
+            user.setBio(request.getBio());
+        }
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+        if (request.getProfilePictureUrl() != null) {
+            user.setProfilePictureUrl(request.getProfilePictureUrl());
+        }
+        if (request.getRoles() != null && !request.getRoles().isEmpty()) {
+            user.setRoles(request.getRoles());
+        }
+        if (request.getUserName() != null && !request.getUserName().equals(user.getUsername())) {
+            if (userRepository.existsByUsername(request.getUserName())) {
+                throw new UserAlreadyExistsException("Username is already taken");
+            }
+            user.setUsername(request.getUserName());
+        }
+        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new UserAlreadyExistsException("Email is already in use");
+            }
+            user.setEmail(request.getEmail());
+            user.setVerified(false);
+            // Generate new verification token
+            String verificationToken = UUID.randomUUID().toString();
+            user.setVerificationToken(verificationToken);
+            user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
+            emailService.sendVerificationEmail(user.getEmail(), verificationToken);
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+        user = userRepository.save(user);
+
+        return UserDTO.fromUser(user);
+    }
+}
 

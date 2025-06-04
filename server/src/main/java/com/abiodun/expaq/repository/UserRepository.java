@@ -5,6 +5,7 @@ import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -61,4 +62,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     List<User> findByRolesName(String name);
 
+    <T> Range<T> findByEmailContainingIgnoreCaseOrUsernameContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String query, String query1, String query2, String query3, Pageable pageable);
 }

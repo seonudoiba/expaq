@@ -1,5 +1,6 @@
 package com.abiodun.expaq.model;
 
+import com.abiodun.expaq.model.enums.HostApplicationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -183,6 +184,12 @@ public class User implements UserDetails {
     }
 
 
+    public HostApplicationStatus getHostApplicationStatus() {
+        boolean isHost = roles.stream()
+                .anyMatch(role -> "HOST".equalsIgnoreCase(role.getName()));
+        return isHost ? HostApplicationStatus.APPROVED : HostApplicationStatus.PENDING;
+    }
+
     public enum UserRole {
         USER,
         HOST,
@@ -197,10 +204,11 @@ public class User implements UserDetails {
         return firstName + " " + lastName;
     }
 
-    public void updateProfile(String firstName, String lastName, String phoneNumber, String bio) {
+    public void updateProfile(String firstName, String lastName, String phoneNumber, String bio, String profilePictureUrl) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
+        this.profilePictureUrl = profilePictureUrl;
         this.bio = bio;
         this.updatedAt = LocalDateTime.now();
     }

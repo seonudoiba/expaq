@@ -6,4 +6,10 @@ public interface EmailService {
     void sendWelcomeEmail(String email, String username);
     void sendBookingConfirmationEmail(String email, String bookingId);
     void sendActivityCancellationEmail(String email, String activityId);
+
+    void sendPasswordChangeNotification(String email, String fullName);
+
+    void sendAccountActivatedNotification(String email, String fullName, String fullName1);
+
+    void sendAccountDeletedNotification(String email, String fullName);
 } 
