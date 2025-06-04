@@ -8,14 +8,13 @@ import { useAuthStore } from "@/lib/store/auth";
 import toast from "react-hot-toast";
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
+  userName: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   firstName: z.string().min(1, "First name cannot be blank"),
   lastName: z.string().min(1, "Last name cannot be blank"),
-  profilePictureUrl: z.string().url("Please enter a valid URL").min(1, "Profile picture URL cannot be blank"),
   bio: z.string().min(1, "Bio cannot be blank"),
-});});
+});
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -23,6 +22,9 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const register = useAuthStore((state) => state.register);
+
+  // Default profile picture URL
+  const defaultProfilePictureUrl = "https://res.cloudinary.com/do0rdj8oj/image/upload/v1749047766/download_qrm8t6.jpg";
 
   const {
     register: registerField,
@@ -34,12 +36,11 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-       if (!uploadedImageUrl) {
-        toast.error("Please upload a profile picture");
-        return;
-      }
       setIsLoading(true);
-      await register(data);
+      
+      const finalData = { ...data, profilePictureUrl: defaultProfilePictureUrl };
+      
+      await register(finalData);
       toast.success("Registration successful!");
       router.push("/");
     } catch (error) {
@@ -51,29 +52,22 @@ export function RegisterForm() {
     }
   };
 
-  const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      const userId = user?.id; // Assuming user ID is available in the auth store
-      if (!userId) throw new Error("User ID is required for file upload");
-
-      const imageUrl = await fileService.upload(file, userId);
-      setUploadedImageUrl(imageUrl);
-      toast.success("Profile picture uploaded successfully!");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to upload profile picture"
-      );
-    } finally {
-      setUploading(false);
-    }
+  const handleFormSubmit = (e: React.FormEvent) => {
+    const submitHandler = handleSubmit(
+      (data) => {
+        onSubmit(data);
+      },
+      () => {
+        toast.error("Please fix the form errors before submitting ");
+      }
+    );
+    
+    submitHandler(e);
   };
   
   return (
     <div className="w-full flex-1 mt-8">
+      {/* Social login buttons */}
       <div className="flex flex-col items-center">
         <button className="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline">
           <div className="bg-white p-2 rounded-full">
@@ -119,7 +113,7 @@ export function RegisterForm() {
       </div>
 
       <div className="mx-auto max-w-md">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4">
           <input
             {...registerField("firstName")}
             type="text"
@@ -132,6 +126,7 @@ export function RegisterForm() {
               {errors.firstName.message}
             </p>
           )}
+          
           <input
             {...registerField("lastName")}
             type="text"
@@ -144,18 +139,20 @@ export function RegisterForm() {
               {errors.lastName.message}
             </p>
           )}
+          
           <input
-            {...registerField("username")}
+            {...registerField("userName")}
             type="text"
-            id="username"
+            id="userName"
             className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-            placeholder="Choose a username"
+            placeholder="Choose a userName"
           />
-          {errors.username && (
+          {errors.userName && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.username.message}
+              {errors.userName.message}
             </p>
           )}
+          
           <input
             {...registerField("email")}
             type="email"
@@ -166,6 +163,7 @@ export function RegisterForm() {
           {errors.email && (
             <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
           )}
+          
           <input
             {...registerField("password")}
             type="password"
@@ -178,16 +176,6 @@ export function RegisterForm() {
               {errors.password.message}
             </p>
           )}
-          <input
-            type="file"
-            id="profilePicture"
-            className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-            onChange={onFileChange}
-            disabled={uploading}
-          />
-          {uploading && (
-            <p className="mt-1 text-sm text-gray-600">Uploading profile picture...</p>
-          )}
           
           <textarea
             {...registerField("bio")}
@@ -199,7 +187,6 @@ export function RegisterForm() {
           {errors.bio && (
             <p className="mt-1 text-sm text-red-600">{errors.bio.message}</p>
           )}
-
 
           <button
             className="mt-5 tracking-wide font-semibold bg-indigo-500
@@ -225,6 +212,7 @@ export function RegisterForm() {
               {isLoading ? "Creating account..." : "Create account"}
             </span>
           </button>
+          
           <p className="mt-6 text-xs text-gray-600 text-center">
             I agree to abide by templatana&apos;s
             <a href="#" className="border-b border-gray-500 border-dotted">

@@ -30,7 +30,7 @@ export function Navbar() {
                     <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                       <span className="sr-only">Open user menu</span>
                       <div className="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center">
-                        {user?.username?.[0]}
+                        {user?.userName?.[0]}
                         {user?.email?.[0]}
                       </div>
                     </Menu.Button>

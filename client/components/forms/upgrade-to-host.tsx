@@ -119,7 +119,7 @@ export function TouristToHostForm() {
             <div className="space-y-1 text-sm text-gray-600">
               <p><span className="font-medium">Name:</span> {user.firstName} {user.lastName}</p>
               <p><span className="font-medium">Email:</span> {user.email}</p>
-              <p><span className="font-medium">Username:</span> {user.userName || user.username}</p>
+              <p><span className="font-medium">Username:</span> {user.userName || user.userName}</p>
             </div>
           </div>
 

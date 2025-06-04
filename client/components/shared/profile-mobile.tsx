@@ -30,12 +30,12 @@ export function ProfileMobile() {
                 <div className="flex items-center px-4">
                   <div className="flex-shrink-0">
                     <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center">
-                      {user?.username?.substring(0, 2).toUpperCase()}
+                      {user?.userName?.substring(0, 2).toUpperCase()}
                     </div>
                   </div>
                   <div className="ml-3">
                     <div className="text-base font-medium text-gray-800">
-                      {user?.username}
+                      {user?.userName}
                     </div>
                     <div className="text-sm font-medium text-gray-500">
                       {user?.email}

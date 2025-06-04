@@ -32,10 +32,10 @@ console.log("User in ProfilePage:", user);
           <Card>
             <CardHeader className="text-center">
               <Avatar className="w-32 h-32 mx-auto mb-4">
-                <AvatarImage src={user.avatar} alt={user.username} />
-                <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarImage src={user.avatar} alt={user.userName} />
+                <AvatarFallback>{user.userName?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-2xl">{user.username}</CardTitle>
+              <CardTitle className="text-2xl">{user.userName}</CardTitle>
               <CardDescription>{user.email}</CardDescription>
             </CardHeader>
             <CardContent>

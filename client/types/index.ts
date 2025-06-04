@@ -1,6 +1,6 @@
 export interface User {
   id: string;
-  username: string;
+  userName: string;
   email: string;
   avatar?: string;
   roles: string[];
@@ -163,14 +163,16 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  username: string;
+  userName: string;
   email: string;
   password: string;
   firstName: string;
   lastName: string;
+  profilePictureUrl: string,
+  bio: string,
 }
 export interface becomeHostRequest {
-  username: string;
+  userName: string;
   email: string;
   password: string;
   firstName: string;

@@ -117,7 +117,7 @@ export function Navbar() {
                   {user ? (
                     <div className="flex items-center gap-x-4">
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{user.username}</p>
+                        <p className="text-sm font-medium">{user.userName}</p>
                         <p className="text-xs text-muted-foreground">
                           {user.email}
                         </p>

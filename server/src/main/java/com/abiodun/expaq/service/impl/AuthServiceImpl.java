@@ -60,7 +60,8 @@ public class AuthServiceImpl implements IAuthService {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setUsername(request.getUserName());
-        System.out.println(user.getUsername());
+        user.setBio(request.getBio());
+        user.setProfilePictureUrl(request.getProfilePictureUrl());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         // Find the TOURIST role
         try{

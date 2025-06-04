@@ -10,7 +10,7 @@ import { fileService } from "@/lib/api/services";
 
 // Extended schema for become host that matches your DTO
 const becomeHostSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
+  userName: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   firstName: z.string().min(1, "First name cannot be blank"),
@@ -137,15 +137,15 @@ export function BecomeHostForm() {
           )}
           
           <input
-            {...becomeHostField("username")}
+            {...becomeHostField("userName")}
             type="text"
-            id="username"
+            id="userName"
             className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-            placeholder="Choose a username"
+            placeholder="Choose a userName"
           />
-          {errors.username && (
+          {errors.userName && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.username.message}
+              {errors.userName.message}
             </p>
           )}
           

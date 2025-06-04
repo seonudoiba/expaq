@@ -9,7 +9,7 @@
 //   user: User | null
 //   isLoading: boolean
 //   login: (email: string, password: string) => Promise<void>
-//   register: (username: string, email: string, password: string) => Promise<void>
+//   register: (userName: string, email: string, password: string) => Promise<void>
 //   logout: () => Promise<void>
 // }
 
@@ -71,14 +71,14 @@
 //     }
 //   }
 
-//   const register = async (username: string, email: string, password: string) => {
+//   const register = async (userName: string, email: string, password: string) => {
 //     try {
 //       const response = await fetch("/api/auth/register", {
 //         method: "POST",
 //         headers: {
 //           "Content-Type": "application/json",
 //         },
-//         body: JSON.stringify({ username, email, password }),
+//         body: JSON.stringify({ userName, email, password }),
 //       })
 
 //       if (!response.ok) {

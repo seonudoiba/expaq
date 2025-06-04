@@ -15,14 +15,16 @@ interface AuthState {
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (data: {
-    username: string;
+    userName: string;
     email: string;
     password: string;
     firstName: string;
     lastName: string;
+    profilePictureUrl: string,
+    bio: string;
   }) => Promise<void>;
   becomeHost: (data: {
-    username: string;
+    userName: string;
     email: string;
     password: string;
     firstName: string;

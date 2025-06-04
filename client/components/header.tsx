@@ -291,10 +291,10 @@ export function Header() {  const isMobile = useMobile();
                         {user && (
                           <div className="flex items-center gap-2 px-2 py-2">
                             <div className="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center">
-                              {user?.username?.[0]}
+                              {user?.userName?.[0]}
                             </div>
                             <div>
-                              <div className="text-sm font-medium">{user?.username}</div>
+                              <div className="text-sm font-medium">{user?.userName}</div>
                               <div className="text-xs text-muted-foreground">{user?.email}</div>
                             </div>
                           </div>
