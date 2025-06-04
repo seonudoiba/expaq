@@ -103,12 +103,12 @@ export function BecomeHostForm() {
     <div className="w-full flex-1 mt-8">
 
       <div className="my-12 border-b text-center">
-        <div className="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
-          Or create host account with e-mail
+        <div className="leading-none px-2 inline-block text-3xl text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
+          Become a Host
         </div>
       </div>
 
-      <div className="mx-auto max-w-xs">
+      <div className="mx-auto max-w-2xl ">
         <div className="space-y-4">
           <input
             {...becomeHostField("firstName")}

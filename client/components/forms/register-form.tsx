@@ -91,7 +91,7 @@ export function RegisterForm() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-xs">
+      <div className="mx-auto max-w-md">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <input
             {...registerField("firstName")}
