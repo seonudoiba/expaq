@@ -228,7 +228,7 @@ export const geocodingService = {
       const { lat, lon } = response.data[0];
       return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
     } else {
-      throw new Error('No results found for the given location.');
+      throw new Error(`No results found for the given location: ${query}`);
     }
   },
 };

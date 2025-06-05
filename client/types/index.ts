@@ -205,6 +205,7 @@ export interface CreateActivityRequest {
   isFeatured: boolean;
   minParticipants: number;
   durationMinutes: number;
+  isActive: boolean;
 }
 
 export interface CreateReviewRequest {

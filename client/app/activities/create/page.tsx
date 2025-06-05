@@ -59,7 +59,8 @@ export default function CreateActivityPage() {
     queryFn: () => cityService.getByCountry(selectedCountry),
     enabled: !!selectedCountry, // Only fetch cities if a country is selected
   })
-console.log("Cities Data:", citiesData, "Selected Country:", selectedCountry, "Countries Data:", countriesData, "Activity Types Data:", activityTypesData)
+
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -73,6 +74,7 @@ console.log("Cities Data:", citiesData, "Selected Country:", selectedCountry, "C
       // Fetch coordinates using geocodingService
       const query = address ? `${address}, ${city}, ${country}` : `${city}, ${country}`;
       const { latitude, longitude } = await geocodingService.getCoordinates(query);
+      console.log("Coordinates:", { latitude, longitude });
 
       const activityData: CreateActivityRequest = {
         title: formData.get("title") as string,
@@ -100,7 +102,7 @@ console.log("Cities Data:", citiesData, "Selected Country:", selectedCountry, "C
         durationMinutes: parseInt(formData.get("durationMinutes") as string),
         isActive: false, // Initially set to false
       };
-
+      console.log("Activity Data:", activityData);
       // Step 1: Create the activity
       const createdActivity = await activityService.create(activityData);
 
