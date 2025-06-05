@@ -62,5 +62,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     List<User> findByRolesName(String name);
 
-    <T> Range<T> findByEmailContainingIgnoreCaseOrUsernameContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String query, String query1, String query2, String query3, Pageable pageable);
 }

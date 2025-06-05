@@ -68,8 +68,6 @@ public class AuthServiceImpl implements IAuthService {
         user.setPasswordUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
 
-        // Invalidate all user's tokens
-        tokenBlacklistRepository.invalidateAllUserTokens(userId);
 
         // Send email notification
         emailService.sendPasswordChangeNotification(user.getEmail(), user.getFullName());
@@ -121,49 +119,6 @@ public class AuthServiceImpl implements IAuthService {
         userRepository.save(user);
 
         log.info("Profile picture removed for user: {}", user.getEmail());
-    }
-
-    @Transactional
-    @Override
-    public UserDTO updateProfile(UUID userId, UpdateProfileRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        // Update basic profile information if provided
-        if (request.getFirstName() != null) {
-            user.setFirstName(request.getFirstName());
-        }
-        if (request.getLastName() != null) {
-            user.setLastName(request.getLastName());
-        }
-        if (request.getBio() != null) {
-            user.setBio(request.getBio());
-        }
-        if (request.getPhoneNumber() != null) {
-            user.setPhoneNumber(request.getPhoneNumber());
-        }
-
-        user.setUpdatedAt(LocalDateTime.now());
-        User updatedUser = userRepository.save(user);
-        
-        log.info("Profile updated for user: {}", user.getEmail());
-        return mapToUserDTO(updatedUser);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<String> getUserRoles() {
-        return roleRepository.findAll().stream()
-                .map(Role::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public UserDTO getUserById(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-        return mapToUserDTO(user);
     }
 
 //    @Override
@@ -279,38 +234,21 @@ public class AuthServiceImpl implements IAuthService {
         return UserDTO.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .username(user.getUsername())
+                .userName(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .fullName(user.getFullName())
                 .profilePictureUrl(user.getProfilePictureUrl())
                 .bio(user.getBio())
                 .phoneNumber(user.getPhoneNumber())
-                .dateOfBirth(user.getDateOfBirth())
-                .gender(user.getGender())
-                .address(user.getAddress())
-                .city(user.getCity())
-                .state(user.getState())
-                .country(user.getCountry())
-                .postalCode(user.getPostalCode())
                 .preferredLanguage(user.getPreferredLanguage())
                 .preferredCurrency(user.getPreferredCurrency())
                 .timeZone(user.getTimeZone())
-                .hostApplicationStatus(user.getHostApplicationStatus())
-                .hostApplicationDate(user.getHostApplicationDate())
-                .hostApprovalDate(user.getHostApprovalDate())
-                .hostRejectionDate(user.getHostRejectionDate())
-                .hostRejectionReason(user.getHostRejectionReason())
-                .hostExperience(user.getHostExperience())
-                .hostDocumentUrl(user.getHostDocumentUrl())
-                .isVerified(user.isVerified())
-                .isActive(user.isActive())
-                .lastLoginAt(user.getLastLoginAt())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .roles(user.getRoles().stream()
-                        .map(Role::getName)
-                        .collect(Collectors.toSet()))
+//                .roles(user.getRoles().stream()
+//                        .map(Role::getName)
+//                        .collect(Collectors.toSet()))
                 .build();
     }
 
@@ -386,7 +324,7 @@ public class AuthServiceImpl implements IAuthService {
         return new AuthResponse(token, UserDTO.fromUser(user));
     }
 
-    public User becomeHost(UUID userId) {
+    public UserDTO becomeHost(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Check if user is the host
@@ -403,7 +341,8 @@ public class AuthServiceImpl implements IAuthService {
         } else {
             throw new UnauthorizedException("User is already a host");
         }
-        return user;
+        UserDTO userDto = mapToUserDTO(user);
+        return userDto;
     }
 
     @Override

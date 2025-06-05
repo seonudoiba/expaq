@@ -21,8 +21,8 @@ public class UserDTO {
     private String email;
     private String firstName;
     private String userName;
+    private String fullName;
     private String lastName;
-    private String profilePicture;
     private String phoneNumber;
     private String bio;
     private Set<Role> roles;
@@ -33,6 +33,7 @@ public class UserDTO {
     private String timeZone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String profilePictureUrl;
 
     public static UserDTO fromUser(User user) {
         return UserDTO.builder()
@@ -41,7 +42,8 @@ public class UserDTO {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .userName(user.getUsername())
-                .profilePicture(user.getProfilePictureUrl())
+                .fullName(user.getFullName())
+                .profilePictureUrl(user.getProfilePictureUrl())
                 .phoneNumber(user.getPhoneNumber())
                 .bio(user.getBio())
                 .roles(user.getRoles())

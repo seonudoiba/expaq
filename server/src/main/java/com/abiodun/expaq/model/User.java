@@ -1,6 +1,5 @@
 package com.abiodun.expaq.model;
 
-import com.abiodun.expaq.model.enums.HostApplicationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -183,12 +182,6 @@ public class User implements UserDetails {
         return isActive;
     }
 
-
-    public HostApplicationStatus getHostApplicationStatus() {
-        boolean isHost = roles.stream()
-                .anyMatch(role -> "HOST".equalsIgnoreCase(role.getName()));
-        return isHost ? HostApplicationStatus.APPROVED : HostApplicationStatus.PENDING;
-    }
 
     public enum UserRole {
         USER,

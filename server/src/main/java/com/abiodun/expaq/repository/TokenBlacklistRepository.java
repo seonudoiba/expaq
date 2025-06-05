@@ -9,8 +9,9 @@ import java.util.UUID;
 public interface TokenBlacklistRepository extends JpaRepository<TokenBlacklist, UUID> {
     boolean existsByToken(String token);
     void deleteByExpirationDateBefore(Date date);
-
-    void deleteByUserId(UUID userId);
-
-    void invalidateAllUserTokens(UUID userId);
+//
+//    void deleteByUserId(UUID userId);
+//
+//    void invalidateAllUserTokens(UUID userId);
+//
 }

@@ -46,9 +46,9 @@ public class AuthController {
         }
     }
     @PostMapping("/become-host")
-    public ResponseEntity<?> becomeHost(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> becomeHost( @AuthenticationPrincipal ExpaqUserDetails currentUser) {
         try {
-            AuthResponse response = authService.becomeHost(request);
+            UserDTO response = authService.becomeHost(currentUser.getId());
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             return ResponseEntity
