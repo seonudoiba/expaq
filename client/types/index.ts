@@ -19,7 +19,7 @@ export interface UserProfile {
   firstName: string;
   userName: string;
   lastName: string;
-  profilePicture: string | "/default-avatar.png";
+  profilePictureUrl: string | "/default-avatar.png";
   bio: string | "";
   roles: Role[];
   verified: boolean;

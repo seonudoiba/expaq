@@ -1,4 +1,3 @@
-import { Navbar } from '@/components/shared/navbar';
 import { Toaster } from 'react-hot-toast';
 import { Providers } from "../providers";
 

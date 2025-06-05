@@ -65,7 +65,7 @@ const {
         {hosts.map((host: UserProfile) => (
           <div key={host.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="relative overflow-hidden">
-              <Image width={300} height={400} className="w-full" src={host.profilePicture} alt={host.firstName} />
+              <Image width={300} height={400} className="w-full" src={host.profilePictureUrl} alt={host.firstName} />
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition duration-300">
                 <div className="flex space-x-4">
                   <Link href="#" className="text-white hover:text-purple-700">

@@ -9,13 +9,51 @@
 //     </div>
 //   );
 // }
+'use client'
 
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Calendar, DollarSign, Users, Shield } from "lucide-react"
+import { useRouter } from "next/router";
+import { useAuthStore } from "@/lib/store/auth";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { authService } from "@/lib/api/services";
 
 export default function BecomeAHostPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
+
+  const handleGetStartedClick = async () => {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    try {
+       const {
+          data: user,
+          isLoading,
+          error,
+        } = useQuery({
+          queryKey: ["become-host"],
+          queryFn: () => authService.becomeHost(),
+        });
+        console.log("User data:", user);
+    } catch (error) {
+      console.error("Error fetching host data:", error); 
+    }
+
+    // try {
+    //   const response = await axios.get("/api/auth/become-host");
+    //   console.log("Host data:", response.data);
+    //   // Handle successful response
+    // } catch (error) {
+    //   console.error("Error fetching host data:", error);
+    //   // Handle error
+    // }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -34,8 +72,10 @@ export default function BecomeAHostPage() {
           <p className="text-xl text-white/90 max-w-[800px]">
             Turn your expertise into income by hosting activities on Expaq
           </p>
-          <Button size="lg" className="mt-4">
-            Get Started <ArrowRight className="ml-2 h-4 w-4" />
+          <Button size="lg" className="mt-4" onClick={handleGetStartedClick}>
+            <Link href="/get-started" className="flex items-center">
+              Get Started <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </section>

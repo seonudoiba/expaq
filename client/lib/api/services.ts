@@ -10,7 +10,6 @@ import type {
   User,
   ActivityType,
   PaginatedUsersResponse,
-  becomeHostRequest,
 } from '@/types';
 
 // Auth Services
@@ -24,10 +23,10 @@ export const authService = {
     const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
     return response.data;
   },
-  becomeHost: async (data: becomeHostRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/api/auth/become-host', data);
-    return response.data;
-  },
+  // becomeHost: async (data: becomeHostRequest): Promise<AuthResponse> => {
+  //   const response = await apiClient.post<AuthResponse>('/api/auth/become-host', data);
+  //   return response.data;
+  // },
 
   getCurrentUser: async (): Promise<User> => {
     const response = await apiClient.get<User>('/api/auth/me');
@@ -45,7 +44,12 @@ export const authService = {
   getHosts: async (): Promise<PaginatedUsersResponse> => {
     const response = await apiClient.get<PaginatedUsersResponse>('/api/auth/users-by-role?roleName=HOST');
     return response.data;
-  }
+  },
+
+  becomeHost: async (): Promise<AuthResponse> => {
+    const response = await apiClient.get<AuthResponse>('/api/auth/become-host');
+    return response.data;
+  },
 };
 
 // Activity Services
