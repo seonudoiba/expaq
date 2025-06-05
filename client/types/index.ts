@@ -190,6 +190,21 @@ export interface CreateActivityRequest {
   maxParticipants: number;
   startDate: string;
   endDate: string;
+  latitude: number;
+  longitude: number;
+  cityId: string;
+  countryId: string;
+  activityTypeId: string;
+  schedule: {
+    startTime: string;
+    daysOfWeek: string[];
+  };
+  capacity: number;
+  bookedCapacity: number;
+  address: string;
+  isFeatured: boolean;
+  minParticipants: number;
+  durationMinutes: number;
 }
 
 export interface CreateReviewRequest {

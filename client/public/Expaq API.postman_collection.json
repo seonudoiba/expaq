@@ -1,0 +1,2293 @@
+{
+	"info": {
+		"_postman_id": "f486faa7-018a-4833-a016-9a1c073c5a82",
+		"name": "Expaq API",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Tests\" tab**\n\nTests help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/b5f280a7-4b09-48ec-857f-0a7ed99d7ef8/U2NyZWVuc2hvdCAyMDIzLTAzLTI3IGF0IDkuNDcuMjggUE0ucG5n\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) in \"Tests\" to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20381754"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Abiodun\",\r\n    \"lastName\": \"Starr\",\r\n    \"userName\": \"Biodun\",\r\n    \"email\": \"biodunrahman1@gmail.com\",\r\n    \"password\": \"abdulrahman1\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Become host",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/become-host",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"become-host"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"abiodunstarr1@gmail.com\",\r\n    \"password\": \"abdulrahman1\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Login Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mj@finest.com\",\r\n    \"password\": \"12345678\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"starr\",\r\n    \"password\": \"abdulrahman1\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"logout"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"starr\",\r\n    \"password\": \"abdulrahman1\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"users"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hosts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"starr\",\r\n    \"password\": \"abdulrahman1\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/users-by-role?roleName=HOST",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"users-by-role"
+							],
+							"query": [
+								{
+									"key": "roleName",
+									"value": "HOST"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "my profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend verification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/resend-verification?email=abiodunstarr@gmail.com",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"resend-verification"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "abiodunstarr@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request password reset",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/request-password-reset?email=abiodunstarr@gmail.com",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"request-password-reset"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "abiodunstarr@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "token",
+									"value": "5fd562bb-2c63-4b3d-88fd-9034d6570875",
+									"type": "text"
+								},
+								{
+									"key": "newPassword",
+									"value": "abdulrahman1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication Flow",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "activities",
+			"item": [
+				{
+					"name": "get All Activities",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/activities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Activity",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/activities/c0b3e9d3-ba97-4904-8ab6-7894326d2648",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"c0b3e9d3-ba97-4904-8ab6-7894326d2648"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Activity nearby",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/activities/nearby?latitude=6.5243793&longitude=3.3792057&distance=4000",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"nearby"
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "6.5243793"
+								},
+								{
+									"key": "longitude",
+									"value": "3.3792057"
+								},
+								{
+									"key": "distance",
+									"value": "4000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Activity nearby By type",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/activities/nearby/SPORTS?latitude=6.5243793&longitude=3.3792057&distance=4000&type=SPORTS",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"nearby",
+								"SPORTS"
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "6.5243793"
+								},
+								{
+									"key": "longitude",
+									"value": "3.3792057"
+								},
+								{
+									"key": "distance",
+									"value": "4000"
+								},
+								{
+									"key": "type",
+									"value": "SPORTS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search Activity",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/activities/search?query=views",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "views"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Featured Activities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/featured",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"featured"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Activities By host",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/host/65ee338f-5518-4c36-bd5a-4820abce10e7",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"host",
+								"65ee338f-5518-4c36-bd5a-4820abce10e7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get upcoming Activities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/upcoming",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"upcoming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get popular Activities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/popular",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"popular"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get available Activities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/available",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"available"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Activities  with Price Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/price-range?minPrice=40&maxPrice=45",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"price-range"
+							],
+							"query": [
+								{
+									"key": "minPrice",
+									"value": "40"
+								},
+								{
+									"key": "maxPrice",
+									"value": "45"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create ActivityImage",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1ef035e3-fdad-4590-b5c2-2a79a196a857"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/activities/e86ed7e1-6b36-4b88-976c-78f471a28282/images",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"e86ed7e1-6b36-4b88-976c-78f471a28282",
+								"images"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete ActivityImage",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1ef035ed-60fb-4ee0-840f-331a08527ebe"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/activities/c0b3e9d3-ba97-4904-8ab6-7894326d2648/images?imageUrl=activities/aznxr7nuqbkdnuzbgscy",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"c0b3e9d3-ba97-4904-8ab6-7894326d2648",
+								"images"
+							],
+							"query": [
+								{
+									"key": "imageUrl",
+									"value": "activities/aznxr7nuqbkdnuzbgscy"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Activities by  Activity type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Activity by countries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/by-country/NIGERIA",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"by-country",
+								"NIGERIA"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Activity by cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activities/by-city/Lagos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"by-city",
+								"Lagos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new Activity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Sunrise Kayaking Tour\",\r\n  \"description\": \"Enjoy a peaceful kayaking experience during sunset with scenic views and professional instructors.\",\r\n  \"price\": 34.99,\r\n  \"latitude\": 6.0722,\r\n  \"longitude\": 9.4437,\r\n  \"category\": \"SPORTS\",\r\n  \"schedule\": {\r\n    \"startDate\": \"2024-07-01\",\r\n    \"endDate\": \"2024-07-15\",\r\n    \"startTime\": \"18:30:00\",\r\n    \"daysOfWeek\": [\"TUESDAY\", \"THURSDAY\", \"FRIDAY\"]\r\n  },\r\n  \"maxParticipants\": 10,\r\n  \"capacity\": 12,\r\n  \"bookedCapacity\": 3,\r\n  \"address\": \"computer village, ikeja\",\r\n  \"city\": \"Lagos\",\r\n  \"country\": \"Nigeria\",\r\n  \"isFeatured\": false,\r\n  \"minParticipants\": 2,\r\n  \"durationMinutes\": 120\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/activities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities"
+							],
+							"query": [
+								{
+									"key": "photophoto",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Activity",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Sunset Abeokuta Tour\",\r\n  \"description\": \"Enjoy a peaceful kayaking experience during sunset with scenic views and professional instructors.\",\r\n  \"price\": 139.99,\r\n  \"latitude\": 6.0522,\r\n  \"longitude\": 9.2437,\r\n  \"category\": \"SPORTS\",\r\n  \"schedule\": {\r\n    \"startDate\": \"2024-07-01\",\r\n    \"endDate\": \"2024-07-15\",\r\n    \"startTime\": \"18:30:00\",\r\n    \"daysOfWeek\": [\"TUESDAY\", \"THURSDAY\", \"FRIDAY\"]\r\n  },\r\n  \"maxParticipants\": 10,\r\n  \"capacity\": 12,\r\n  \"bookedCapacity\": 3,\r\n  \"address\": \"computer village, ikeja\",\r\n  \"city\": \"Lagos\",\r\n  \"country\": \"Nigeria\",\r\n  \"isFeatured\": false,\r\n  \"minParticipants\": 2,\r\n  \"durationMinutes\": 120\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/activities/8864614f-c9c5-4d83-ae2e-1799ccbca8d2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"8864614f-c9c5-4d83-ae2e-1799ccbca8d2"
+							],
+							"query": [
+								{
+									"key": "photophoto",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Activity",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "postman-cloud:///1efe62de-c721-4130-b038-800e86f470f7"
+								},
+								{
+									"key": "activityType",
+									"value": "Fishing",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Shark Fishing",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Experience the thrill of paragliding in stunning landscapes. 3",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "140.00",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Nigeria",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Lagos",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Hauptstrasse 1, 3800 Interlaken",
+									"type": "text"
+								},
+								{
+									"key": "capacity",
+									"value": "5",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/activities/8864614f-c9c5-4d83-ae2e-1799ccbca8d2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activities",
+								"8864614f-c9c5-4d83-ae2e-1799ccbca8d2"
+							],
+							"query": [
+								{
+									"key": "photophoto",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "booking",
+			"item": [
+				{
+					"name": "get all Booking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/all-bookings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings",
+								"all-bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Booking with confirmation code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/confirmation/3828912344",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings",
+								"confirmation",
+								"3828912344"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get User Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/user/abiodunstarr@gmail.com/bookings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings",
+								"user",
+								"abiodunstarr@gmail.com",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Booking new activities",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "bookingId",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "checkInDate",
+									"value": "2025-02-14",
+									"type": "text"
+								},
+								{
+									"key": "checkOutDate",
+									"value": "2025-02-15",
+									"type": "text"
+								},
+								{
+									"key": "guestFullName",
+									"value": "Abiodun Igbehinadun",
+									"type": "text"
+								},
+								{
+									"key": "guestEmail",
+									"value": "abiodunstarr@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "numOfAdults",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "numOfChildren",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "totalNumOfGuest",
+									"value": "5",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "bookingConfirmationCode",
+									"value": "ssed",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/bookings/activity/1/booking",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings",
+								"activity",
+								"1",
+								"booking"
+							],
+							"query": [
+								{
+									"key": "photophoto",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Booking",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "postman-cloud:///1efe62de-c721-4130-b038-800e86f470f7"
+								},
+								{
+									"key": "activityType",
+									"value": "Fishing",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Shark Fishing",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Experience the thrill of paragliding in stunning landscapes. 3",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "140.00",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Nigeria",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Lagos",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Hauptstrasse 1, 3800 Interlaken",
+									"type": "text"
+								},
+								{
+									"key": "capacity",
+									"value": "5",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/bookings/booking/3/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings",
+								"booking",
+								"3",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "photophoto",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "rating",
+			"item": [
+				{
+					"name": "get Ratings for an activity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/ratings/activity/1/ratings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ratings",
+								"activity",
+								"1",
+								"ratings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get a Rating for an activity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/ratings/activity/1/ratings/4",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ratings",
+								"activity",
+								"1",
+								"ratings",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New rating",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"rating 4\",\r\n    \"content\": \"Nice\",\r\n    \"stars\": 5\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/ratings/activity/1/ratings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ratings",
+								"activity",
+								"1",
+								"ratings"
+							],
+							"query": [
+								{
+									"key": "photophoto",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update rating",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"rating 4\",\r\n    \"content\": \"Nice yoooo\",\r\n    \"stars\": 5\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/ratings/activity/1/ratings/4",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ratings",
+								"activity",
+								"1",
+								"ratings",
+								"4"
+							],
+							"query": [
+								{
+									"key": "photophoto",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Rating",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "postman-cloud:///1efe62de-c721-4130-b038-800e86f470f7"
+								},
+								{
+									"key": "activityType",
+									"value": "Fishing",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Shark Fishing",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Experience the thrill of paragliding in stunning landscapes. 3",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "140.00",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Nigeria",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Lagos",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Hauptstrasse 1, 3800 Interlaken",
+									"type": "text"
+								},
+								{
+									"key": "capacity",
+									"value": "5",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/ratings/activity/1/ratings/4",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ratings",
+								"activity",
+								"1",
+								"ratings",
+								"4"
+							],
+							"query": [
+								{
+									"key": "photophoto",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "roles",
+			"item": [
+				{
+					"name": "assign role to users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "postman-cloud:///1ef035f0-4ed4-4610-a3f3-7f08c3a83c55",
+									"disabled": true
+								},
+								{
+									"key": "activityType",
+									"value": "Adventure",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "Paragliding Experience",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "description",
+									"value": "Experience the thrill of paragliding in stunning landscapes.",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "price",
+									"value": "120.00",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "Switzerland",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "city",
+									"value": "Interlaken",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "address",
+									"value": "Hauptstrasse 1, 3800 Interlaken",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "capacity",
+									"value": "10",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/assign-user-to-role?userId=3&roleId=4",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"assign-user-to-role"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "3"
+								},
+								{
+									"key": "roleId",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Romove user from role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "postman-cloud:///1ef035f0-4ed4-4610-a3f3-7f08c3a83c55",
+									"disabled": true
+								},
+								{
+									"key": "activityType",
+									"value": "Adventure",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "Paragliding Experience",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "description",
+									"value": "Experience the thrill of paragliding in stunning landscapes.",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "price",
+									"value": "120.00",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "Switzerland",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "city",
+									"value": "Interlaken",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "address",
+									"value": "Hauptstrasse 1, 3800 Interlaken",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "capacity",
+									"value": "10",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/remove-user-from-role?userId=3&roleId=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"remove-user-from-role"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "3"
+								},
+								{
+									"key": "roleId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"ROLE_ABLE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/create-new-role",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"create-new-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"ROLE_ABLE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/delete/5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"delete",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all roles",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cities",
+			"item": [
+				{
+					"name": "get cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create city",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"San Francisco\",\r\n    \"image\": \"https://res.cloudinary.com/do0rdj8oj/image/upload/v1747160495/download_1_zd7fpo.jpg\",\r\n    \"countryId\": \"2da6ad52-ce40-4f4f-a9df-ead8a8f53dda\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update cities",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete cities",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Countries",
+			"item": [
+				{
+					"name": "create country",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Unitted States\",\r\n    \"image\": \"https://res.cloudinary.com/do0rdj8oj/image/upload/v1747139542/e5ra2bgjhc5f1dknspl3.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/countries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Countries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/countries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/countries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/countries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countries"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Activity Types",
+			"item": [
+				{
+					"name": "create Acticity Type",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Cooking\",\r\n    \"image\": \"https://res.cloudinary.com/do0rdj8oj/image/upload/v1747167033/download_2_dmlaz9.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/activity-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activity-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Activities types",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/activity-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activity-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update activity types",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activity-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activity-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete activity type",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/countries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countries"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authtoken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "http://localhost:8081"
+		},
+		{
+			"key": "token",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0YThiZjYzNy1iNmFmLTRmNzAtYWE3OS1mN2ZmMWQzZTAzZjAiLCJlbWFpbCI6InN0YXJyMkBnbWFpbC5jb20iLCJyb2xlcyI6IkdVRVNUIiwiaWF0IjoxNzQ2NjE2NzM0LCJleHAiOjE3NDY2MjAzMzR9.1Zz86zyFcFbvpHsfzXpT-mjf95nOcU3dw2CTF2C-tgI",
+			"type": "string"
+		},
+		{
+			"key": "authtoken",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0NWRiMDcwNi1lMjcwLTRhYzgtOTFlZC1jYThhZTY0YWMyZWMiLCJlbWFpbCI6Im1qQGZpbmVzdC5jb20iLCJyb2xlcyI6WyJST0xFX0dVRVNUIl0sInVzZXJuYW1lIjoibWpAZmluZXN0LmNvbSIsImlhdCI6MTc0OTA0OTEwMCwiZXhwIjoxNzQ5MDUyNzAwfQ.trU5yAZ1Suy7p84ZJ0DdiIMQHOPHclcyWKHnSpkyw4g",
+			"type": "string"
+		}
+	]
+}

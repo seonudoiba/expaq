@@ -1,3 +1,4 @@
+import { get } from 'http';
 import { apiClient } from './client';
 import type {
   Activity,
@@ -110,8 +111,21 @@ export const activityService = {
     return response.data;
   },
 
-  create: async (data: CreateActivityRequest): Promise<Activity> => {
-    const response = await apiClient.post<Activity>('/api/activities', data);
+  create: async (data: CreateActivityRequest, images: File[]): Promise<Activity> => {
+    // Upload images and get their URLs
+    const formData = new FormData();
+    images.forEach((image) => formData.append("files", image));
+
+    const uploadResponse = await apiClient.post<string[]>("/api/files/upload-multiple", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    const mediaUrls = uploadResponse.data;
+
+    // Include media URLs in the activity data
+    const activityData = { ...data, mediaUrls };
+
+    const response = await apiClient.post<Activity>("/api/activities", activityData);
     return response.data;
   },
 
@@ -205,5 +219,29 @@ export const cityService = {
   getAll: async () => {
     const response = await apiClient.get('/api/cities');
     return response.data;
+  },
+  getByCountry: async (countryId: string) => {
+    const response = await apiClient.get(`/api/cities/country/${countryId}`);
+    return response.data;
+  }
+};
+
+export const geocodingService = {
+  getCoordinates: async (query: string): Promise<{ latitude: number; longitude: number }> => {
+    const response = await apiClient.get('https://nominatim.openstreetmap.org/search', {
+      params: {
+        q: query,
+        format: 'json',
+        addressdetails: 1,
+        limit: 1,
+      },
+    });
+
+    if (response.data.length > 0) {
+      const { lat, lon } = response.data[0];
+      return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
+    } else {
+      throw new Error('No results found for the given location.');
+    }
   },
 };

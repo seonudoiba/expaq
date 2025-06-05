@@ -102,10 +102,10 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      becomeHost: async (data) => {
+      becomeHost: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await authService.becomeHost(data);
+          const response = await authService.becomeHost();
           // Set token as a cookie
           if (response.token) {
             document.cookie = `token=${response.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`; // Expires in 7 days

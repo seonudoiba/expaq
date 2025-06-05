@@ -209,9 +209,9 @@ export default function BecomeAHostPage() {
                 Maria, Cooking Instructor
               </h3>
               <p className="text-muted-foreground mb-4">
-                "I've been able to share my family's traditional recipes with
+                &quot;I&lsquo;ve been able to share my family&lsquo;s traditional recipes with
                 people from all over the world. The platform makes it easy to
-                manage bookings and I've doubled my income in just six months."
+                manage bookings and I&lsquo;ve doubled my income in just six months.&quot;
               </p>
               <p className="text-sm text-muted-foreground">Rome, Italy</p>
             </CardContent>
@@ -230,9 +230,9 @@ export default function BecomeAHostPage() {
                 Carlos, Hiking Guide
               </h3>
               <p className="text-muted-foreground mb-4">
-                "I turned my weekend hobby into a full-time business. The
+                &quot;I turned my weekend hobby into a full-time business. The
                 flexibility allows me to lead tours when I want, and the support
-                from Expaq has been incredible."
+                from Expaq has been incredible.&quot;
               </p>
               <p className="text-sm text-muted-foreground">Costa Rica</p>
             </CardContent>
@@ -251,9 +251,9 @@ export default function BecomeAHostPage() {
                 Sophie, Art Instructor
               </h3>
               <p className="text-muted-foreground mb-4">
-                "Hosting painting workshops has connected me with amazing people
+                &quot;Hosting painting workshops has connected me with amazing people
                 and provided a steady income stream. The platform handles all
-                the logistics so I can focus on creating."
+                the logistics so I can focus on creating.&quot;
               </p>
               <p className="text-sm text-muted-foreground">Paris, France</p>
             </CardContent>
@@ -278,7 +278,7 @@ export default function BecomeAHostPage() {
                 How much does it cost to list my activity?
               </h3>
               <p className="text-muted-foreground">
-                It's free to create and list your activity on Expaq. We only
+                It&apos;s free to create and list your activity on Expaq. We only
                 take a commission when you receive a booking.
               </p>
             </div>
@@ -307,14 +307,14 @@ export default function BecomeAHostPage() {
               </h3>
               <p className="text-muted-foreground">
                 While some activities may require certifications (like scuba
-                instruction), many don't. What's most important is your
+                instruction), many don&apos;t. What&apos;s most important is your
                 knowledge, passion, and ability to create a great experience.
               </p>
             </div>
             <div>
               <h3 className="font-semibold text-lg mb-2">How do I get paid?</h3>
               <p className="text-muted-foreground">
-                Payments are processed securely through our platform. You'll
+                Payments are processed securely through our platform. You&apos;ll
                 receive your earnings via direct deposit to your bank account.
               </p>
             </div>

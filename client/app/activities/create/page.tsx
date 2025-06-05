@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -11,6 +10,13 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { MapPin, Clock, Users, DollarSign, Image as ImageIcon } from "lucide-react"
 import { useAuthStore } from "@/lib/store/auth"
+import { activityService } from "@/lib/api/services"
+import { useQuery } from "@tanstack/react-query"
+import { useActivityStore } from "@/lib/store/activity"
+import { countryService, cityService, activityTypeService } from "@/lib/api/services"
+import { activityType, Country, CreateActivityRequest } from "@/types"
+import axios from "axios"
+import { geocodingService } from '@/lib/api/services';
 
 export default function CreateActivityPage() {
   const router = useRouter()
@@ -18,35 +24,82 @@ export default function CreateActivityPage() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [images, setImages] = useState<File[]>([])
+  const {
+    countries,
+    cities,
+    activityTypes,
+    selectedCountry,
+    setCountries,
+    setCities,
+    setActivityTypes,
+    setSelectedCountry,
+  } = useActivityStore()
 
+  const {
+    data: countriesData,
+    isLoading: isLoadingCountries,
+    error: countriesError,
+  } = useQuery({
+    queryKey: ["countries"],
+    queryFn: () => countryService.getAllCountries(),
+  })
+
+  const {
+    data: activityTypesData,
+    isLoading: isLoadingActivityTypes,
+    error: activityTypesError,
+  } = useQuery({
+    queryKey: ["activityTypes"],
+    queryFn: () => activityTypeService.getAll(),
+  })
+
+  const { data: citiesData, isLoading: isCitiesLoading, error: citiesError } = useQuery({
+    queryKey: ["cities", selectedCountry],
+    queryFn: () => cityService.getByCountry(selectedCountry),
+    enabled: !!selectedCountry, // Only fetch cities if a country is selected
+  })
+console.log("Cities Data:", citiesData, "Selected Country:", selectedCountry, "Countries Data:", countriesData, "Activity Types Data:", activityTypesData)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
       const formData = new FormData(e.currentTarget)
-      const activityData = {
-        title: formData.get("title"),
-        description: formData.get("description"),
-        location: formData.get("location"),
-        duration: formData.get("duration"),
-        maxParticipants: parseInt(formData.get("maxParticipants") as string),
+      const address = formData.get("address") as string | null
+      const city = formData.get("city") as string
+      const country = selectedCountry
+
+      // Fetch coordinates using geocodingService
+      const query = address ? `${address}, ${city}, ${country}` : `${city}, ${country}`;
+      const { latitude, longitude } = await geocodingService.getCoordinates(query);
+
+      const activityData: CreateActivityRequest = {
+        title: formData.get("title") as string,
+        description: formData.get("description") as string,
         price: parseFloat(formData.get("price") as string),
-        category: formData.get("category"),
-      }
-
-      // Here you would typically upload images first, then create the activity
-      const response = await fetch("/api/activities", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+        latitude,
+        longitude,
+        category: formData.get("category") as string,
+        cityId: city,
+        countryId: country,
+        activityTypeId: formData.get("activityType") as string,
+        location: formData.get("location") as string,
+        startDate: formData.get("startDate") as string,
+        endDate: formData.get("endDate") as string,
+        schedule: {
+          startTime: formData.get("startTime") as string,
+          daysOfWeek: (formData.get("daysOfWeek") as string)?.split(","),
         },
-        body: JSON.stringify(activityData),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to create activity")
+        maxParticipants: parseInt(formData.get("maxParticipants") as string),
+        capacity: parseInt(formData.get("capacity") as string),
+        bookedCapacity: parseInt(formData.get("bookedCapacity") as string),
+        address: address || '',
+        isFeatured: formData.get("isFeatured") === "true",
+        minParticipants: parseInt(formData.get("minParticipants") as string),
+        durationMinutes: parseInt(formData.get("durationMinutes") as string),
       }
+
+      await activityService.create(activityData, images)
 
       toast({
         title: "Success",
@@ -55,6 +108,7 @@ export default function CreateActivityPage() {
 
       router.push("/dashboard")
     } catch (error) {
+      console.error("Error creating activity:", error)
       toast({
         title: "Error",
         description: "Failed to create activity. Please try again.",
@@ -83,6 +137,62 @@ export default function CreateActivityPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Country and City Selection */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="country">Country</Label>
+                <select
+                  id="country"
+                  name="country"
+                  required
+                  className="w-full p-2 border rounded-md"
+                  onChange={(e) => setSelectedCountry(e.target.value)}
+                >
+                  <option value="">Select a country</option>
+                  {countries.map((country) => (
+                    <option key={country.id} value={country.id}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="city">City</Label>
+                <select
+                  id="city"
+                  name="city"
+                  required
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="">Select a city</option>
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Activity Type Selection */}
+            <div>
+              <Label htmlFor="activityType">Activity Type</Label>
+              <select
+                id="activityType"
+                name="activityType"
+                required
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="">Select an activity type</option>
+                {activityTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Basic Information */}
             <div className="space-y-4">
               <div>
@@ -235,4 +345,4 @@ export default function CreateActivityPage() {
       </Card>
     </div>
   )
-} 
+}
