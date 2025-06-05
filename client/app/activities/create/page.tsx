@@ -3,7 +3,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,10 +10,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { MapPin, Clock, Users, DollarSign, Image as ImageIcon } from "lucide-react"
+import { useAuthStore } from "@/lib/store/auth"
 
 export default function CreateActivityPage() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user } = useAuthStore()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [images, setImages] = useState<File[]>([])

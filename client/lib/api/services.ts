@@ -12,6 +12,25 @@ import type {
   PaginatedUsersResponse,
 } from '@/types';
 
+// Add an interceptor to include auth details with every request
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('auth-storage'); // Replace with your auth token retrieval logic
+  let tokenObject = null;
+  if (token) {
+    try {
+      tokenObject = JSON.parse(token);
+      console.log('Parsed token:', tokenObject.state.token); // Log the parsed token for debugging
+      tokenObject = tokenObject.state.token; // Assuming the token is stored in state.token
+    } catch (error) {
+      console.error('Failed to parse token:', error);
+    }
+  }
+  if (tokenObject) {
+    config.headers.Authorization = `Bearer ${tokenObject}`;
+  }
+  return config;
+});
+
 // Auth Services
 export const authService = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
@@ -45,11 +64,10 @@ export const authService = {
     const response = await apiClient.get<PaginatedUsersResponse>('/api/auth/users-by-role?roleName=HOST');
     return response.data;
   },
-
   becomeHost: async (): Promise<AuthResponse> => {
-    const response = await apiClient.get<AuthResponse>('/api/auth/become-host');
+    const response = await apiClient.post<AuthResponse>('/api/auth/become-host');
     return response.data;
-  },
+},
 };
 
 // Activity Services
