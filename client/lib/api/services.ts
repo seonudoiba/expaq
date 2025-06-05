@@ -111,20 +111,7 @@ export const activityService = {
     return response.data;
   },
 
-  create: async (data: CreateActivityRequest, images: File[]): Promise<Activity> => {
-    // Upload images and get their URLs
-    const formData = new FormData();
-    images.forEach((image) => formData.append("files", image));
-
-    const uploadResponse = await apiClient.post<string[]>("/api/files/upload-multiple", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    const mediaUrls = uploadResponse.data;
-
-    // Include media URLs in the activity data
-    const activityData = { ...data, mediaUrls };
-
+  create: async (activityData: CreateActivityRequest): Promise<Activity> => {
     const response = await apiClient.post<Activity>("/api/activities", activityData);
     return response.data;
   },
@@ -244,4 +231,21 @@ export const geocodingService = {
       throw new Error('No results found for the given location.');
     }
   },
+};
+
+export const uploadActivityImages = async (activityId: string, images: File[]) => {
+  const formData = new FormData();
+  images.forEach((image) => formData.append("images", image));
+
+  const response = await apiClient.post(
+    `/api/activities/${activityId}/images`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
 };

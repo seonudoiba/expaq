@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +17,7 @@ import { countryService, cityService, activityTypeService } from "@/lib/api/serv
 import { activityType, Country, CreateActivityRequest } from "@/types"
 import axios from "axios"
 import { geocodingService } from '@/lib/api/services';
+import { uploadActivityImages } from '@/lib/api/services';
 
 export default function CreateActivityPage() {
   const router = useRouter()
@@ -60,14 +61,14 @@ export default function CreateActivityPage() {
   })
 console.log("Cities Data:", citiesData, "Selected Country:", selectedCountry, "Countries Data:", countriesData, "Activity Types Data:", activityTypesData)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const formData = new FormData(e.currentTarget)
-      const address = formData.get("address") as string | null
-      const city = formData.get("city") as string
-      const country = selectedCountry
+      const formData = new FormData(e.currentTarget);
+      const address = formData.get("address") as string | null;
+      const city = formData.get("city") as string;
+      const country = selectedCountry;
 
       // Fetch coordinates using geocodingService
       const query = address ? `${address}, ${city}, ${country}` : `${city}, ${country}`;
@@ -97,9 +98,19 @@ console.log("Cities Data:", citiesData, "Selected Country:", selectedCountry, "C
         isFeatured: formData.get("isFeatured") === "true",
         minParticipants: parseInt(formData.get("minParticipants") as string),
         durationMinutes: parseInt(formData.get("durationMinutes") as string),
+        isActive: false, // Initially set to false
+      };
+
+      // Step 1: Create the activity
+      const createdActivity = await activityService.create(activityData);
+
+      // Step 2: Upload images
+      if (images.length > 0) {
+        await uploadActivityImages(createdActivity.id, images);
       }
 
-      await activityService.create(activityData, images)
+      // Step 3: Update the activity to set isActive to true
+      await activityService.update(createdActivity.id, { isActive: true });
 
       toast({
         title: "Success",
@@ -124,6 +135,24 @@ console.log("Cities Data:", citiesData, "Selected Country:", selectedCountry, "C
       setImages(Array.from(e.target.files))
     }
   }
+
+  useEffect(() => {
+    if (countriesData) {
+      setCountries(countriesData);
+    }
+  }, [countriesData, setCountries]);
+
+  useEffect(() => {
+    if (activityTypesData) {
+      setActivityTypes(activityTypesData);
+    }
+  }, [activityTypesData, setActivityTypes]);
+
+  useEffect(() => {
+    if (citiesData) {
+      setCities(citiesData);
+    }
+  }, [citiesData, setCities]);
 
   if (!user) {
     return null
