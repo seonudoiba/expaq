@@ -27,19 +27,16 @@ export default function BecomeAHostPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGetStartedClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); // Prevent default behavior to avoid rerender
-
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-
+    event.preventDefault(); 
     setIsLoading(true);
+
+    if (isAuthenticated) {
+
     try {
       const response = await authService.becomeHost();
       toast.success("You are now a host!");
       console.log("Become Host Response:", response);
-      router.push("/create-activities"); // Redirect to dashboard after success
+      router.push("/activities/create"); 
     } catch (error) {
       console.error("Error becoming host:", error);
       toast.error("Failed to become a host. Please try again later.");
@@ -47,6 +44,7 @@ export default function BecomeAHostPage() {
     } finally {
       setIsLoading(false);
     }
+  }
   };
 
   return (

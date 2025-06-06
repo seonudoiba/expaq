@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,13 +13,34 @@ import { activityService } from "@/lib/api/services"
 import { useQuery } from "@tanstack/react-query"
 import { useActivityStore } from "@/lib/store/activity"
 import { countryService, cityService, activityTypeService } from "@/lib/api/services"
-import { activityType, Country, CreateActivityRequest } from "@/types"
-import axios from "axios"
 import { geocodingService } from '@/lib/api/services';
 import { uploadActivityImages } from '@/lib/api/services';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { format, } from 'date-fns';
+
+const activitySchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  price: z.number().min(0, "Price must be a positive number"),
+  startDate: z.string().min(1, "Start date is required"),
+  endDate: z.string().min(1, "End date is required"),
+  startTime: z.string().min(1, "Start time is required"),
+  daysOfWeek: z.array(z.string()).min(1, "At least one day must be selected"),
+  maxParticipants: z.number().min(1, "Maximum participants must be at least 1"),
+  // capacity: z.number().min(1, "Capacity must be at least 1"),
+  bookedCapacity: z.number().min(0, "Booked capacity must be at least 0"),
+  address: z.string().min(1, "Address is required"),
+  // isFeatured: z.string(),
+  city: z.string().min(1, "City is required"),
+  country: z.string().min(1, "Country is required"),
+  activityType: z.string().min(1, "Activity type is required"),
+  minParticipants: z.number().min(1, "Minimum participants must be at least 1"),
+  durationMinutes: z.number().min(1, "Duration must be at least 1 minute"),
+});
 
 export default function CreateActivityPage() {
-  const router = useRouter()
   const { user } = useAuthStore()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
@@ -38,8 +58,6 @@ export default function CreateActivityPage() {
 
   const {
     data: countriesData,
-    isLoading: isLoadingCountries,
-    error: countriesError,
   } = useQuery({
     queryKey: ["countries"],
     queryFn: () => countryService.getAllCountries(),
@@ -47,90 +65,122 @@ export default function CreateActivityPage() {
 
   const {
     data: activityTypesData,
-    isLoading: isLoadingActivityTypes,
-    error: activityTypesError,
   } = useQuery({
     queryKey: ["activityTypes"],
     queryFn: () => activityTypeService.getAll(),
   })
 
-  const { data: citiesData, isLoading: isCitiesLoading, error: citiesError } = useQuery({
+  const { data: citiesData } = useQuery({
     queryKey: ["cities", selectedCountry],
     queryFn: () => cityService.getByCountry(selectedCountry),
     enabled: !!selectedCountry, // Only fetch cities if a country is selected
   })
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<z.infer<typeof activitySchema>>({
+    resolver: zodResolver(activitySchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: z.infer<typeof activitySchema>) => {
+    console.log("Form submitted with data:", data); // Debugging log
     setIsLoading(true);
 
     try {
-      const formData = new FormData(e.currentTarget);
-      const address = formData.get("address") as string | null;
-      const city = formData.get("city") as string;
-      const country = selectedCountry;
+      // Convert isFeatured to boolean
+      // const isFeatured = data.isFeatured === "true";
 
-      // Fetch coordinates using geocodingService
-      const query = address ? `${address}, ${city}, ${country}` : `${city}, ${country}`;
-      const { latitude, longitude } = await geocodingService.getCoordinates(query);
-      console.log("Coordinates:", { latitude, longitude });
+      const { address, city, country, startDate, endDate, ...rest } = data;
+      console.log("Processing data:", { address, city, country, rest }); // Debugging log
 
-      const activityData: CreateActivityRequest = {
-        title: formData.get("title") as string,
-        description: formData.get("description") as string,
-        price: parseFloat(formData.get("price") as string),
+      const cityName = cities.find((c) => c.id === city)?.name;
+      const countryName = countries.find((c) => c.id === country)?.name;
+
+      if (!cityName || !countryName) {
+        throw new Error("Invalid city or country selection.");
+      }
+
+      const query = `${address}, ${cityName}, ${countryName}`;
+      let latitude, longitude;
+
+      try {
+        ({ latitude, longitude } = await geocodingService.getCoordinates(query));
+
+        if (!latitude || !longitude) {
+          console.warn(`No results found for the full address: ${query}. Retrying with city and country only.`);
+          const fallbackQuery = `${cityName}, ${countryName}`;
+          ({ latitude, longitude } = await geocodingService.getCoordinates(fallbackQuery));
+
+          if (!latitude || !longitude) {
+            throw new Error(`No results found for the fallback location: ${fallbackQuery}`);
+          }
+        }
+      } catch (geoError) {
+        console.error("Geocoding error:", geoError);
+        throw new Error("Unable to fetch coordinates. Please check the address and try again.");
+      }
+
+      console.log("Coordinates fetched:", { latitude, longitude }); // Debugging log
+
+      // Format startDate and endDate to include time
+      const formattedStartDate = format(new Date(startDate), "yyyy-MM-dd'T'HH:mm:ss");
+      const formattedEndDate = format(new Date(endDate), "yyyy-MM-dd'T'HH:mm:ss");
+
+      const activityData = {
+        ...rest,
+        // isFeatured, // Use the converted boolean value
         latitude,
         longitude,
-        category: formData.get("category") as string,
-        cityId: city,
-        countryId: country,
-        activityTypeId: formData.get("activityType") as string,
-        location: formData.get("location") as string,
-        startDate: formData.get("startDate") as string,
-        endDate: formData.get("endDate") as string,
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+        city: { id: city },
+        country: { id: country },
+        activityType: { id: data.activityType },
+        address,
         schedule: {
-          startTime: formData.get("startTime") as string,
-          daysOfWeek: (formData.get("daysOfWeek") as string)?.split(","),
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+          startTime: data.startTime,
+          daysOfWeek: data.daysOfWeek,
         },
-        maxParticipants: parseInt(formData.get("maxParticipants") as string),
-        capacity: parseInt(formData.get("capacity") as string),
-        bookedCapacity: parseInt(formData.get("bookedCapacity") as string),
-        address: address || '',
-        isFeatured: formData.get("isFeatured") === "true",
-        minParticipants: parseInt(formData.get("minParticipants") as string),
-        durationMinutes: parseInt(formData.get("durationMinutes") as string),
-        isActive: false, // Initially set to false
       };
-      console.log("Activity Data:", activityData);
+
+      console.log("Final activity data:", activityData); // Debugging log
+
       // Step 1: Create the activity
       const createdActivity = await activityService.create(activityData);
+      console.log("Activity created with ID:", createdActivity.id); // Debugging log
 
       // Step 2: Upload images
       if (images.length > 0) {
-        await uploadActivityImages(createdActivity.id, images);
+        try {
+          await uploadActivityImages(createdActivity.id, images);
+          console.log("Images uploaded for activity ID:", createdActivity.id); // Debugging log
+        } catch (imageUploadError) {
+          console.error("Error uploading images:", imageUploadError);
+          throw new Error("Failed to upload images. Please try again.");
+        }
       }
-
-      // Step 3: Update the activity to set isActive to true
-      await activityService.update(createdActivity.id, { isActive: true });
 
       toast({
         title: "Success",
         description: "Activity created successfully",
-      })
+      });
 
-      router.push("/dashboard")
-    } catch (error) {
-      console.error("Error creating activity:", error)
+    } catch (error: unknown) {
+      console.error("Error creating activity:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to create activity. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to create activity. Please try again.",
+        description: errorMessage,
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -167,17 +217,33 @@ export default function CreateActivityPage() {
           <CardTitle>Create New Activity</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)} // Directly pass the onSubmit function
+            className="space-y-6"
+          >
+            {Object.keys(errors).length > 0 && (
+              <div className="text-red-500">
+                <p>Validation Errors:</p>
+                <ul>
+                  {Object.entries(errors).map(([field, error]) => (
+                    <li key={field}>{field}: {error.message}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Country and City Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="country">Country</Label>
                 <select
                   id="country"
-                  name="country"
+                  {...register("country")}
                   required
                   className="w-full p-2 border rounded-md"
-                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedCountry(e.target.value);
+                  }}
                 >
                   <option value="">Select a country</option>
                   {countries.map((country) => (
@@ -192,7 +258,7 @@ export default function CreateActivityPage() {
                 <Label htmlFor="city">City</Label>
                 <select
                   id="city"
-                  name="city"
+                  {...register("city")}
                   required
                   className="w-full p-2 border rounded-md"
                 >
@@ -211,7 +277,7 @@ export default function CreateActivityPage() {
               <Label htmlFor="activityType">Activity Type</Label>
               <select
                 id="activityType"
-                name="activityType"
+                {...register("activityType")}
                 required
                 className="w-full p-2 border rounded-md"
               >
@@ -230,38 +296,23 @@ export default function CreateActivityPage() {
                 <Label htmlFor="title">Activity Title</Label>
                 <Input
                   id="title"
-                  name="title"
+                  {...register("title")}
                   required
                   placeholder="Enter activity title"
                 />
+                {errors.title && <p className="text-red-500">{errors.title.message}</p>}
               </div>
 
               <div>
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
-                  name="description"
+                  {...register("description")}
                   required
                   placeholder="Describe your activity"
                   className="min-h-[100px]"
                 />
-              </div>
-
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <select
-                  id="category"
-                  name="category"
-                  required
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select a category</option>
-                  <option value="city-tour">City Tour</option>
-                  <option value="hiking">Hiking</option>
-                  <option value="food">Food & Drink</option>
-                  <option value="culture">Cultural Experience</option>
-                  <option value="adventure">Adventure</option>
-                </select>
+                {errors.description && <p className="text-red-500">{errors.description.message}</p>}
               </div>
             </div>
 
@@ -306,14 +357,15 @@ export default function CreateActivityPage() {
                   <Users className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="maxParticipants"
-                    name="maxParticipants"
                     type="number"
+                    {...register("maxParticipants", { valueAsNumber: true })}
                     required
                     min="1"
                     placeholder="Enter max participants"
                     className="pl-10"
                   />
                 </div>
+                {errors.maxParticipants && <p className="text-red-500">{errors.maxParticipants.message}</p>}
               </div>
 
               <div>
@@ -322,8 +374,8 @@ export default function CreateActivityPage() {
                   <DollarSign className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="price"
-                    name="price"
                     type="number"
+                    {...register("price", { valueAsNumber: true })}
                     required
                     min="0"
                     step="0.01"
@@ -331,6 +383,118 @@ export default function CreateActivityPage() {
                     className="pl-10"
                   />
                 </div>
+                {errors.price && <p className="text-red-500">{errors.price.message}</p>}
+              </div>
+            </div>
+
+            {/* Capacity and Booked Capacity */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="bookedCapacity">Booked Capacity</Label>
+                <Input
+                  id="bookedCapacity"
+                  type="number"
+                  {...register("bookedCapacity", { valueAsNumber: true })}
+                  required
+                  min="0"
+                  placeholder="Enter booked capacity"
+                  className="pl-10"
+                />
+                {errors.bookedCapacity && <p className="text-red-500">{errors.bookedCapacity.message}</p>}
+              </div>
+            </div>
+
+            {/* Address */}
+            <div>
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                {...register("address")}
+                required
+                placeholder="Enter address"
+              />
+              {errors.address && <p className="text-red-500">{errors.address.message}</p>}
+            </div>
+            {/* Minimum Participants */}
+            <div>
+              <Label htmlFor="minParticipants">Minimum Participants</Label>
+              <Input
+                id="minParticipants"
+                type="number"
+                {...register("minParticipants", { valueAsNumber: true })}
+                required
+                min="1"
+                placeholder="Enter minimum participants"
+                className="pl-10"
+              />
+              {errors.minParticipants && <p className="text-red-500">{errors.minParticipants.message}</p>}
+            </div>
+
+            {/* Duration in Minutes */}
+            <div>
+              <Label htmlFor="durationMinutes">Duration (Minutes)</Label>
+              <Input
+                id="durationMinutes"
+                type="number"
+                {...register("durationMinutes", { valueAsNumber: true })}
+                required
+                min="1"
+                placeholder="Enter duration in minutes"
+                className="pl-10"
+              />
+              {errors.durationMinutes && <p className="text-red-500">{errors.durationMinutes.message}</p>}
+            </div>
+
+            {/* Schedule Inputs */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="startDate">Start Date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  {...register("startDate")}
+                  required
+                />
+                {errors.startDate && <p className="text-red-500">{errors.startDate.message}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="endDate">End Date</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  {...register("endDate")}
+                  required
+                />
+                {errors.endDate && <p className="text-red-500">{errors.endDate.message}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="startTime">Start Time</Label>
+                <Input
+                  id="startTime"
+                  type="time"
+                  {...register("startTime")}
+                  required
+                />
+                {errors.startTime && <p className="text-red-500">{errors.startTime.message}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="daysOfWeek">Days of the Week</Label>
+                <select
+                  id="daysOfWeek"
+                  multiple
+                  {...register("daysOfWeek")}
+                  required
+                  className="w-full p-2 border rounded-md"
+                >
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
+                    <option key={day.toUpperCase()} value={day.toUpperCase()}>{day}</option>
+                  ))}
+                </select>
+                <p className="text-sm text-muted-foreground">Hold Ctrl (Cmd on Mac) to select multiple days.</p>
+                {errors.daysOfWeek && <p className="text-red-500">{errors.daysOfWeek.message}</p>}
               </div>
             </div>
 

@@ -18,7 +18,7 @@ const About = () => {
                         />
                     </div>
                     <div className="bg-white  px-8 md:px-10 md:py-6 ml-[-8vw] z-10 shadow-lg ">
-                        <h6 className="text-purple-700 uppercase tracking-widest">About Us</h6>
+                        <h6 className="text-primary uppercase tracking-widest">About Us</h6>
                         <h1 className="md:text-3xl font-semibold my-4">
                         Connecting Travelers with <br/> Local Hosts for Authentic Experiences
                         </h1>
@@ -46,7 +46,7 @@ const About = () => {
                             />
                         </div>
                         <div className='flex mt-2 md:my-4'>
-                            <Link href={'#'} className="text-2xl cursor-pointer text-white py-3 px-5 bg-[#7b35fc] rounded-full">Book Now</Link>
+                            <Link href={'#'} className="text-2xl cursor-pointer text-white py-3 px-5 bg-primary  rounded-full">Book Now</Link>
                         </div>
                     </div>
                 </div>

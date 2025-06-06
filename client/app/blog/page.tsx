@@ -64,18 +64,18 @@ const Blog = () => {
                       height={250}
                       className="w-full h-60 object-cover"
                     />
-                    <div className="absolute top-4 left-4 bg-purple-700 text-white px-3 py-2 rounded">
+                    <div className="absolute top-4 left-4 bg-primary text-white px-3 py-2 rounded">
                       <h6 className="font-bold text-xl mb-0">01</h6>
                       <small className="uppercase">Jan</small>
                     </div>
                   </div>
                   <div className="p-4">
                     <div className="flex items-center mb-2 text-sm">
-                      <Link href="#" className="text-purple-700 uppercase no-underline">{post._embedded?.author?.[0]?.name || "Admin"}</Link>
-                      <span className="text-purple-700 px-2">|</span>
-                      <Link href="#" className="text-purple-700 uppercase no-underline">{post._embedded?.['wp:term']?.[0]?.[0]?.name || "Category"}</Link>
+                      <Link href="#" className="text-primary uppercase no-underline">{post._embedded?.author?.[0]?.name || "Admin"}</Link>
+                      <span className="text-primary px-2">|</span>
+                      <Link href="#" className="text-primary uppercase no-underline">{post._embedded?.['wp:term']?.[0]?.[0]?.name || "Category"}</Link>
                     </div>
-                    <Link href={`/blog/${post.id}`} className="font-medium text-gray-800 hover:text-purple-700 no-underline">
+                    <Link href={`/blog/${post.id}`} className="font-medium text-gray-800 hover:text-primary no-underline">
                       {post.title.rendered}
                     </Link>
                   </div>
@@ -93,22 +93,22 @@ const Blog = () => {
                 </span>
               </li>
               <li className="mx-1">
-                <Link href="#" className="px-4 py-2 bg-purple-700 text-white rounded-md">
+                <Link href="#" className="px-4 py-2 bg-primary text-white rounded-md">
                   1
                 </Link>
               </li>
               <li className="mx-1">
-                <Link href="#" className="px-4 py-2 text-purple-700 hover:bg-blue-100 rounded-md">
+                <Link href="#" className="px-4 py-2 text-primary hover:bg-blue-100 rounded-md">
                   2
                 </Link>
               </li>
               <li className="mx-1">
-                <Link href="#" className="px-4 py-2 text-purple-700 hover:bg-blue-100 rounded-md">
+                <Link href="#" className="px-4 py-2 text-primary hover:bg-blue-100 rounded-md">
                   3
                 </Link>
               </li>
               <li className="mx-1">
-                <Link href="#" className="flex items-center px-4 py-2 text-purple-700 hover:bg-blue-100 rounded-md">
+                <Link href="#" className="flex items-center px-4 py-2 text-primary hover:bg-blue-100 rounded-md">
                   &raquo;
                 </Link>
               </li>
@@ -126,16 +126,16 @@ const Blog = () => {
               height={100}
               className="rounded-full mb-4"
             />
-            <h3 className="text-purple-700 mb-3 font-semibold">{posts[0]?._embedded?.author?.[0]?.name || "Admin"}</h3>
+            <h3 className="text-primary mb-3 font-semibold">{posts[0]?._embedded?.author?.[0]?.name || "Admin"}</h3>
             <p className="text-gray-600 mb-4">
               {posts[0]?._embedded?.author?.[0]?.description || "Admin"}
             </p>
             <div className="flex justify-center">
-              <Link href="#" className="text-purple-700 mx-2 hover:text-blue-700"><FaFacebookF /></Link>
-              <Link href="#" className="text-purple-700 mx-2 hover:text-blue-700"><FaTwitter /></Link>
-              <Link href="#" className="text-purple-700 mx-2 hover:text-blue-700"><FaLinkedinIn /></Link>
-              <Link href="#" className="text-purple-700 mx-2 hover:text-blue-700"><FaInstagram /></Link>
-              <Link href="#" className="text-purple-700 mx-2 hover:text-blue-700"><FaYoutube /></Link>
+              <Link href="#" className="text-primary mx-2 hover:text-blue-700"><FaFacebookF /></Link>
+              <Link href="#" className="text-primary mx-2 hover:text-blue-700"><FaTwitter /></Link>
+              <Link href="#" className="text-primary mx-2 hover:text-blue-700"><FaLinkedinIn /></Link>
+              <Link href="#" className="text-primary mx-2 hover:text-blue-700"><FaInstagram /></Link>
+              <Link href="#" className="text-primary mx-2 hover:text-blue-700"><FaYoutube /></Link>
             </div>
           </div>
 
@@ -145,10 +145,10 @@ const Blog = () => {
               <div className="flex">
                 <input
                   type="text"
-                  className="form-input px-4 py-3 rounded-l-lg w-full border-gray-300 focus:ring-purple-700 focus:border-purple-700"
+                  className="form-input px-4 py-3 rounded-l-lg w-full border-gray-300 focus:ring-primary focus:border-primary"
                   placeholder="Keyword"
                 />
-                <button className="bg-purple-700 text-white px-4 rounded-r-lg hover:bg-blue-600 transition-colors">
+                <button className="bg-primary text-white px-4 rounded-r-lg hover:bg-blue-600 transition-colors">
                   <FaSearch />
                 </button>
               </div>
@@ -162,11 +162,11 @@ const Blog = () => {
               <ul className="m-0">
                 {categories?.map((category, index) => (
                   <li key={index} className="mb-3 flex justify-between items-center">
-                    <Link href="#" className="text-gray-700 hover:text-purple-700 flex items-center">
-                      <FaAngleRight className="text-purple-700 mr-2" />
+                    <Link href="#" className="text-gray-700 hover:text-primary flex items-center">
+                      <FaAngleRight className="text-primary mr-2" />
                       {category.name}
                     </Link>
-                    <span className="bg-purple-700 text-white px-2 py-1 rounded-full text-xs">
+                    <span className="bg-primary text-white px-2 py-1 rounded-full text-xs">
                       {category.count}
                     </span>
                   </li>
@@ -192,7 +192,7 @@ const Blog = () => {
                   className="w-24 h-24 object-cover"
                 />
                 <div className="pl-3 p-2">
-                  <h6 className="text-gray-800 hover:text-purple-700 m-1 text-sm">{post.title}</h6>
+                  <h6 className="text-gray-800 hover:text-primary m-1 text-sm">{post.title}</h6>
                   <small className="text-gray-500">{post.date}</small>
                 </div>
               </Link>
@@ -207,7 +207,7 @@ const Blog = () => {
                 <Link
                   key={index}
                   href="#"
-                  className="bg-gray-100 hover:bg-purple-700 hover:text-white text-gray-700 px-3 py-1 m-1 rounded-md transition-colors"
+                  className="bg-gray-100 hover:bg-primary hover:text-white text-gray-700 px-3 py-1 m-1 rounded-md transition-colors"
                 >
                   {tag}
                 </Link>

@@ -121,7 +121,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Star className="h-6 w-6 text-purple-700" />
+              <Star className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Verified Experiences</h3>
             <p className="text-muted-foreground">
@@ -130,14 +130,14 @@ export default function Home() {
           </div>
           <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Calendar className="h-6 w-6 text-purple-700" />
+              <Calendar className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Instant Booking</h3>
             <p className="text-muted-foreground">Book activities instantly with our secure and easy-to-use platform</p>
           </div>
           <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Users className="h-6 w-6 text-purple-700" />
+              <Users className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Local Connections</h3>
             <p className="text-muted-foreground">Connect with local hosts who share their passion and expertise</p>

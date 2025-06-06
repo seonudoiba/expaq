@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { useParams } from "next/navigation"
-import { Calendar, MapPin, Clock, Users, Star, Heart } from "lucide-react"
+import { Clock, Users, Star, Heart, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -214,3 +214,34 @@ export default function ActivityDetailsPage() {
     </div>
   )
 } 
+
+      //  {/* Is Featured */}
+      //       <div>
+      //         <Label htmlFor="isFeatured">Is Featured</Label>
+      //         <select
+      //           id="isFeatured"
+      //           {...register("isFeatured")}
+      //           required
+      //           className="w-full p-2 border rounded-md"
+      //         >
+      //           <option value="">Select an option</option>
+      //           <option value="true">Yes</option>
+      //           <option value="false">No</option>
+      //         </select>
+      //         {errors.isFeatured && <p className="text-red-500">{errors.isFeatured.message}</p>}
+      //       </div>
+  
+
+        // <div>
+        //               <Label htmlFor="capacity">Capacity</Label>
+        //               <Input
+        //                 id="capacity"
+        //                 type="number"
+        //                 {...register("capacity", { valueAsNumber: true })}
+        //                 required
+        //                 min="1"
+        //                 placeholder="Enter capacity"
+        //                 className="pl-10"
+        //               />
+        //               {errors.capacity && <p className="text-red-500">{errors.capacity.message}</p>}
+        //             </div>

@@ -58,7 +58,7 @@ const {
   return (
     <div className="container py-12 px-4 w-11/12 mx-auto">
       <div className="text-center mb-8">
-        <h6 className="text-purple-700 uppercase tracking-widest">Guides</h6>
+        <h6 className="text-primary uppercase tracking-widest">Guides</h6>
         <h1 className="text-4xl font-bold">Our Travel Guides</h1>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -68,16 +68,16 @@ const {
               <Image width={300} height={400} className="w-full" src={host.profilePictureUrl} alt={host.firstName} />
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition duration-300">
                 <div className="flex space-x-4">
-                  <Link href="#" className="text-white hover:text-purple-700">
+                  <Link href="#" className="text-white hover:text-primary">
                     <i className="fab fa-twitter"></i>
                   </Link>
-                  <Link href="#" className="text-white hover:text-purple-700">
+                  <Link href="#" className="text-white hover:text-primary">
                     <i className="fab fa-facebook-f"></i>
                   </Link>
-                  <Link href="#" className="text-white hover:text-purple-700">
+                  <Link href="#" className="text-white hover:text-primary">
                     <i className="fab fa-instagram"></i>
                   </Link>
-                  <Link href="#" className="text-white hover:text-purple-700">
+                  <Link href="#" className="text-white hover:text-primary">
                     <i className="fab fa-linkedin-in"></i>
                   </Link>
                 </div>

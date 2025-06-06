@@ -1,9 +1,9 @@
-import { get } from 'http';
 import { apiClient } from './client';
 import type {
   Activity,
   AuthResponse,
   CreateActivityRequest,
+  UpdateActivityRequest,
   CreateReviewRequest,
   LoginRequest,
   RegisterRequest,
@@ -20,7 +20,6 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     try {
       tokenObject = JSON.parse(token);
-      console.log('Parsed token:', tokenObject.state.token); // Log the parsed token for debugging
       tokenObject = tokenObject.state.token; // Assuming the token is stored in state.token
     } catch (error) {
       console.error('Failed to parse token:', error);
@@ -35,12 +34,12 @@ apiClient.interceptors.request.use((config) => {
 // Auth Services
 export const authService = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/api/auth/login', data);
+    const response = await apiClient.post<AuthResponse>('/api/login', data);
     return response.data;
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
+    const response = await apiClient.post<AuthResponse>('/api/register', data);
     return response.data;
   },
   // becomeHost: async (data: becomeHostRequest): Promise<AuthResponse> => {
@@ -116,7 +115,7 @@ export const activityService = {
     return response.data;
   },
 
-  update: async (id: string, data: Partial<CreateActivityRequest>): Promise<Activity> => {
+  update: async (id: string, data: Partial<UpdateActivityRequest>): Promise<Activity> => {
     const response = await apiClient.put<Activity>(`/api/activities/${id}`, data);
     return response.data;
   },
@@ -234,18 +233,23 @@ export const geocodingService = {
 };
 
 export const uploadActivityImages = async (activityId: string, images: File[]) => {
-  const formData = new FormData();
-  images.forEach((image) => formData.append("images", image));
+  console.log('Uploading images for activity:', activityId, 'Images:', images);
 
-  const response = await apiClient.post(
-    `/api/activities/${activityId}/images`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
+  const uploadPromises = images.map((image) => {
+    const formData = new FormData();
+    formData.append("file", image);
 
-  return response.data;
+    return apiClient.post(
+      `/api/activities/${activityId}/images`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  });
+
+  const responses = await Promise.all(uploadPromises);
+  return responses.map((response) => response.data);
 };

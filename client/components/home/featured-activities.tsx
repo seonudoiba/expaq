@@ -88,7 +88,7 @@ export function FeaturedActivities() {
                 className="object-cover transition-transform group-hover:scale-105"
               />
               <Badge className="absolute top-3 left-3 z-10">
-                {activity.category}
+                {activity.activityType.name}
               </Badge>
             </div>
             <CardContent className="p-4">

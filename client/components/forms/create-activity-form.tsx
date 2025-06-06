@@ -14,7 +14,6 @@ const createActivitySchema = z.object({
   description: z.string().min(10, 'Description must be at least 10 characters'),
   location: z.string().min(3, 'Location must be at least 3 characters'),
   price: z.number().min(0, 'Price must be greater than or equal to 0'),
-  category: z.string().min(1, 'Category is required'),
   maxParticipants: z.number().min(1, 'Max participants must be at least 1'),
   startDate: z.string().min(1, 'Start date is required'),
   endDate: z.string().min(1, 'End date is required'),
@@ -165,29 +164,6 @@ export function CreateActivityForm() {
             </p>
           )}
         </div>
-      </div>
-
-      <div>
-        <label
-          htmlFor="category"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Category
-        </label>
-        <select
-          {...register('category')}
-          id="category"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-        >
-          <option value="">Select a category</option>
-          <option value="outdoor">Outdoor</option>
-          <option value="indoor">Indoor</option>
-          <option value="sports">Sports</option>
-          <option value="cultural">Cultural</option>
-        </select>
-        {errors.category && (
-          <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>
-        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">

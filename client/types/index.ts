@@ -75,7 +75,7 @@ export interface Activity {
   price: number;
   latitude: number;
   longitude: number;
-  activityType: string;
+  activityType: activityType;
   schedule: Schedule;
   mediaUrls: string[];
   maxParticipants: number;
@@ -91,8 +91,8 @@ export interface Activity {
   endDate: string;
   locationPoint: string;
   address: string;
-  city: Location;
-  country: Location;
+  city: City;
+  country: Country;
 }
 
 export interface Review {
@@ -184,28 +184,69 @@ export interface becomeHostRequest {
 export interface CreateActivityRequest {
   title: string;
   description: string;
-  location: string;
   price: number;
-  category: string;
-  maxParticipants: number;
-  startDate: string;
-  endDate: string;
   latitude: number;
   longitude: number;
-  cityId: string;
-  countryId: string;
-  activityTypeId: string;
+  startDate: string;
+  endDate: string;
   schedule: {
+    startDate: string;
+    endDate: string;
     startTime: string;
     daysOfWeek: string[];
   };
+  maxParticipants: number;
+  // capacity: number;
+  bookedCapacity: number;
+  address: string;
+  // isFeatured: boolean;
+  city: {
+    id: string;
+  };
+  country: {
+    id: string;
+  };
+  activityType: {
+    id: string;
+  };
+  minParticipants: number;
+  durationMinutes: number;
+}
+export interface UpdateActivityRequest {
+  title: string;
+  description: string;
+  price: number;
+  latitude: number;
+  longitude: number;
+  schedule: {
+    startDate: string;
+    endDate: string;
+    startTime: string;
+    daysOfWeek: string[];
+  };
+  maxParticipants: number;
   capacity: number;
   bookedCapacity: number;
   address: string;
   isFeatured: boolean;
+  city: {
+    id: string;
+  };
+  country: {
+    id: string;
+  };
+  activityType: {
+    id: string;
+  };
   minParticipants: number;
   durationMinutes: number;
   isActive: boolean;
+  isVerified: boolean;
+  mediaUrls: string[];
+  locationPoint: string;
+  startDate: string;
+  endDate: string;
+
 }
 
 export interface CreateReviewRequest {
