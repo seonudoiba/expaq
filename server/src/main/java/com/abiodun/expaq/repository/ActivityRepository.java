@@ -3,7 +3,6 @@ package com.abiodun.expaq.repository;
 import com.abiodun.expaq.dto.ActivityDTO;
 import com.abiodun.expaq.dto.LocationStatsDTO;
 import com.abiodun.expaq.model.Activity;
-import com.abiodun.expaq.model.Activity.ActivityCategory;
 import com.abiodun.expaq.model.ActivityType;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
@@ -28,8 +27,6 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     // Find activities by host ID
     List<Activity> findByHostId(UUID hostId);
 
-    // Find activities by category
-    List<Activity> findByActivityType(ActivityType activityType);
     
     // Search and filter methods
     @Query("SELECT a FROM Activity a WHERE " +
@@ -72,8 +69,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
 
     Page<Activity> findByHostId(UUID hostId, Pageable pageable);
     
-    Page<Activity> findByCategory(ActivityCategory category, Pageable pageable);
-    
+
     Page<Activity> findByIsActiveTrue(Pageable pageable);
     
     Page<Activity> findByIsVerifiedTrue(Pageable pageable);
@@ -90,9 +86,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
                                                 @Param("distance") double distance, 
                                                 Pageable pageable);
     
-    @Query("SELECT a FROM Activity a WHERE a.isActive = true AND a.isVerified = true AND a.host.id = :hostId AND a.category = :category")
-    Page<Activity> findByHostAndCategory(@Param("hostId") UUID hostId, @Param("category") ActivityCategory category, Pageable pageable);
-    
+
 //    @Query("SELECT a FROM Activity a WHERE a.isActive = true AND a.isVerified = true AND LOWER(a.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(a.description) LIKE LOWER(CONCAT('%', :query, '%'))")
 //    Page<Activity> searchActivities(@Param("query") String query, Pageable pageable);
     

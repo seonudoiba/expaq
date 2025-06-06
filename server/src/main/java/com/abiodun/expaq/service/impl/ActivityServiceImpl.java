@@ -2,12 +2,10 @@ package com.abiodun.expaq.service.impl;
 
 import com.abiodun.expaq.dto.ActivityDTO;
 import com.abiodun.expaq.dto.CreateActivityRequest;
-import com.abiodun.expaq.dto.LocationStatsDTO;
 import com.abiodun.expaq.dto.UpdateActivityRequest;
 import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.model.Activity;
-import com.abiodun.expaq.model.Activity.ActivityCategory;
 import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.repository.ActivityRepository;
@@ -34,6 +32,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.abiodun.expaq.exception.ServiceException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Service
 @RequiredArgsConstructor
@@ -46,87 +45,315 @@ public class ActivityServiceImpl implements IActivityService {
     private final GeometryFactory geometryFactory = new GeometryFactory();
     private static final String folder = "activities";
 
+    private static final Logger logger = LoggerFactory.getLogger(ActivityServiceImpl.class);;
 
     @Override
     @Transactional
     public ActivityDTO createActivity(CreateActivityRequest request, UUID hostId) {
+        String operation = "createActivity";
+        logger.debug(String.valueOf(request));
+
         try {
+            // Validate input parameters
+            if (request == null) {
+                String error = "CreateActivityRequest cannot be null - request body is missing or malformed";
+                logger.error("{} - Validation Error: {}", operation, error);
+                throw new IllegalArgumentException(error);
+            }
+
+            // Log the incoming request for debugging
+            try {
+                logger.debug("{} - Received request: title={}, activityType={},  " +
+                                "price={}, minParticipants={}, maxParticipants={}, startDate={}, endDate={}, durationMinutes={}, " +
+                                "latitude={}, longitude={}, address={}, city={}, country={}",
+                        operation, request.getTitle(), request.getActivityType(),
+                        request.getStartDate(), request.getEndDate(),
+                        request.getPrice(),
+                        request.getMinParticipants(), request.getMaxParticipants(),
+                        request.getDurationMinutes(), request.getLatitude(),
+                        request.getLongitude(), request.getAddress(),
+                        request.getCity(), request.getCountry());
+            } catch (Exception e) {
+                logger.warn("{} - Could not log request details due to potential JSON parsing issues: {}",
+                        operation, e.getMessage());
+            }
+
+            if (hostId == null) {
+                String error = "Host ID cannot be null";
+                logger.error("{} - Validation Error: {}", operation, error);
+                throw new IllegalArgumentException(error);
+            }
+
+            logger.info("{} - Starting activity creation for hostId: {}", operation, hostId);
+            logger.info(" request.getEndDate(): {}", request.getEndDate());
+
             // Validate that the host exists
-            User host = userRepository.findById(hostId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Host not found with ID: " + hostId));
+            User host;
+            try {
+                host = userRepository.findById(hostId)
+                        .orElseThrow(() -> {
+                            String error = "Host not found with ID: " + hostId;
+                            logger.error("{} - Database Error: {}", operation, error);
+                            return new ResourceNotFoundException(error);
+                        });
+                logger.debug("{} - Host found: {}", operation, host.getId());
+            } catch (Exception e) {
+                String error = "Database error while fetching host with ID: " + hostId;
+                logger.error("{} - Database Error: {} - Exception: {}", operation, error, e.getMessage(), e);
+                throw new RuntimeException(error, e);
+            }
 
             // Validate that the host has the HOST role
-            boolean isHost = host.getRoles().stream()
-                    .anyMatch(role -> role.getName().equals("HOST") || role.getName().equals("ROLE_HOST"));
-            if (!isHost) {
-                throw new UnauthorizedException("User does not have HOST privileges");
+            try {
+                boolean isHost = host.getRoles().stream()
+                        .anyMatch(role -> role.getName().equals("HOST") || role.getName().equals("ROLE_HOST"));
+                if (!isHost) {
+                    String error = "User " + hostId + " does not have HOST privileges. Current roles: " +
+                            host.getRoles().stream().map(role -> role.getName()).collect(Collectors.joining(", "));
+                    logger.error("{} - Authorization Error: {}", operation, error);
+                    throw new UnauthorizedException(error);
+                }
+                logger.debug("{} - Host authorization validated", operation);
+            } catch (UnauthorizedException e) {
+                throw e;
+            } catch (Exception e) {
+                String error = "Error validating host roles for user: " + hostId;
+                logger.error("{} - Role Validation Error: {} - Exception: {}", operation, error, e.getMessage(), e);
+                throw new RuntimeException(error, e);
             }
 
+            // Validate request data
+            validateActivityRequest(request, operation);
+
+            // Create Point for location
+            Point location;
             try {
-                // Create Point for location
-                Point location = geometryFactory.createPoint(
+                if (request.getLongitude() == null || request.getLatitude() == null) {
+                    String error = "Longitude and latitude are required for location";
+                    logger.error("{} - Location Validation Error: {}", operation, error);
+                    throw new IllegalArgumentException(error);
+                }
+
+                location = geometryFactory.createPoint(
                         new Coordinate(request.getLongitude(), request.getLatitude())
                 );
-
-                // Create activity with validation
-                Activity activity = new Activity();
-                activity.setTitle(request.getTitle());
-                activity.setDescription(request.getDescription());
-                activity.setLocation(String.valueOf(location));
-                activity.setLocationPoint(location);
-                activity.setPrice(request.getPrice());
-                activity.setStartDate(request.getStartDate());
-                activity.setEndDate(request.getEndDate());
-
-                // Validate activity category
-                try {
-                    activity.setActivityType(request.getActivityType());
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid activity activity type: " + request.getActivityType() +
-                            ". Valid categories are: " + String.join(", ",
-                            Arrays.stream(Activity.ActivityCategory.values())
-                                    .map(Enum::name)
-                                    .collect(Collectors.toList())));
-                }
-                activity.setBookedCapacity(0);
-
-                // Set address fields
-                activity.setAddress(request.getAddress());
-                activity.setCity(request.getCity());
-                activity.setCountry(request.getCountry());
-
-                // Set schedule with validation
-                if (request.getSchedule() == null) {
-                    throw new IllegalArgumentException("Activity schedule is required");
-                }
-                activity.setSchedule(request.getSchedule());
-
-                // Set host and default values
-                activity.setHost(host);
-                activity.setActive(true);
-                activity.setIsFeatured( false);
-                activity.setMinParticipants(request.getMinParticipants());
-                activity.setMaxParticipants(request.getMaxParticipants());
-                activity.setDurationMinutes(request.getDurationMinutes());
-                // Convert minutes to hours for the duration field
-                activity.setDuration((int) Math.ceil(request.getDurationMinutes() / 60.0));
-
-                // Save activity
-                activity = activityRepository.save(activity);
-
-                return ActivityDTO.fromActivity(activity);
-
+                logger.debug("{} - Location point created: lat={}, lng={}", operation,
+                        request.getLatitude(), request.getLongitude());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid activity data: " + e.getMessage());
+                throw e;
             } catch (Exception e) {
-                throw new RuntimeException("Error creating activity: " + e.getMessage(), e);
+                String error = "Error creating location point with coordinates: lat=" +
+                        request.getLatitude() + ", lng=" + request.getLongitude();
+                logger.error("{} - Geometry Error: {} - Exception: {}", operation, error, e.getMessage(), e);
+                throw new RuntimeException(error, e);
             }
-        } catch (ResourceNotFoundException | UnauthorizedException e) {
-            throw e; // Let these pass through unchanged
+
+            // Create and populate activity
+            Activity activity;
+            try {
+                activity = createActivityEntity(request, host, location, operation);
+                logger.debug("{} - Activity entity created successfully", operation);
+            } catch (IllegalArgumentException e) {
+                throw e;
+            } catch (Exception e) {
+                String error = "Error creating activity entity";
+                logger.error("{} - Entity Creation Error: {} - Exception: {}", operation, error, e.getMessage(), e);
+                throw new RuntimeException(error, e);
+            }
+            if (request.getDurationMinutes() == null) {
+                throw new IllegalArgumentException("Duration must not be null");
+            }
+
+            // Save activity to database
+            try {
+                activity = activityRepository.save(activity);
+                logger.info("{} - Activity saved successfully with ID: {}", operation, activity.getId());
+            } catch (DataIntegrityViolationException e) {
+                String error = "Data integrity violation while saving activity. Possible duplicate or constraint violation";
+                logger.error("{} - Database Constraint Error: {} - Exception: {} ", operation, error, e.getMessage(), e );
+                logger.error("{} - Activity Details: {}", operation, activity);
+                throw new RuntimeException(error, e);
+            } catch (Exception e) {
+                String error = "Database error while saving activity";
+                logger.error("{} - Database Save Error: {} - Exception: {}", operation, error, e.getMessage(), e);
+                throw new RuntimeException(error, e);
+            }
+
+            // Convert to DTO
+            try {
+                ActivityDTO dto = ActivityDTO.fromActivity(activity);
+                logger.info("{} - Activity creation completed successfully. Activity ID: {}", operation, activity.getId());
+                return dto;
+            } catch (Exception e) {
+                String error = "Error converting activity to DTO for activity ID: " + activity.getId();
+                logger.error("{} - DTO Conversion Error: {} - Exception: {}", operation, error, e.getMessage(), e);
+                throw new RuntimeException(error, e);
+            }
+
+        }  catch (Exception e) {
+            String error = "Unexpected error during activity creation for hostId: " + hostId;
+            logger.error("{} - Unexpected Error: {} - Exception: {}", operation, error, e.getMessage(), e);
+            throw new RuntimeException(error, e);
+        }
+
+
+    }
+
+    // PRIVATE HELPER METHODS - ADD THESE TO THE SAME SERVICE CLASS
+    private void validateActivityRequest(CreateActivityRequest request, String operation) {
+        List<String> errors = new ArrayList<>();
+        List<String> jsonErrors = new ArrayList<>();
+
+        try {
+            // String fields validation
+            try {
+                String title = request.getTitle();
+                if (title == null || title.trim().isEmpty()) {
+                    errors.add("Activity title is required and cannot be empty");
+                } else if (title.length() > 200) {
+                    errors.add("Activity title cannot exceed 200 characters");
+                }
+            } catch (Exception e) {
+                jsonErrors.add("Error accessing 'title' field: " + e.getMessage() + " - Expected: string");
+            }
+
+            // Add other validations here (price, dates, coordinates, etc.)
+            // ... (rest of validation logic from previous artifact)
+
         } catch (Exception e) {
-            throw new RuntimeException("Unexpected error creating activity", e);
+            jsonErrors.add("General JSON parsing error: " + e.getMessage());
+        }
+
+        if (!jsonErrors.isEmpty()) {
+            String jsonErrorMessage = "JSON parsing/mapping errors detected: " + String.join("; ", jsonErrors);
+            logger.error("{} - JSON Errors: {}", operation, jsonErrorMessage);
+            throw new IllegalArgumentException(jsonErrorMessage);
+        }
+
+        if (!errors.isEmpty()) {
+            String errorMessage = "Activity validation failed: " + String.join("; ", errors);
+            logger.error("{} - Validation Errors: {}", operation, errorMessage);
+            throw new IllegalArgumentException(errorMessage);
         }
     }
+
+    private Activity createActivityEntity(CreateActivityRequest request, User host, Point location, String operation) {
+        try {
+            Activity activity = new Activity();
+            activity.setTitle(request.getTitle().trim());
+            activity.setDescription(request.getDescription().trim());
+            activity.setLocation(String.valueOf(location));
+            activity.setLocationPoint(location);
+            activity.setPrice(request.getPrice());
+            activity.setStartDate(request.getStartDate());
+            activity.setEndDate(request.getEndDate());
+            activity.setActivityType(request.getActivityType());
+            activity.setBookedCapacity(0);
+            activity.setAddress(request.getAddress().trim());
+            activity.setCity(request.getCity());
+            activity.setCountry(request.getCountry());
+            activity.setSchedule(request.getSchedule());
+            activity.setHost(host);
+            activity.setActive(true);
+            activity.setIsFeatured(false);
+            activity.setMinParticipants(request.getMinParticipants());
+            activity.setMaxParticipants(request.getMaxParticipants());
+            activity.setDurationMinutes(request.getDurationMinutes());
+//            activity.setDuration((int) Math.ceil(request.getDurationMinutes() / 60.0));
+
+            logger.debug("{} - Activity entity populated successfully", operation);
+            return activity;
+
+        } catch (Exception e) {
+            String error = "Error populating activity entity fields";
+            logger.error("{} - Entity Population Error: {} - Exception: {}", operation, error, e.getMessage(), e);
+            throw new RuntimeException(error, e);
+        }
+    }
+
+//    @Override
+//    @Transactional
+//    public ActivityDTO createActivity(CreateActivityRequest request, UUID hostId) {
+//        try {
+//            // Validate that the host exists
+//            User host = userRepository.findById(hostId)
+//                    .orElseThrow(() -> new ResourceNotFoundException("Host not found with ID: " + hostId));
+//
+//            // Validate that the host has the HOST role
+//            boolean isHost = host.getRoles().stream()
+//                    .anyMatch(role -> role.getName().equals("HOST") || role.getName().equals("ROLE_HOST"));
+//            if (!isHost) {
+//                throw new UnauthorizedException("User does not have HOST privileges");
+//            }
+//
+//            try {
+//                // Create Point for location
+//                Point location = geometryFactory.createPoint(
+//                        new Coordinate(request.getLongitude(), request.getLatitude())
+//                );
+//
+//                // Create activity with validation
+//                Activity activity = new Activity();
+//                activity.setTitle(request.getTitle());
+//                activity.setDescription(request.getDescription());
+//                activity.setLocation(String.valueOf(location));
+//                activity.setLocationPoint(location);
+//                activity.setPrice(request.getPrice());
+//                activity.setStartDate(request.getStartDate());
+//                activity.setEndDate(request.getEndDate());
+//
+//
+//                // Validate activity category
+//                try {
+//                    activity.setActivityType(request.getActivityType());
+//                } catch (IllegalArgumentException e) {
+//                    throw new IllegalArgumentException("Invalid activity activity type: " + request.getActivityType() +
+//                            ". Valid categories are: " + String.join(", ",
+//                            Arrays.stream(Activity.ActivityCategory.values())
+//                                    .map(Enum::name)
+//                                    .collect(Collectors.toList())));
+//                }
+//                activity.setBookedCapacity(0);
+//
+//                // Set address fields
+//                activity.setAddress(request.getAddress());
+//                activity.setCity(request.getCity());
+//                activity.setCountry(request.getCountry());
+//
+//                // Set schedule with validation
+//                if (request.getSchedule() == null) {
+//                    throw new IllegalArgumentException("Activity schedule is required");
+//                }
+//                activity.setSchedule(request.getSchedule());
+//
+//                // Set host and default values
+//                activity.setHost(host);
+//                activity.setActive(true);
+//                activity.setIsFeatured( false);
+//                activity.setMinParticipants(request.getMinParticipants());
+//                activity.setMaxParticipants(request.getMaxParticipants());
+//                activity.setDurationMinutes(request.getDurationMinutes());
+//                // Convert minutes to hours for the duration field
+//                activity.setDuration((int) Math.ceil(request.getDurationMinutes() / 60.0));
+//
+//                // Save activity
+//                activity = activityRepository.save(activity);
+//
+//                return ActivityDTO.fromActivity(activity);
+//
+//            } catch (IllegalArgumentException e) {
+//                throw new IllegalArgumentException("Invalid activity data: " + e.getMessage());
+//            } catch (Exception e) {
+//                throw new RuntimeException("Error creating activity: " + e.getMessage(), e);
+//            }
+//        } catch (ResourceNotFoundException | UnauthorizedException e) {
+//            throw e; // Let these pass through unchanged
+//        } catch (Exception e) {
+//            throw new RuntimeException("Unexpected error creating activity", e);
+//        }
+//    }
+
+
     @Transactional
     @Override
     public ActivityDTO updateActivity(UUID activityId, UpdateActivityRequest request, UUID hostId) {
@@ -158,8 +385,8 @@ public class ActivityServiceImpl implements IActivityService {
         if (request.getSchedule() != null) activity.setSchedule(request.getSchedule());
         if (request.getIsActive() != null) activity.setActive(request.getIsActive()); // Changed from getIsActive
         if (request.getIsFeatured() != null) activity.setIsFeatured(request.getIsFeatured()); // Changed from getIsFeatured
-        if (request.getStartDate() != null) activity.setStartDate(request.getStartDate());
-        if (request.getEndDate() != null) activity.setEndDate(request.getEndDate());
+//        if (request.getStartDate() != null) activity.setStartDate(request.getStartDate());
+//        if (request.getEndDate() != null) activity.setEndDate(request.getEndDate());
         // Save activity
         activity = activityRepository.save(activity);
 
@@ -325,7 +552,15 @@ public class ActivityServiceImpl implements IActivityService {
         imageUrl = "https://res.cloudinary.com/do0rdj8oj/image/upload/v1747010925/" + imageUrl;
         // Add image URL to activity
         activity.getMediaUrls().add(imageUrl);
+
         activity = activityRepository.save(activity);
+
+
+        // Set activity to active when the first image is added
+        if (!activity.isActive() && !activity.getMediaUrls().isEmpty()) {
+            activity.setActive(true);
+            log.info("Activity {} activated after image upload", activityId);
+        }
 
         return ActivityDTO.fromActivity(activity);
     }

@@ -35,14 +35,11 @@ public class Activity {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(nullable = false)
+    @Column()
     private String location;
 
     @Column(nullable = false)
-    private Integer duration; // in hours
-
-    @Column(nullable = false)
-    private boolean isActive = true;
+    private boolean isActive = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id", nullable = false)
@@ -66,8 +63,8 @@ public class Activity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @Enumerated(EnumType.STRING)
-    private ActivityCategory category;
+//    @Enumerated(EnumType.STRING)
+//    private ActivityCategory category;
 
 //    @Column(nullable = false)
     private Boolean isFeatured;

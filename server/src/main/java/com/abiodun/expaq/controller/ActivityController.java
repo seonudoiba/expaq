@@ -24,7 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -36,7 +38,7 @@ import java.util.UUID;
 public class ActivityController {
 
     private final IActivityService activityService;
-    private static final Logger log = LoggerFactory.getLogger(ActivityController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActivityController.class);
 
 //    @Autowired
 //    public ActivityController(IActivityService activityService) {
@@ -89,20 +91,73 @@ public class ActivityController {
     public ResponseEntity<ActivityDTO> createActivity(
             @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @Valid @RequestBody CreateActivityRequest request) {
-        log.info("Creating activity with user: {} and authorities: {}", 
+        logger.info("Creating activity with user: {} and authorities: {}",
             currentUser.getUsername(), 
             currentUser.getAuthorities());
 
         // Check if user has HOST role
         boolean hasHostRole = currentUser.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_HOST") || auth.getAuthority().equals("HOST"));
-        log.info("User has HOST role: {}", hasHostRole);
+        logger.info("User has HOST role: {}", hasHostRole);
         if (!hasHostRole) {
             throw new UnauthorizedException("User does not have HOST privileges");
         }
         
         UUID hostId = currentUser.getId();
         return ResponseEntity.ok(activityService.createActivity(request, hostId));
+    }
+
+    @PostMapping("/activities")
+    public ResponseEntity<ActivityDTO> createActivity(
+            @Valid @RequestBody CreateActivityRequest request,
+            @RequestHeader("X-User-ID") UUID hostId) {
+
+        String operation = "createActivity_Controller";
+
+        try {
+            logger.info("{} - Received request to create activity for hostId: {}", operation, hostId);
+
+            // Additional JSON structure validation at controller level
+            validateJsonStructure(request, operation);
+
+            ActivityDTO activity = activityService.createActivity(request, hostId);
+            logger.info("{} - Activity created successfully with ID: {}", operation, activity.getId());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(activity);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("{} - Validation Error: {}", operation, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            logger.error("{} - Unexpected Error: {}", operation, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // PRIVATE HELPER METHOD - ADD TO CONTROLLER
+    private void validateJsonStructure(CreateActivityRequest request, String operation) {
+        List<String> structureErrors = new ArrayList<>();
+
+        try {
+            Field[] fields = CreateActivityRequest.class.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                try {
+                    Object value = field.get(request);
+                    logger.debug("{} - Field '{}' has value: {}", operation, field.getName(), value);
+                } catch (Exception e) {
+                    structureErrors.add("Error accessing field '" + field.getName() + "': " + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            structureErrors.add("Error validating JSON structure: " + e.getMessage());
+        }
+
+        if (!structureErrors.isEmpty()) {
+            String errorMessage = "JSON structure validation failed: " + String.join("; ", structureErrors);
+            logger.error("{} - Structure Validation Errors: {}", operation, errorMessage);
+            throw new IllegalArgumentException(errorMessage);
+        }
     }
 
     // PUT /activities/{id} - Update activity (host only, owner only)

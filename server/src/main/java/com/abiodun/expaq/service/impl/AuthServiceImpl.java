@@ -325,36 +325,23 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     public UserDTO becomeHost(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // Check if user is already a host
+        // Check if user is the host
         boolean isHost = user.getRoles().stream()
                 .anyMatch(role -> "HOST".equals(role.getName()));
-
         if (!isHost) {
-            try {
+            try{
                 Role hostRole = roleRepository.findByName("HOST");
-                if (hostRole == null) {
-                    throw new RoleNotFoundException("HOST role not found in the database");
-                }
                 // Set the HOST role to the user
-                user.getRoles().add(hostRole); // Assuming roles is a Set or Collection
-
-                userRepository.save(user); // Save the updated user with new role
-
-            } catch (RoleNotFoundException e) {
-                throw e; // Re-throw RoleNotFoundException to handle it appropriately
+                user.setRoles(Collections.singleton(hostRole));
             } catch (Exception e) {
-                throw new RuntimeException("Failed to assign HOST role to user", e);
+                throw  new RoleNotFoundException("HOST  role not found in the database");
             }
         } else {
             throw new UnauthorizedException("User is already a host");
         }
-
-        // Mapping user to DTO to return
         UserDTO userDto = mapToUserDTO(user);
-
         return userDto;
     }
 

@@ -31,4 +31,6 @@ server/build/
 
 ### VS Code ###
 server/.vscode/
+
 server/src/main/resources/application.properties
+

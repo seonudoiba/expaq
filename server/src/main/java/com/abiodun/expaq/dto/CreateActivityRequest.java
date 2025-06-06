@@ -2,10 +2,10 @@ package com.abiodun.expaq.dto;
 
 import com.abiodun.expaq.model.Activity.ActivityCategory;
 import com.abiodun.expaq.model.ActivitySchedule;
-
 import com.abiodun.expaq.model.ActivityType;
 import com.abiodun.expaq.model.City;
 import com.abiodun.expaq.model.Country;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -39,9 +39,6 @@ public class CreateActivityRequest {
     @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
     private Double longitude;
 
-//    @NotNull(message = "Category is required")
-//    private ActivityCategory category;
-
     @Valid
     @NotNull(message = "Schedule is required")
     private ActivitySchedule schedule;
@@ -50,19 +47,15 @@ public class CreateActivityRequest {
     @Min(value = 1, message = "Maximum participants must be at least 1")
     private Integer maxParticipants;
 
-//    @NotNull(message = "Capacity should ")
-//    @Min(value = 1, message = "Maximum participants must be at least 1")
-//    private Integer capacity;
     private Integer bookedCapacity;
 
-    @NotEmpty( message = " Address is required")
+    @NotEmpty(message = "Address is required")
     private String address;
 
-
-    @NotNull( message = " City is required")
+    @NotNull(message = "City is required")
     private City city;
 
-    @NotNull( message = " Country is required")
+    @NotNull(message = "Country is required")
     private Country country;
 
     @NotNull(message = "Type is required")
@@ -77,6 +70,9 @@ public class CreateActivityRequest {
     @Max(value = 1440, message = "Duration cannot exceed 24 hours (1440 minutes)")
     private Integer durationMinutes;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endDate;
-} 
+}
