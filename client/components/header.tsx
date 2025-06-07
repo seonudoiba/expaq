@@ -185,7 +185,7 @@ export function Header() {  const isMobile = useMobile();
               <Link href="/login">
                 <Button variant="outline">Log in</Button>
               </Link>
-              <Link href="/signup">
+              <Link href="/register">
                 <Button>Sign up</Button>
               </Link>
             </>
@@ -282,7 +282,7 @@ export function Header() {  const isMobile = useMobile();
                             <LogIn className="mr-2 h-4 w-4" /> Log in
                           </Button>
                         </Link>
-                        <Link href="/signup">
+                        <Link href="/register">
                           <Button className="w-full">Sign up</Button>
                         </Link>
                       </div>
