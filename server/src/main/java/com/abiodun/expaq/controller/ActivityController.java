@@ -63,6 +63,7 @@ public class ActivityController {
             spec = spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(root.get("type"), type));
         }
+        
 
         if (minPrice != null) {
             spec = spec.and((root, query, criteriaBuilder) ->

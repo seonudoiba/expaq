@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { activityService } from "@/lib/api/services"
+import { useQuery } from "@tanstack/react-query"
 
 export default function ActivityDetailsPage() {
   const params = useParams()
@@ -15,52 +17,21 @@ export default function ActivityDetailsPage() {
   const [participants, setParticipants] = useState(1)
 
   // This would be fetched from the API in a real application
-  const activity = {
-    id: params.id,
-    title: "City Tour Experience",
-    description: "Experience the vibrant city life with our expert guides. Visit iconic landmarks, hidden gems, and local hotspots while learning about the city's rich history and culture.",
-    location: "New York City",
-    duration: "3 hours",
-    maxParticipants: 10,
-    price: 75,
-    rating: 4.8,
-    reviewCount: 120,
-    images: [
-      "/img/activity-1.jpg",
-      "/img/activity-2.jpg",
-      "/img/activity-3.jpg",
-    ],
-    host: {
-      name: "John Doe",
-      avatar: "/img/guide-1.jpg",
-      rating: 4.9,
-      reviewCount: 250,
-    },
-    reviews: [
-      {
-        id: 1,
-        user: {
-          name: "Alice Smith",
-          avatar: "/img/user-1.jpg",
-        },
-        rating: 5,
-        comment: "Amazing experience! The guide was knowledgeable and friendly.",
-        date: "2024-03-15",
-      },
-      {
-        id: 2,
-        user: {
-          name: "Bob Johnson",
-          avatar: "/img/user-2.jpg",
-        },
-        rating: 4,
-        comment: "Great tour, but it was a bit rushed at some points.",
-        date: "2024-03-10",
-      },
-    ],
-  }
 
-  return (
+  const { data: activity, error, isLoading} = useQuery({
+    queryKey: ['activity'],
+    queryFn: () => activityService.getById(params.id as string),
+  });
+  if (error) {
+    return <div>Error loading activity details</div>
+  }
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+  if (!activity) {
+    return <div>Activity not found</div>
+  }
+ return (
     <div className="container mx-auto py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
@@ -68,7 +39,7 @@ export default function ActivityDetailsPage() {
           {/* Image Gallery */}
           <div className="relative h-[400px] rounded-lg overflow-hidden">
             <Image
-              src={activity.images[0]}
+              src={activity.mediaUrls[0]}
               alt={activity.title}
               fill
               className="object-cover"
@@ -87,11 +58,11 @@ export default function ActivityDetailsPage() {
             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <div className="flex items-center">
                 <MapPin className="h-4 w-4 mr-1" />
-                <span>{activity.location}</span>
+                <span>{activity.address + activity.city.name + ", " + activity.country.name }</span>
               </div>
               <div className="flex items-center">
                 <Clock className="h-4 w-4 mr-1" />
-                <span>{activity.duration}</span>
+                <span>{activity.durationMinutes/60 + "Hours"}</span>
               </div>
               <div className="flex items-center">
                 <Users className="h-4 w-4 mr-1" />
@@ -99,7 +70,7 @@ export default function ActivityDetailsPage() {
               </div>
               <div className="flex items-center">
                 <Star className="h-4 w-4 mr-1 text-yellow-400" />
-                <span>{activity.rating} ({activity.reviewCount} reviews)</span>
+                <span>{activity.averageRating} ({activity.totalReviews} reviews)</span>
               </div>
             </div>
 
@@ -108,14 +79,14 @@ export default function ActivityDetailsPage() {
               <CardContent className="p-4">
                 <div className="flex items-center space-x-4">
                   <Avatar>
-                    <AvatarImage src={activity.host.avatar} alt={activity.host.name} />
-                    <AvatarFallback>{activity.host.name[0]}</AvatarFallback>
+                    <AvatarImage src={activity.hostProfilePicture ?? undefined} alt={activity.hostName} />
+                    <AvatarFallback>{activity.hostName}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="font-semibold">{activity.host.name}</h3>
+                    <h3 className="font-semibold">{activity.hostName}</h3>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Star className="h-4 w-4 mr-1 text-yellow-400" />
-                      <span>{activity.host.rating} ({activity.host.reviewCount} reviews)</span>
+                      <span>{activity.averageRating} ({activity.totalReviews} reviews)</span>
                     </div>
                   </div>
                 </div>
@@ -134,7 +105,7 @@ export default function ActivityDetailsPage() {
               </TabsContent>
 
               <TabsContent value="reviews" className="space-y-4">
-                {activity.reviews.map((review) => (
+                {/* {activity.reviews.map((review) => (
                   <Card key={review.id}>
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-4 mb-2">
@@ -155,9 +126,65 @@ export default function ActivityDetailsPage() {
                       <p className="text-muted-foreground">{review.comment}</p>
                     </CardContent>
                   </Card>
-                ))}
+                ))} */}
               </TabsContent>
             </Tabs>
+
+            {/* Additional Activity Details */}
+            <div className="space-y-8">
+              <h2 className="text-2xl font-bold text-primary">Activity Details</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 border rounded-lg shadow-sm bg-white">
+                  <h3 className="text-lg font-semibold text-secondary">Host Information</h3>
+                  <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                    <li><strong>Host ID:</strong> {activity.hostId}</li>
+                    <li><strong>Host Name:</strong> {activity.hostName}</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 border rounded-lg shadow-sm bg-white">
+                  <h3 className="text-lg font-semibold text-secondary">Location</h3>
+                  <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                    <li><strong>Latitude:</strong> {activity.latitude}</li>
+                    <li><strong>Longitude:</strong> {activity.longitude}</li>
+                    <li><strong>City:</strong> {activity.city.name}</li>
+                    <li><strong>Country:</strong> {activity.country.name}</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 border rounded-lg shadow-sm bg-white">
+                  <h3 className="text-lg font-semibold text-secondary">Activity Type</h3>
+                  <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                    <li><strong>Type:</strong> {activity.activityType.name}</li>
+                    <li><strong>Image:</strong> <Image src={activity.activityType.image} alt={activity.activityType.name} width={64} height={64} className="rounded-md" /></li>
+                  </ul>
+                </div>
+
+                <div className="p-4 border rounded-lg shadow-sm bg-white">
+                  <h3 className="text-lg font-semibold text-secondary">Status</h3>
+                  <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                    <li><strong>Active:</strong> {activity.active ? 'Yes' : 'No'}</li>
+                    <li><strong>Verified:</strong> {activity.verified ? 'Yes' : 'No'}</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 border rounded-lg shadow-sm bg-white">
+                  <h3 className="text-lg font-semibold text-secondary">Participants</h3>
+                  <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                    <li><strong>Minimum Participants:</strong> {activity.minParticipants}</li>
+                    <li><strong>Maximum Participants:</strong> {activity.maxParticipants}</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 border rounded-lg shadow-sm bg-white">
+                  <h3 className="text-lg font-semibold text-secondary">Timestamps</h3>
+                  <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                    <li><strong>Created At:</strong> {new Date(activity.createdAt).toLocaleString()}</li>
+                    <li><strong>Updated At:</strong> {new Date(activity.updatedAt).toLocaleString()}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -213,35 +240,4 @@ export default function ActivityDetailsPage() {
       </div>
     </div>
   )
-} 
-
-      //  {/* Is Featured */}
-      //       <div>
-      //         <Label htmlFor="isFeatured">Is Featured</Label>
-      //         <select
-      //           id="isFeatured"
-      //           {...register("isFeatured")}
-      //           required
-      //           className="w-full p-2 border rounded-md"
-      //         >
-      //           <option value="">Select an option</option>
-      //           <option value="true">Yes</option>
-      //           <option value="false">No</option>
-      //         </select>
-      //         {errors.isFeatured && <p className="text-red-500">{errors.isFeatured.message}</p>}
-      //       </div>
-  
-
-        // <div>
-        //               <Label htmlFor="capacity">Capacity</Label>
-        //               <Input
-        //                 id="capacity"
-        //                 type="number"
-        //                 {...register("capacity", { valueAsNumber: true })}
-        //                 required
-        //                 min="1"
-        //                 placeholder="Enter capacity"
-        //                 className="pl-10"
-        //               />
-        //               {errors.capacity && <p className="text-red-500">{errors.capacity.message}</p>}
-        //             </div>
+}
