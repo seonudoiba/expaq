@@ -1,4 +1,4 @@
-import BarChartOne from "@/components/charts/bar/BarChartOne";
+import BarChartOne from "@/components/admin/charts/bar/BarChartOne";
 import ComponentCard from "@/components/admin/common/ComponentCard";
 import PageBreadcrumb from "@/components/admin/common/PageBreadCrumb";
 import { Metadata } from "next";

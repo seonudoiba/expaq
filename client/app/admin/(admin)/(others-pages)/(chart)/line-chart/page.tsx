@@ -1,4 +1,4 @@
-import LineChartOne from "@/components/charts/line/LineChartOne";
+import LineChartOne from "@/components/admin/charts/line/LineChartOne";
 import ComponentCard from "@/components/admin/common/ComponentCard";
 import PageBreadcrumb from "@/components/admin/common/PageBreadCrumb";
 import { Metadata } from "next";

@@ -1,6 +1,6 @@
 import ComponentCard from "@/components/admin/common/ComponentCard";
 import PageBreadcrumb from "@/components/admin/common/PageBreadCrumb";
-import BasicTableOne from "@/components/tables/BasicTableOne";
+import BasicTableOne from "@/components/admin/tables/BasicTableOne";
 import { Metadata } from "next";
 import React from "react";
 

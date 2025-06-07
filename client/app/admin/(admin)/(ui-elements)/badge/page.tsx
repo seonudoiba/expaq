@@ -1,5 +1,5 @@
 import PageBreadcrumb from "@/components/admin/common/PageBreadCrumb";
-import Badge from "@/components/ui/badge/Badge";
+import Badge from "@/components/admin/ui/badge/Badge";
 import { PlusIcon } from "@/icons";
 import { Metadata } from "next";
 import React from "react";

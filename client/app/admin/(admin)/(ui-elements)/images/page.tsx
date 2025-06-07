@@ -1,8 +1,8 @@
 import ComponentCard from "@/components/admin/common/ComponentCard";
 import PageBreadcrumb from "@/components/admin/common/PageBreadCrumb";
-import ResponsiveImage from "@/components/ui/images/ResponsiveImage";
-import ThreeColumnImageGrid from "@/components/ui/images/ThreeColumnImageGrid";
-import TwoColumnImageGrid from "@/components/ui/images/TwoColumnImageGrid";
+import ResponsiveImage from "@/components/admin/ui/images/ResponsiveImage";
+import ThreeColumnImageGrid from "@/components/admin/ui/images/ThreeColumnImageGrid";
+import TwoColumnImageGrid from "@/components/admin/ui/images/TwoColumnImageGrid";
 import { Metadata } from "next";
 import React from "react";
 
