@@ -1,6 +1,6 @@
 import ComponentCard from "@/components/admin/common/ComponentCard";
 import PageBreadcrumb from "@/components/admin/common/PageBreadCrumb";
-import Alert from "@/components/ui/alert/Alert";
+import Alert from "@/components/admin/ui/alert/Alert";
 import { Metadata } from "next";
 import React from "react";
 
