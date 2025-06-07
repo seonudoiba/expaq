@@ -1,6 +1,6 @@
 "use client"
 
-import { Compass, Link } from "lucide-react"
+import { Link } from "lucide-react"
 import Image from "next/image"
 
 export default function Loading() {
@@ -13,15 +13,15 @@ export default function Loading() {
             <div className="h-16 w-16 rounded-full bg-primary/20"></div>
           </div>
           <div className="relative h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Compass className="h-8 w-8 text-primary animate-spin" style={{ animationDuration: "3s" }} />
-          </div>
-          <Link href="/" className="absolute inset-0">
+            
+          <Link href="/" className="">
             <Image
               src="/logo.png"
               alt="Expaq Logo"
               width={64}
-              height={64} />
+              height={64} className="h-8 w-8 text-primary animate-spin" style={{ animationDuration: "3s" }}/>
           </Link>
+          </div>
         </div>
 
         {/* Brand Name */}
