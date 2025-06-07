@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+// import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/lib/store/auth';
@@ -8,7 +8,7 @@ import { useAuthStore } from '@/lib/store/auth';
 export function CreateActivityButton() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = () => {
     if (!user) {
@@ -16,7 +16,7 @@ export function CreateActivityButton() {
       return;
     }
 
-    if (user.role !== 'HOST') {
+    if (!user.roles.includes('HOST')) {
       // Show upgrade to host message
       return;
     }
@@ -24,10 +24,11 @@ export function CreateActivityButton() {
     router.push('/activities/create');
   };
 
+
   return (
     <Button
       onClick={handleClick}
-      disabled={isLoading}
+      // disabled={isLoading}
     >
       Create Activity
     </Button>

@@ -27,7 +27,7 @@ const Blog = ({
     };
 
     fetchPosts();
-  }, []);
+  }, [params]);
 
   useEffect(() => {
     const fetchcategories = async () => {

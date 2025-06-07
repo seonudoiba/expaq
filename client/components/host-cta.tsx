@@ -55,7 +55,7 @@ export function HostCta() {
               <div className="rounded-lg overflow-hidden h-40 bg-primary-foreground/10">
                 <div className="p-6">
                   <h3 className="font-semibold text-xl mb-2">Full Support</h3>
-                  <p className="text-primary-foreground/90">We're here to help you succeed</p>
+                  <p className="text-primary-foreground/90">We&apos;re here to help you succeed</p>
                 </div>
               </div>
             </div>

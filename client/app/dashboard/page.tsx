@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { activityService, authService } from "@/lib/api/services";
+import { activityService } from "@/lib/api/services";
 import { useAuthStore } from "@/lib/store/auth";
 import { Activity } from "@/types";
 
@@ -17,10 +17,10 @@ export default function HostDashboard() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // if (!user) {
-    //   router.push("/login");
-    //   return;
-    // }
+    if (!user) {
+      router.push("/login");
+      return;
+    }
 
     const fetchHostData = async () => {
       setIsLoading(true);
