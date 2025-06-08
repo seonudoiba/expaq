@@ -57,7 +57,7 @@ console.log("User in ProfilePage:", user);
         </div>
 
         {/* Main Content */}
-        {user.roles.some(role => role === 'HOST')  ?(
+        {user.roles.some(role => role.name === 'HOST')  ?(
  <div className="md:col-span-2">
           <Tabs defaultValue="activities" className="space-y-4">
             <TabsList>

@@ -3,7 +3,7 @@ export interface User {
   userName: string;
   email: string;
   avatar?: string;
-  roles: string[];
+  roles: Role[];
   createdAt: string;
   updatedAt: string;
 }
@@ -11,6 +11,7 @@ export interface User {
 export interface Role {
   id: string;
   name: "GUEST" | "ADMIN" | "HOST";
+
 }
 
 export interface UserProfile {
