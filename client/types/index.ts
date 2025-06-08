@@ -212,6 +212,8 @@ export interface CreateActivityRequest {
   };
   minParticipants: number;
   durationMinutes: number;
+  mediaUrls: string[];
+  
 }
 export interface UpdateActivityRequest {
   title: string;
@@ -254,4 +256,12 @@ export interface CreateReviewRequest {
   activityId: string;
   rating: number;
   comment: string;
+}
+
+export interface PaginatedUsersResponse {
+  data: User[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }

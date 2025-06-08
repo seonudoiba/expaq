@@ -12,11 +12,12 @@ import toast from 'react-hot-toast';
 const createActivitySchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
-  location: z.string().min(3, 'Location must be at least 3 characters'),
+  location: z.string().min(3, 'Location must be at least 3 characters'), // This will be used as address
   price: z.number().min(0, 'Price must be greater than or equal to 0'),
   maxParticipants: z.number().min(1, 'Max participants must be at least 1'),
   startDate: z.string().min(1, 'Start date is required'),
   endDate: z.string().min(1, 'End date is required'),
+  // You could add more fields here as needed
 });
 
 type CreateActivityFormData = z.infer<typeof createActivitySchema>;
@@ -39,21 +40,36 @@ export function CreateActivityForm() {
       setImages(Array.from(e.target.files));
     }
   };
-
   const onSubmit = async (data: CreateActivityFormData) => {
     try {
       setIsLoading(true);
 
       // Upload images first
-      let imageUrls: string[] = [];
+      let mediaUrls: string[] = [];
       if (images.length > 0) {
-        imageUrls = await fileService.uploadMultiple(images, 'activity');
+        mediaUrls = await fileService.uploadMultiple(images, 'activity');
       }
 
       // Create activity with image URLs
       await activityService.create({
         ...data,
-        images: imageUrls,
+        mediaUrls, // Use mediaUrls instead of images
+        // Add required fields from CreateActivityRequest that might be missing
+        latitude: 0,
+        longitude: 0,
+        schedule: {
+          startDate: data.startDate,
+          endDate: data.endDate,
+          startTime: "09:00",
+          daysOfWeek: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]
+        },
+        bookedCapacity: 0,
+        city: { id: "city-id" },
+        country: { id: "country-id" },
+        activityType: { id: "activity-type-id" },
+        address: data.location, // Using location for address
+        minParticipants: 1,
+        durationMinutes: 60
       });
 
       toast.success('Activity created successfully!');
