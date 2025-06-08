@@ -268,4 +268,5 @@ export interface PaginatedUsersResponse {
   page: number;
   limit: number;
   totalPages: number;
+  content: UserProfile[];
 }
