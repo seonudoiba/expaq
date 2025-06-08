@@ -4,6 +4,7 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/lib/store/auth';
+import { Role } from '@/types';
 
 export function CreateActivityButton() {
   const router = useRouter();
@@ -15,9 +16,9 @@ export function CreateActivityButton() {
       router.push('/login');
       return;
     }
-
-    if (!user.roles.includes('HOST')) {
+    if (!user.roles.some((role: Role) => role.name === 'HOST')) {
       // Show upgrade to host message
+      alert('You need to be a host to create an activity. Please upgrade your account.');
       return;
     }
 
