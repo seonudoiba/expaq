@@ -2,7 +2,7 @@
 
 import { User } from "@/types"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/use-auth"
+import {useAuthStore} from "@/lib/store/auth"
 
 import {
   DropdownMenu,
@@ -21,7 +21,7 @@ interface UserNavProps {
 
 export function UserNav({ user }: UserNavProps) {
   const router = useRouter()
-  const { logout } = useAuth()
+  const { logout } = useAuthStore()
 
   const handleLogout = async () => {
     try {
