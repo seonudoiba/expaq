@@ -8,8 +8,8 @@ import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/layout/user-nav"
-import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
+import { useAuthStore } from "@/lib/store/auth"
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -21,7 +21,7 @@ const navigation = [
 export function Navbar() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user } = useAuth()
+  const { user } = useAuthStore()
   const router = useRouter()
 
   return (

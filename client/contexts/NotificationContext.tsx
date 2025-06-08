@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/lib/store/auth';
 import { toast } from 'sonner';
 
 interface Notification {
@@ -8,7 +8,7 @@ interface Notification {
     title: string;
     message: string;
     type: string;
-    data: any;
+    data: Record<string, string | number | boolean | null>;
     read: boolean;
     readAt: string | null;
     createdAt: string;
@@ -28,7 +28,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
-    const { user } = useAuth();
+    const { user } = useAuthStore();
     const { lastMessage } = useWebSocket();
 
     useEffect(() => {
@@ -41,14 +41,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     useEffect(() => {
         if (lastMessage) {
             if (lastMessage.type === 'notification') {
-                const notification = lastMessage.payload;
+                const notification = lastMessage.payload as Notification;
                 setNotifications(prev => [notification, ...prev]);
                 setUnreadCount(prev => prev + 1);
                 toast.info(notification.message, {
                     description: notification.title,
                 });
             } else if (lastMessage.type === 'count') {
-                setUnreadCount(lastMessage.payload);
+                setUnreadCount(lastMessage.payload as number);
             }
         }
     }, [lastMessage]);

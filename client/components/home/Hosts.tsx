@@ -62,7 +62,7 @@ const {
         <h1 className="text-4xl font-bold">Our Travel Guides</h1>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {hosts.map((host: UserProfile) => (
+        {(hosts ?? []).map((host: UserProfile) => (
           <div key={host.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="relative overflow-hidden">
               <Image width={300} height={400} className="w-full" src={host.profilePictureUrl} alt={host.firstName} />
