@@ -139,6 +139,7 @@ export default function CreateActivityPage() {
         country: { id: country },
         activityType: { id: data.activityType },
         address,
+        mediaUrls: [],
         schedule: {
           startDate: formattedStartDate,
           endDate: formattedEndDate,

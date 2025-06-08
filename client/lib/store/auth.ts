@@ -32,6 +32,9 @@ interface AuthState {
     profilePictureUrl: string,
     bio: string;
   }) => Promise<void>;
+
+  
+
   logout: () => void;
   getCurrentUser: () => Promise<void>;
   hasRole: (role: string | string[]) => boolean;
@@ -58,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: response.user,
             token: response.token,
-            roles: (response.user.roles || []).map(role => ({ name: role, id: role })),
+            roles: (response.user.roles || []).map(role => ({ name: String(role), id: String(role) })),
             isAuthenticated: true,
             isLoading: false,
           });
