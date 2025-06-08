@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://expat.tours
+
+# Sitemaps
+Sitemap: https://expat.tours/sitemap.xml
