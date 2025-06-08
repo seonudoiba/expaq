@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, TouchEvent } from "react"
 import { useQuery } from "@tanstack/react-query";
 import { activityTypeService } from "@/lib/api/services";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -108,15 +108,16 @@ export function ActivityType() {
   };
 
   // Touch/swipe handlers
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (e: TouchEvent) => {
     setIsDragging(true);
     setStartX(e.touches[0].clientX);
     setCurrentX(e.touches[0].clientX);
   };
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = (e: TouchEvent ) => {
     if (!isDragging) return;
     setCurrentX(e.touches[0].clientX);
+    
   };
 
   const handleTouchEnd = () => {
@@ -141,13 +142,13 @@ export function ActivityType() {
   };
 
   // Mouse handlers for desktop
-  const handleMouseDown = (e) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
     setStartX(e.clientX);
     setCurrentX(e.clientX);
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
     setCurrentX(e.clientX);
   };
