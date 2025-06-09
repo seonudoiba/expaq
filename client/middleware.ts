@@ -29,7 +29,9 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/activities/:path*',
+    '/activities/create',
+    '/activities/edit/:path*',
+    '/activities/upload-image/:path*',
     '/profile/:path*',
     '/admin/:path*',
     '/login',
