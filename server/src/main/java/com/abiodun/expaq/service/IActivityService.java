@@ -5,7 +5,6 @@ import com.abiodun.expaq.dto.CreateActivityRequest;
 import com.abiodun.expaq.dto.LocationStatsDTO;
 import com.abiodun.expaq.dto.UpdateActivityRequest;
 import com.abiodun.expaq.model.Activity;
-import com.abiodun.expaq.model.Activity.ActivityCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,13 +22,11 @@ public interface IActivityService {
 
     ActivityDTO updateActivity(UUID activityId, UpdateActivityRequest request, UUID hostId);
 
-    ActivityDTO updateActivity(UUID activityId, ActivityDTO activityDTO, UUID hostId);
-
     void deleteActivity(UUID activityId, UUID hostId);
 
     ActivityDTO getActivityById(UUID activityId);
 
-    List<ActivityDTO> getAllActivities(Specification<Activity> spec);
+    List<ActivityDTO> getAllActivities(Specification<Activity> spec, String sortBy);
 
     ActivityDTO getActivity(UUID activityId);
 
@@ -62,4 +59,5 @@ public interface IActivityService {
     Page<ActivityDTO> findActivitiesByActivityType(UUID typeId, Pageable pageable);
 
     List<ActivityDTO> findNearbyActivitiesByActivityType(String activityType, double latitude, double longitude, double distance);
+    Page<ActivityDTO> getSortedActivities(String sortBy, Double latitude, Double longitude, Double distance, Pageable pageable);
 }

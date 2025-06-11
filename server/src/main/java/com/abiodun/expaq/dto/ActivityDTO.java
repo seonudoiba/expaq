@@ -1,7 +1,6 @@
 package com.abiodun.expaq.dto;
 
 import com.abiodun.expaq.model.*;
-import com.abiodun.expaq.model.Activity.ActivityCategory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -95,8 +94,8 @@ public class ActivityDTO {
         
         dto.setCreatedAt(activity.getCreatedAt());
         dto.setUpdatedAt(activity.getUpdatedAt());
-//        dto.setStartDate(activity.getStartDate());
-//        dto.setEndDate(activity.getEndDate());
+        dto.setStartDate(activity.getStartDate());
+        dto.setEndDate(activity.getEndDate());
         dto.setAddress(activity.getAddress());
         
         // Handle city and country

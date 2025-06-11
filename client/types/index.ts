@@ -270,3 +270,50 @@ export interface PaginatedUsersResponse {
   totalPages: number;
   content: UserProfile[];
 }
+export interface Booking {
+  id: string;
+  activityId: string;
+  activity: Activity;
+  userId: string;
+  user: User;
+  date: string;
+  time: string;
+  participants: number;
+  totalPrice: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Review {
+  id: string;
+  activityId: string;
+  activity: Activity;
+  userId: string;
+  user: User;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
+
+export interface ActivitySearchParams {
+  search?: string;
+  location?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  size?: number;
+  sortBy?: string;
+  sortDirection?: 'ASC' | 'DESC';
+}

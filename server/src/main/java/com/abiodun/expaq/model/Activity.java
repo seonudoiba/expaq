@@ -116,16 +116,6 @@ public class Activity {
     @JoinColumn(name = "activity_type_id")
     private ActivityType activityType;
 
-    public enum ActivityCategory {
-        ADVENTURE,
-        CULTURAL,
-        FOOD_AND_DRINK,
-        NATURE,
-        SPORTS,
-        WELLNESS,
-        SIGHTSEEING,
-        WORKSHOP
-    }
 
     // Methods for booking management
     public boolean canAccommodateBooking(int numberOfGuests) {

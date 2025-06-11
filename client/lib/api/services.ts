@@ -73,10 +73,15 @@ export const authService = {
 // Activity Services
 export const activityService = {
   getAll: async (params?: {
-    location?: string;
-    type?: string;
+    city?: string;
+    country?: string;
+    activityType?: string;
     minPrice?: number;
     maxPrice?: number;
+    sortBy?: string;
+    querySearch?: string;
+    when?: string;
+    numOfPeople?: string;
   }): Promise<Activity[]> => {
     const response = await apiClient.get<Activity[]>('/api/activities', { params });
     console.log('Activities:', response.data);

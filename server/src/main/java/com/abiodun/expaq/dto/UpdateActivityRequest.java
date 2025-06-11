@@ -1,8 +1,6 @@
 package com.abiodun.expaq.dto;
 
 import com.abiodun.expaq.model.*;
-import com.abiodun.expaq.model.Activity.ActivityCategory;
-
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

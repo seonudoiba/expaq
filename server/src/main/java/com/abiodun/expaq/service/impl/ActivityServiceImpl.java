@@ -15,7 +15,9 @@ import com.abiodun.expaq.service.IActivityService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,7 +111,7 @@ public class ActivityServiceImpl implements IActivityService {
                         .anyMatch(role -> role.getName().equals("HOST") || role.getName().equals("ROLE_HOST"));
                 if (!isHost) {
                     String error = "User " + hostId + " does not have HOST privileges. Current roles: " +
-                            host.getRoles().stream().map(role -> role.getName()).collect(Collectors.joining(", "));
+                            host.getRoles().stream().map(Role::getName).collect(Collectors.joining(", "));
                     logger.error("{} - Authorization Error: {}", operation, error);
                     throw new UnauthorizedException(error);
                 }
@@ -271,89 +273,6 @@ public class ActivityServiceImpl implements IActivityService {
         }
     }
 
-//    @Override
-//    @Transactional
-//    public ActivityDTO createActivity(CreateActivityRequest request, UUID hostId) {
-//        try {
-//            // Validate that the host exists
-//            User host = userRepository.findById(hostId)
-//                    .orElseThrow(() -> new ResourceNotFoundException("Host not found with ID: " + hostId));
-//
-//            // Validate that the host has the HOST role
-//            boolean isHost = host.getRoles().stream()
-//                    .anyMatch(role -> role.getName().equals("HOST") || role.getName().equals("ROLE_HOST"));
-//            if (!isHost) {
-//                throw new UnauthorizedException("User does not have HOST privileges");
-//            }
-//
-//            try {
-//                // Create Point for location
-//                Point location = geometryFactory.createPoint(
-//                        new Coordinate(request.getLongitude(), request.getLatitude())
-//                );
-//
-//                // Create activity with validation
-//                Activity activity = new Activity();
-//                activity.setTitle(request.getTitle());
-//                activity.setDescription(request.getDescription());
-//                activity.setLocation(String.valueOf(location));
-//                activity.setLocationPoint(location);
-//                activity.setPrice(request.getPrice());
-//                activity.setStartDate(request.getStartDate());
-//                activity.setEndDate(request.getEndDate());
-//
-//
-//                // Validate activity category
-//                try {
-//                    activity.setActivityType(request.getActivityType());
-//                } catch (IllegalArgumentException e) {
-//                    throw new IllegalArgumentException("Invalid activity activity type: " + request.getActivityType() +
-//                            ". Valid categories are: " + String.join(", ",
-//                            Arrays.stream(Activity.ActivityCategory.values())
-//                                    .map(Enum::name)
-//                                    .collect(Collectors.toList())));
-//                }
-//                activity.setBookedCapacity(0);
-//
-//                // Set address fields
-//                activity.setAddress(request.getAddress());
-//                activity.setCity(request.getCity());
-//                activity.setCountry(request.getCountry());
-//
-//                // Set schedule with validation
-//                if (request.getSchedule() == null) {
-//                    throw new IllegalArgumentException("Activity schedule is required");
-//                }
-//                activity.setSchedule(request.getSchedule());
-//
-//                // Set host and default values
-//                activity.setHost(host);
-//                activity.setActive(true);
-//                activity.setIsFeatured( false);
-//                activity.setMinParticipants(request.getMinParticipants());
-//                activity.setMaxParticipants(request.getMaxParticipants());
-//                activity.setDurationMinutes(request.getDurationMinutes());
-//                // Convert minutes to hours for the duration field
-//                activity.setDuration((int) Math.ceil(request.getDurationMinutes() / 60.0));
-//
-//                // Save activity
-//                activity = activityRepository.save(activity);
-//
-//                return ActivityDTO.fromActivity(activity);
-//
-//            } catch (IllegalArgumentException e) {
-//                throw new IllegalArgumentException("Invalid activity data: " + e.getMessage());
-//            } catch (Exception e) {
-//                throw new RuntimeException("Error creating activity: " + e.getMessage(), e);
-//            }
-//        } catch (ResourceNotFoundException | UnauthorizedException e) {
-//            throw e; // Let these pass through unchanged
-//        } catch (Exception e) {
-//            throw new RuntimeException("Unexpected error creating activity", e);
-//        }
-//    }
-
-
     @Transactional
     @Override
     public ActivityDTO updateActivity(UUID activityId, UpdateActivityRequest request, UUID hostId) {
@@ -385,17 +304,12 @@ public class ActivityServiceImpl implements IActivityService {
         if (request.getSchedule() != null) activity.setSchedule(request.getSchedule());
         if (request.getIsActive() != null) activity.setActive(request.getIsActive()); // Changed from getIsActive
         if (request.getIsFeatured() != null) activity.setIsFeatured(request.getIsFeatured()); // Changed from getIsFeatured
-//        if (request.getStartDate() != null) activity.setStartDate(request.getStartDate());
-//        if (request.getEndDate() != null) activity.setEndDate(request.getEndDate());
+        if (request.getStartDate() != null) activity.setStartDate(request.getStartDate());
+        if (request.getEndDate() != null) activity.setEndDate(request.getEndDate());
         // Save activity
         activity = activityRepository.save(activity);
 
         return ActivityDTO.fromActivity(activity);
-    }
-
-    @Override
-    public ActivityDTO updateActivity(UUID activityId, ActivityDTO activityDTO, UUID hostId) {
-        return null;
     }
 
     @Override
@@ -422,11 +336,62 @@ public class ActivityServiceImpl implements IActivityService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ActivityDTO> getAllActivities(Specification<Activity> spec) {
-        List<Activity> activities = activityRepository.findAll(spec);
-        return activities.stream()
-                .map(this::mapToActivityDTO)
-                .collect(Collectors.toList());
+    public List<ActivityDTO> getAllActivities(Specification<Activity> spec, String sortBy) {
+        if ("lowPrice".equalsIgnoreCase(sortBy)) {
+            List<Activity> activities = activityRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "price"));
+            return activities.stream()
+                    .map(this::mapToActivityDTO)
+                    .collect(Collectors.toList());
+        } else if ("highPrice".equalsIgnoreCase(sortBy)) {
+            List<Activity> activities = activityRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "price"));
+            return activities.stream()
+                    .map(this::mapToActivityDTO)
+                    .collect(Collectors.toList());
+        } else if ("alphabetical".equalsIgnoreCase(sortBy)) {
+            List<Activity> activities = activityRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "title"));
+            return activities.stream()
+                    .map(this::mapToActivityDTO)
+                    .collect(Collectors.toList());
+        } else if ("highRating".equalsIgnoreCase(sortBy)) {
+            List<Activity> activities = activityRepository.findAll(spec, Sort.by("reviews"));
+            return activities.stream()
+                    .map(this::mapToActivityDTO)
+                    .collect(Collectors.toList());
+        } else if ("lowRating".equalsIgnoreCase(sortBy)) {
+            List<Activity> activities = activityRepository.findAll(spec, Sort.by(Sort.Direction.DESC,"reviews"));
+            return activities.stream()
+                    .map(this::mapToActivityDTO)
+                    .collect(Collectors.toList());
+        } else if ("minParticipants".equalsIgnoreCase(sortBy)) {
+            List<Activity> activities =
+                    activityRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "minParticipants"));
+            return activities.stream()
+                    .map(this::mapToActivityDTO)
+                    .collect(Collectors.toList());
+        } else  {
+            List<Activity> activities = activityRepository.findAll(spec);
+            return activities.stream()
+                    .map(this::mapToActivityDTO)
+                    .collect(Collectors.toList());
+        }
+
+
+    }
+
+    @Override
+    public Page<ActivityDTO> getSortedActivities(String sortBy, Double latitude, Double longitude, Double distance, Pageable pageable) {
+        if ("lowPrice".equalsIgnoreCase(sortBy)) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("price").ascending());
+        } else if ("highPrice".equalsIgnoreCase(sortBy)) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("price").descending());
+        } else if ("alphabetical".equalsIgnoreCase(sortBy)) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("title").ascending());
+        } else if ("nearby".equalsIgnoreCase(sortBy) && latitude != null && longitude != null && distance != null) {
+            Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+            return activityRepository.findByLocationWithinDistance(longitude, latitude, distance, pageable)
+                    .map(this::mapToActivityDTO);
+        }
+        return activityRepository.findAll(pageable).map(this::mapToActivityDTO);
     }
 
     @Override
@@ -461,6 +426,8 @@ public class ActivityServiceImpl implements IActivityService {
                 .map(this::mapToActivityDTO)
                 .collect(Collectors.toList());
     }
+
+
 
     @Override
     @Transactional(readOnly = true)

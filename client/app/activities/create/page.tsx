@@ -248,7 +248,7 @@ export default function CreateActivityPage() {
                 >
                   <option value="">Select a country</option>
                   {countries.map((country) => (
-                    <option key={country.id} value={country.id}>
+                    <option key={country.id} value={country.name}>
                       {country.name}
                     </option>
                   ))}
@@ -265,7 +265,7 @@ export default function CreateActivityPage() {
                 >
                   <option value="">Select a city</option>
                   {cities.map((city) => (
-                    <option key={city.id} value={city.id}>
+                    <option key={city.id} value={city.name}>
                       {city.name}
                     </option>
                   ))}

@@ -1,6 +1,5 @@
 package com.abiodun.expaq.dto;
 
-import com.abiodun.expaq.model.Activity.ActivityCategory;
 import com.abiodun.expaq.model.ActivitySchedule;
 import com.abiodun.expaq.model.ActivityType;
 import com.abiodun.expaq.model.City;
@@ -9,11 +8,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class CreateActivityRequest {

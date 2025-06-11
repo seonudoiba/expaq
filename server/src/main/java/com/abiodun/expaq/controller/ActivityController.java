@@ -6,13 +6,15 @@ import com.abiodun.expaq.dto.LocationStatsDTO;
 import com.abiodun.expaq.dto.UpdateActivityRequest;
 import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.model.Activity; // Import Activity for Specification
-import com.abiodun.expaq.model.Activity.ActivityCategory;
+import com.abiodun.expaq.model.ActivityType;
 import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.service.IActivityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,23 +51,31 @@ public class ActivityController {
     // GET /activities - List activities (publicly accessible, filtering added)
     @GetMapping
     public ResponseEntity<List<ActivityDTO>> getAllActivities(
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) String activityType,
             @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice
-    ) {
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String querySearch,
+            @RequestParam(required = false) String when,
+            @RequestParam(required = false) String numOfPeople
+            ) {
         Specification<Activity> spec = Specification.where(null);
 
-        if (location != null) {
+        if (city != null) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("location"), location));
+                    criteriaBuilder.equal(root.get("city").get("name"), city));
+        }
+        if (country != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("country").get("name"), country));
         }
 
-        if (type != null) {
+        if (activityType != null) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("type"), type));
+                    criteriaBuilder.equal(root.get("activityType").get("name"), activityType));
         }
-
 
         if (minPrice != null) {
             spec = spec.and((root, query, criteriaBuilder) ->
@@ -75,9 +87,49 @@ public class ActivityController {
                     criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
         }
 
-        List<ActivityDTO> activities = activityService.getAllActivities(spec);
+        if (when != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+            LocalDateTime whenDateTime = LocalDateTime.parse(when, formatter);
+
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.and(
+                            criteriaBuilder.lessThanOrEqualTo(root.get("startDate"), whenDateTime),
+                            criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), whenDateTime)
+                    )
+            );
+        }
+        if (numOfPeople != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.and(
+                        criteriaBuilder.greaterThanOrEqualTo(root.get("maxParticipants"), numOfPeople),
+                        criteriaBuilder.lessThanOrEqualTo(root.get("minParticipants"), numOfPeople)
+                )
+            );
+        }
+
+
+        if (querySearch != null) {
+            String likePattern = "%" + querySearch.toLowerCase() + "%";
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.or(
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), likePattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), likePattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("activityType").get("name")), likePattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("country").get("name")), likePattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("address")), likePattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("city").get("name")), likePattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("host").get("firstName")), likePattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("host").get("lastName")), likePattern)
+                    )
+            );
+        }
+
+
+        List<ActivityDTO> activities = activityService.getAllActivities(spec, sortBy);
         return ResponseEntity.ok(activities);
     }
+
 
     // GET /activities/{id} - View one activity (publicly accessible)
     @GetMapping("/{id}")
@@ -106,33 +158,6 @@ public class ActivityController {
         
         UUID hostId = currentUser.getId();
         return ResponseEntity.ok(activityService.createActivity(request, hostId));
-    }
-
-    @PostMapping("/activities")
-    public ResponseEntity<ActivityDTO> createActivity(
-            @Valid @RequestBody CreateActivityRequest request,
-            @RequestHeader("X-User-ID") UUID hostId) {
-
-        String operation = "createActivity_Controller";
-
-        try {
-            logger.info("{} - Received request to create activity for hostId: {}", operation, hostId);
-
-            // Additional JSON structure validation at controller level
-            validateJsonStructure(request, operation);
-
-            ActivityDTO activity = activityService.createActivity(request, hostId);
-            logger.info("{} - Activity created successfully with ID: {}", operation, activity.getId());
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(activity);
-
-        } catch (IllegalArgumentException e) {
-            logger.error("{} - Validation Error: {}", operation, e.getMessage());
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            logger.error("{} - Unexpected Error: {}", operation, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
     }
 
     // PRIVATE HELPER METHOD - ADD TO CONTROLLER
@@ -197,7 +222,16 @@ public class ActivityController {
             @RequestParam double distance) {
         return ResponseEntity.ok(activityService.findNearbyActivities(latitude, longitude, distance));
     }
-
+    @GetMapping("/sorted")
+    public ResponseEntity<Page<ActivityDTO>> getSortedActivities(
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Double distance,
+            Pageable pageable) {
+        Page<ActivityDTO> activities = activityService.getSortedActivities(sortBy, latitude, longitude, distance, pageable);
+        return ResponseEntity.ok(activities);
+    }
         @GetMapping("/by-type/{typeId}")
     public ResponseEntity<Page<ActivityDTO>> getActivitiesByType(
             @PathVariable UUID typeId,
