@@ -14,6 +14,7 @@ public interface IAuthService {
     AuthResponse register(RegisterRequest request);
     AuthResponse login(LoginRequest request);
     UserDTO getMe(UUID userId);
+    UserDTO getUser(UUID userId);
     void verifyEmail(String token);
     void resendVerificationEmail(String email);
     void requestPasswordReset(String email);

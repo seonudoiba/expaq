@@ -47,10 +47,14 @@ public class BookingServiceImpl implements IBookingService {
         Booking booking = new Booking();
         booking.setActivity(activity);
         booking.setUser(user);
-        booking.setBookingDateTime(request.getBookingDateTime());
         booking.setNumberOfGuests(request.getNumberOfGuests());
         booking.setSpecialRequests(request.getSpecialRequests());
+        booking.setEndTime(request.getEndTime());
+        booking.setStartTime(request.getStartTime());
         booking.setStatus(Booking.BookingStatus.PENDING);
+        booking.setGuestEmail(user.getEmail());
+        booking.setHost(activity.getHost());
+
         booking.calculateTotalPrice();
 
         // Save booking
@@ -190,6 +194,7 @@ public class BookingServiceImpl implements IBookingService {
 
         booking.setPaymentId(paymentId);
         booking.setPaymentStatus(paymentStatus);
+        booking.setStatus(Booking.BookingStatus.PAID);
         booking.setPaymentDate(LocalDateTime.now());
 
         if ("SUCCESS".equals(paymentStatus)) {

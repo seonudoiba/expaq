@@ -11,7 +11,8 @@ import type { ActivityType, City, Country } from "@/types";
 import { useActivitiesStore } from "@/lib/store/useActivitiesStore";
 
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Calendar, Users } from "lucide-react";
+import { Search, MapPin, Users } from "lucide-react";
+import { DateTimePicker } from "@/components/ui/datetime-picker";
 
 export function ActivityFilters() {
   const { 
@@ -25,7 +26,25 @@ export function ActivityFilters() {
   const [activityTypes, setActivityTypes] = useState<ActivityType[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    filters.when ? new Date(filters.when) : undefined
+  );
 
+  // Handle date changes
+  const handleDateChange = (date: Date | undefined) => {
+    setSelectedDate(date);
+    if (date) {
+      // Format date as ISO string (YYYY-MM-DDThh:mm:ss)
+      const formattedDate = date.toISOString().split('.')[0]; // Remove milliseconds
+      updateFilters({ when: formattedDate });
+      
+      // Apply filters with a small delay
+      setTimeout(() => applyFilters(filters), 300);
+    } else {
+      updateFilters({ when: "" });
+      setTimeout(() => applyFilters(filters), 300);
+    }
+  };
 
   const sortData = [
     { label: "Most Popular", value: "popular" },
@@ -51,9 +70,24 @@ export function ActivityFilters() {
     queryKey: ["countries"],
     queryFn: () => countryService.getAllCountries(),
   });
-  // Since we're now using the Zustand store, no need to fetch activities here
-  // The store will handle loading activities based on filters
-  // No need for ID maps since we're using names directly
+  
+  // Effect to update selectedDate when filters.when changes (e.g. from clearFilters)
+  useEffect(() => {
+    // If filters.when is cleared, reset selectedDate
+    if (!filters.when) {
+      setSelectedDate(undefined);
+    } else if (filters.when && (!selectedDate || filters.when !== selectedDate.toISOString().split('.')[0])) {
+      // If filters.when is set and different from current selectedDate
+      setSelectedDate(new Date(filters.when));
+    }
+  }, [filters.when, selectedDate]);
+
+  // Create a wrapper for the clearFilters function to also reset selectedDate
+  const handleClearFilters = () => {
+    clearFilters();
+    setSelectedDate(undefined);
+  };
+
   // Set data when loaded from the API
   useEffect(() => {
     if (activityTypesData) {
@@ -91,10 +125,12 @@ export function ActivityFilters() {
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input placeholder="Where are you looking for?" value={filters.querySearch} name="querySearch" onChange={handleFilterChange} className="pl-10" />
-            </div>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input placeholder="When?" value={filters.when} name="when" onChange={handleFilterChange} className="pl-10" />
+            </div>            <div className="relative">
+              <DateTimePicker
+                date={selectedDate}
+                setDate={handleDateChange}
+                placeholder="When would you like to go?"
+              />
             </div>
             <div className="relative">
               <Users className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
@@ -107,7 +143,7 @@ export function ActivityFilters() {
               />
             </div>            <div className="w-full flex items-center justify-center bg-primary text-white p-2 rounded-md">
               <Search className="mr-2 h-4 w-4" /> 
-              <span>Search results update as you type</span>
+              <span>Search</span>
             </div>
           </div>
         </form>
@@ -283,8 +319,8 @@ export function ActivityFilters() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="flex gap-2">
+            <div className="max-w-[140px]">
               <Label
                 htmlFor="minPrice"
                 className="text-sm font-medium text-gray-700 mb-1 block"
@@ -308,7 +344,7 @@ export function ActivityFilters() {
               </div>
             </div>
 
-            <div>
+            <div className="max-w-[140px]">
               <Label
                 htmlFor="maxPrice"
                 className="text-sm font-medium text-gray-700 mb-1 block"
@@ -334,7 +370,7 @@ export function ActivityFilters() {
           </div>          <div className="flex items-center pt-2">
             <button
               type="button"
-              onClick={clearFilters}
+              onClick={handleClearFilters}
               className="flex-1 py-2 px-4 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
               Clear All
@@ -366,11 +402,11 @@ export function ActivityFilters() {
           </div>
         )}
         
-        {!isLoading && (
+        {/* {!isLoading && (
           <div className="mt-4 flex items-center justify-center text-sm text-green-600">
             <span>Filters are applied in real-time</span>
           </div>
-        )}
+        )} */}
       </div>
     </>
   );

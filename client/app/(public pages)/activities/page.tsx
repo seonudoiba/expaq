@@ -7,7 +7,7 @@ import { ActivityFilters } from "@/components/activities/activity-filters";
 export default function ActivitiesPage() {
   
   return (
-    <section className=" py-1 md:py-1 lg:py-2">
+    <section className=" py-1 md:py-1 lg:py-2 px-6">
       <div className="flex items-center justify-between py-4">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div>

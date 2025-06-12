@@ -46,6 +46,14 @@ public class AuthController {
                             "Authentication failed: " + e.getMessage()));
         }
     }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDTO> getMe(
+            @PathVariable UUID userId
+    ) {
+        return ResponseEntity.ok(authService.getUser(userId));
+    }
+
     @PostMapping("/become-host")
     public ResponseEntity<?> becomeHost( @AuthenticationPrincipal ExpaqUserDetails currentUser) {
         try {

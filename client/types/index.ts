@@ -74,7 +74,9 @@ export interface Activity {
   id: string;
   hostId: string;
   hostName: string;
-  hostProfilePicture: string | null;
+  hostProfilePicture: string;
+  hostCreatedAt: string;
+  hostBio: string;
   title: string;
   description: string;
   price: number;

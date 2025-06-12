@@ -173,6 +173,20 @@
 			<version>1.19.0</version>
 		</dependency>
 
+		<!-- Stripe -->
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>22.0.0</version>
+		</dependency>
+		
+		<!-- Paystack -->
+		<dependency>
+			<groupId>com.github.paystackhq</groupId>
+			<artifactId>paystack-java</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
 	</dependencies>
 
 <!--	<build>-->

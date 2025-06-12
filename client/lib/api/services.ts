@@ -20,7 +20,7 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     try {
       tokenObject = JSON.parse(token);
-      tokenObject = tokenObject.state.token; // Assuming the token is stored in state.token
+      tokenObject = tokenObject.state.token; 
     } catch (error) {
       console.error('Failed to parse token:', error);
     }
@@ -49,6 +49,10 @@ export const authService = {
 
   getCurrentUser: async (): Promise<User> => {
     const response = await apiClient.get<User>('/api/auth/me');
+    return response.data;
+  },
+  getHostById: async (id: string): Promise<User> => {
+    const response = await apiClient.get<User>(`/api/auth/${id}`);
     return response.data;
   },
 

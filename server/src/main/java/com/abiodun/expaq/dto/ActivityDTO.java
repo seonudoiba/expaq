@@ -14,12 +14,14 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActivityDTO {
     private UUID id;
     private UUID hostId;
     private String hostName;
     private String hostProfilePicture;
+    private String hostBio;
+    private String hostCreatedAt;
     private String title;
     private String description;
     private BigDecimal price;
@@ -56,7 +58,10 @@ public class ActivityDTO {
         if (activity.getHost() != null) {
             dto.setHostId(activity.getHost().getId());
             dto.setHostName(activity.getHost().getFirstName() + " " + activity.getHost().getLastName());
-            dto.setHostProfilePicture(activity.getHost().getProfilePicture());
+            dto.setHostProfilePicture(activity.getHost().getProfilePictureUrl());
+            dto.setHostCreatedAt(activity.getHost().getCreatedAt().toString());
+            dto.setHostBio(activity.getHost().getBio());
+
         }
         
         dto.setTitle(activity.getTitle());

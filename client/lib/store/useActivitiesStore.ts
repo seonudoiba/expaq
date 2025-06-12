@@ -14,6 +14,8 @@ export interface Activity {
   endDate: string | Date;
   averageRating: number;
   totalReviews: number;
+  hostName: string;
+  durationMinutes: number;
 }
 
 export interface ActivityFilters {

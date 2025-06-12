@@ -3,10 +3,13 @@ package com.abiodun.expaq.controller;
 import com.abiodun.expaq.dto.BookingDTO;
 import com.abiodun.expaq.dto.CreateBookingRequest;
 import com.abiodun.expaq.model.BookingStatus;
+import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.service.IBookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -23,24 +26,28 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingDTO> createBooking(
-            @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @Valid @RequestBody CreateBookingRequest request) {
+        UUID userId = currentUser.getId();
         return ResponseEntity.ok(bookingService.createBooking(request, userId));
     }
 
     @PutMapping("/{bookingId}/cancel")
     public ResponseEntity<Void> cancelBooking(
-            @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @PathVariable UUID bookingId,
             @RequestParam String reason) {
+        UUID userId = currentUser.getId();
         bookingService.cancelBooking(bookingId, userId, reason);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{bookingId}/confirm")
+    @PreAuthorize("hasRole('HOST')")
     public ResponseEntity<Void> confirmBooking(
-            @RequestAttribute("userId") UUID hostId,
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @PathVariable UUID bookingId) {
+        UUID hostId = currentUser.getId();
         bookingService.confirmBooking(bookingId, hostId);
         return ResponseEntity.ok().build();
     }
@@ -48,20 +55,24 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public ResponseEntity<BookingDTO> getBooking(
             @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @PathVariable UUID bookingId) {
         return ResponseEntity.ok(bookingService.getBooking(bookingId, userId));
     }
 
     @GetMapping("/my-bookings")
     public ResponseEntity<List<BookingDTO>> getUserBookings(
-            @RequestAttribute("userId") UUID userId) {
+            @AuthenticationPrincipal ExpaqUserDetails currentUser
+            ) {
+        UUID userId = currentUser.getId();
         return ResponseEntity.ok(bookingService.getUserBookings(userId));
     }
 
     @GetMapping("/activity/{activityId}")
     public ResponseEntity<List<BookingDTO>> getActivityBookings(
-            @RequestAttribute("userId") UUID hostId,
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @PathVariable UUID activityId) {
+        UUID hostId = currentUser.getId();
         return ResponseEntity.ok(bookingService.getActivityBookings(activityId, hostId));
     }
 

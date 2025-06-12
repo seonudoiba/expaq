@@ -35,9 +35,7 @@ public class Booking {
     private User host;
 
     @Column(nullable = false)
-    private int numberOfParticipants;
-
-    @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime bookingDate;
 
     @Column(nullable = false)
@@ -66,7 +64,10 @@ public class Booking {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
     private LocalDateTime startTime;
+
+    @Column(nullable = false)
     private LocalDateTime endTime;
 
     @CreationTimestamp
@@ -103,7 +104,7 @@ public class Booking {
     // Method to calculate total price
     public void calculateTotalPrice() {
         if (activity != null) {
-            this.totalPrice = activity.getPrice().multiply(BigDecimal.valueOf(numberOfParticipants));
+            this.totalPrice = activity.getPrice().multiply(BigDecimal.valueOf(numberOfGuests));
         }
     }
 
@@ -123,6 +124,7 @@ public class Booking {
     // Define BookingStatus enum (can be in a separate file or nested)
     public enum BookingStatus {
         PENDING,
+        PAID,
         CONFIRMED,
         CANCELLED,
         COMPLETED,

@@ -397,6 +397,14 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public UserDTO getUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return UserDTO.fromUser(user);
+    }
+
+    @Override
     @Transactional
     public void verifyEmail(String token) {
         User user = userRepository.findByVerificationToken(token)

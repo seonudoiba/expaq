@@ -1,3 +1,5 @@
+
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -15,9 +17,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Authorization for admin pages is handled by the RequireAdmin component
-  // This middleware just ensures the user is authenticated
-
   // Prevent authenticated users from accessing login pages
   if (token && isAuthPage) {
     return NextResponse.redirect(new URL('/', request.url));
@@ -26,6 +25,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+// This config restricts which paths the middleware applies to
 export const config = {
   matcher: [
     '/dashboard/:path*',
