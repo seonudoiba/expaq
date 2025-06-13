@@ -79,6 +79,7 @@ public class Payment {
         DEBIT_CARD,
         BANK_TRANSFER,
         PAYPAL,
-        STRIPE
+        STRIPE,
+        WALLET
     }
 } 

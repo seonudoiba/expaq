@@ -142,7 +142,6 @@ public class FraudDetectionServiceImpl implements IFraudDetectionService {
     }
 
     private BigDecimal calculateCurrencyRisk(String currency) {
-        // Some currencies might have higher risk due to exchange rate volatility
         return switch (currency.toUpperCase()) {
             case "USD", "EUR", "GBP" -> new BigDecimal("0.3");
             case "JPY", "CAD", "AUD" -> new BigDecimal("0.4");

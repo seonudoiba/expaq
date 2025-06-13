@@ -180,12 +180,12 @@
 			<version>22.0.0</version>
 		</dependency>
 		
-		<!-- Paystack -->
-		<dependency>
-			<groupId>com.github.paystackhq</groupId>
-			<artifactId>paystack-java</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+<!--		&lt;!&ndash; Paystack &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>com.github.paystackhq</groupId>-->
+<!--			<artifactId>paystack-java</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
 
 	</dependencies>
 
