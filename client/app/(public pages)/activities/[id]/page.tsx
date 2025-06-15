@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { Clock, Users, Star, Heart, MapPin, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { activityService } from "@/lib/api/services";
 import { useQuery } from "@tanstack/react-query";
