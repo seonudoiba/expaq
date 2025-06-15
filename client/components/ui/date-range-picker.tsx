@@ -15,7 +15,7 @@ import {
   SelectValue
 } from './select'
 import { Switch } from './switch'
-import { ChevronUpIcon, ChevronDownIcon, CheckIcon } from '@radix-ui/react-icons'
+// import { ChevronUpIcon, ChevronDownIcon, CheckIcon } from '@radix-ui/react-icons'
 import { FaChevronUp, FaChevronDown, FaCheck } from 'react-icons/fa';
 import { cn } from '@/lib/utils'
 
