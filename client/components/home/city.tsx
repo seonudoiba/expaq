@@ -16,8 +16,14 @@ export default function Cities() {
   });
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500"></div>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="animate-pulse rounded-lg bg-white p-6 shadow">
+            <div className="h-48 bg-gray-200 rounded-lg mb-4" />
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+            <div className="h-4 bg-gray-200 rounded w-1/2" />
+          </div>
+        ))}
       </div>
     );
   }
