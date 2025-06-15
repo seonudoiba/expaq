@@ -19,7 +19,7 @@ import { PaymentAnalytics } from '@/components/payments/PaymentAnalytics';
 import { PaymentList } from '@/components/payments/PaymentList';
 import { PaymentChart } from '@/components/payments/PaymentChart';
 import { PaymentStats } from '@/components/payments/PaymentStats';
-import { PaymentFilters } from '@/components/payments/PaymentFilters';
+//import { PaymentFilters } from '@/components/payments/PaymentFilters';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function PaymentsPage() {
