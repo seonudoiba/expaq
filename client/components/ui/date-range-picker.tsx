@@ -16,6 +16,7 @@ import {
 } from './select'
 import { Switch } from './switch'
 import { ChevronUpIcon, ChevronDownIcon, CheckIcon } from '@radix-ui/react-icons'
+import { FaChevronUp, FaChevronDown, FaCheck } from 'react-icons/fa';
 import { cn } from '@/lib/utils'
 
 export interface DateRangePickerProps {
@@ -303,7 +304,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
     >
       <>
         <span className={cn('pr-2 opacity-0', isSelected && 'opacity-70')}>
-          <CheckIcon width={18} height={18} />
+          <FaCheck width={18} height={18} />
         </span>
         {label}
       </>
@@ -357,7 +358,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
             )}
           </div>
           <div className="pl-1 opacity-60 -mr-2 scale-125">
-            {isOpen ? (<ChevronUpIcon width={24} />) : (<ChevronDownIcon width={24} />)}
+            {isOpen ? (<FaChevronUp width={24} />) : (<FaChevronDown width={24} />)}
           </div>
         </Button>
       </PopoverTrigger>
