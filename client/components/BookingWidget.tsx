@@ -135,16 +135,17 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 bg-white" align="start">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date: Date | null) => {
-                  setSelectedDate(date || undefined);
-                  setIsCalendarOpen(false);
-                }}
-                disabled={(date: Date) => date < new Date()}
-                initialFocus
-              />
+         
+<Calendar
+  mode="single"
+  selected={selectedDate}
+  onSelect={(date: Date | undefined) => {
+    setSelectedDate(date);
+    setIsCalendarOpen(false);
+  }}
+  disabled={(date: Date) => date < new Date()}
+  initialFocus={true}
+/>
             </PopoverContent>
           </Popover>
         </div>
