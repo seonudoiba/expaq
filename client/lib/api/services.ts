@@ -34,12 +34,12 @@ apiClient.interceptors.request.use((config) => {
 // Auth Services
 export const authService = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/api/login', data);
+    const response = await apiClient.post<AuthResponse>('/api/auth/login', data);
     return response.data;
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/api/register', data);
+    const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
     return response.data;
   },
   // becomeHost: async (data: becomeHostRequest): Promise<AuthResponse> => {

@@ -14,8 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-// import { DateRangePicker } from '@/components/ui/date-range-picker';
-import { DateTimePicker } from '@/components/ui/datetime-picker';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { PaymentAnalytics } from '@/components/payments/PaymentAnalytics';
 import { PaymentList } from '@/components/payments/PaymentList';
 import { PaymentChart } from '@/components/payments/PaymentChart';
@@ -68,14 +67,10 @@ export default function PaymentsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Payment Dashboard</h1>
         <div className="flex gap-4">
-          {/* <DateRangePicker
+          <DateRangePicker
             value={dateRange}
             onChange={setDateRange}
-          /> */}
-          {/* <DateTimePicker
-              date={dateRange}
-                setDate={setDateRange}
-          /> */}
+          />
           <Select value={paymentMethod} onValueChange={setPaymentMethod}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Payment Method" />

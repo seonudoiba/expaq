@@ -19,6 +19,12 @@ export function formatPrice(price: number) {
     currency: 'USD',
   }).format(price);
 }
+  export function formatCurrency(price: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(price);
+}
 
 export function truncateText(text: string, length: number) {
   if (text.length <= length) return text;

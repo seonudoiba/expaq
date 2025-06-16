@@ -63,6 +63,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll() // Allow GET requests to specific endpoints
                     .requestMatchers(PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                    .requestMatchers("/api/login", "/api/activities").permitAll() // Permit /api/login and /api/activities for all users
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
