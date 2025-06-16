@@ -11,19 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
+import { Payment } from '@/types/payments';
 
-interface Payment {
-  id: string;
-  amount: number;
-  currency: string;
-  status: string;
-  paymentMethod: string;
-  createdAt: string;
-  user: {
-    name: string;
-    email: string;
-  };
-}
+
 
 export function PaymentList() {
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -32,6 +22,7 @@ export function PaymentList() {
 
   useEffect(() => {
     fetchPayments();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchPayments = async () => {
@@ -41,6 +32,7 @@ export function PaymentList() {
       const data = await response.json();
       setPayments(data);
     } catch (error) {
+      console.error('Error fetching recent payments:', error);
       toast({
         title: 'Error',
         description: 'Failed to fetch recent payments',
@@ -94,9 +86,9 @@ export function PaymentList() {
             <TableRow key={payment.id}>
               <TableCell>
                 <div>
-                  <div className="font-medium">{payment.user.name}</div>
+                  <div className="font-medium">{payment.customerName}</div>
                   <div className="text-sm text-muted-foreground">
-                    {payment.user.email}
+                    {payment.customerEmail}
                   </div>
                 </div>
               </TableCell>
@@ -104,7 +96,7 @@ export function PaymentList() {
                 {formatCurrency(payment.amount, payment.currency)}
               </TableCell>
               <TableCell className="capitalize">
-                {payment.paymentMethod.toLowerCase()}
+                {payment.method.toLowerCase()}
               </TableCell>
               <TableCell>
                 <Badge className={getStatusColor(payment.status)}>

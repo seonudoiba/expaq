@@ -1,3 +1,5 @@
+import { PaymentAnalytics } from "./payments";
+
 export interface User {
   id: string;
   userName: string;
@@ -318,4 +320,33 @@ export interface ActivitySearchParams {
   size?: number;
   sortBy?: string;
   sortDirection?: 'ASC' | 'DESC';
+}
+
+
+export interface AnalyticsItem {
+  label: string;
+  name: string;
+  value: string | number;
+  percentage: number;
+  isNegative?: boolean;
+}
+
+
+export interface PaymentAnalyticsProps {
+  analytics: PaymentAnalytics;
+  loading: boolean;
+  totalRevenue: number;
+  revenueGrowthRate: number;
+  overallSuccessRate: number;
+  successRateGrowth: number;
+  averageTransactionAmount: number;
+  averageTransactionGrowth: number;
+  fraudRate: number;
+  fraudRateChange: number;
+  highRiskTransactions: number;
+  highRiskTransactionsChange: number;
+  averageRiskScore: number;
+  riskScoreChange: number;
+  averageTransactionTime: number;
+  transactionTimeChange: number;
 }

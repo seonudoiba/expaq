@@ -17,16 +17,15 @@ export default function HostDashboard() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
     const fetchHostData = async () => {
       setIsLoading(true);
       try {
-        const hostActivities = await activityService.getAllHostActivities(user.id);
-        setActivities(hostActivities);
+        if (user) {
+          const hostActivities = await activityService.getAllHostActivities(
+            user.id
+          );
+          setActivities(hostActivities);
+        }
       } catch (error) {
         console.error("Error fetching host activities:", error);
         toast({
@@ -48,7 +47,9 @@ export default function HostDashboard() {
     setIsLoading(true);
     try {
       await activityService.delete(activityId);
-      setActivities((prev) => prev.filter((activity) => activity.id !== activityId));
+      setActivities((prev) =>
+        prev.filter((activity) => activity.id !== activityId)
+      );
       toast({
         title: "Success",
         description: "Activity deleted successfully.",
@@ -85,7 +86,9 @@ export default function HostDashboard() {
                     <div className="flex justify-between mt-4">
                       <Button
                         variant="secondary"
-                        onClick={() => router.push(`/activities/edit/${activity.id}`)}
+                        onClick={() =>
+                          router.push(`/activities/edit/${activity.id}`)
+                        }
                       >
                         Edit
                       </Button>
@@ -107,8 +110,12 @@ export default function HostDashboard() {
           <div className="mt-8">
             <h2 className="text-xl font-bold">Profile</h2>
             <div className="border p-4 rounded-md">
-              <p><strong>Name:</strong> {user?.userName }</p>
-              <p><strong>Email:</strong> {user?.email}</p>
+              <p>
+                <strong>Name:</strong> {user?.userName}
+              </p>
+              <p>
+                <strong>Email:</strong> {user?.email}
+              </p>
               <Button
                 variant="secondary"
                 className="mt-4"

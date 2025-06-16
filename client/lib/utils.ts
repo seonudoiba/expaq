@@ -19,10 +19,10 @@ export function formatPrice(price: number) {
     currency: 'USD',
   }).format(price);
 }
-  export function formatCurrency(price: number) {
+  export function formatCurrency(price: number, currency: string = 'USD') {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: currency,
   }).format(price);
 }
 

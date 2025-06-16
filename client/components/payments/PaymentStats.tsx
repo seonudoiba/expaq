@@ -1,13 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
+import { PaymentAnalyticsProps } from '@/types/payments';
+// import { PaymentAnalyticsProps } from '@/types';
 
-interface PaymentStatsProps {
-  analytics: any;
-  loading: boolean;
-}
 
-export function PaymentStats({ analytics, loading }: PaymentStatsProps) {
+export function PaymentStats({ analytics, loading }: PaymentAnalyticsProps) {
   if (loading) {
     return (
       <>

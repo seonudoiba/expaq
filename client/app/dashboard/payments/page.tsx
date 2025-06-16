@@ -15,24 +15,27 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
-import { PaymentAnalytics } from '@/components/payments/PaymentAnalytics';
+import { PaymentAnalytics as PaymentAnalyticsComponent } from '@/components/payments/PaymentAnalytics';
 import { PaymentList } from '@/components/payments/PaymentList';
 import { PaymentChart } from '@/components/payments/PaymentChart';
 import { PaymentStats } from '@/components/payments/PaymentStats';
-// import { PaymentFilters } from '@/components/payments/PaymentFilters';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuthStore } from '@/lib/store/auth';
+
+// Import types
+import { PaymentAnalytics } from '@/types/payments';
+import { useQuery } from "@tanstack/react-query";
+import { PaymentAnalyticsService } from '@/lib/api/payment-service';
+
 
 export default function PaymentsPage() {
   const [dateRange, setDateRange] = useState({ from: new Date(), to: new Date() });
   const [paymentMethod, setPaymentMethod] = useState('all');
   const [currency, setCurrency] = useState('all');
-  const [analytics, setAnalytics] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const {user} = useAuthStore()
+  // const [analytics, setAnalytics] = useState<PaymentAnalytics | null>(null);
+  // const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
-  useEffect(() => {
-    fetchAnalytics();
-  }, [dateRange, paymentMethod, currency]);
 
   const fetchAnalytics = async () => {
     try {
@@ -50,7 +53,7 @@ export default function PaymentsPage() {
 
       if (!response.ok) throw new Error('Failed to fetch analytics');
       const data = await response.json();
-      setAnalytics(data);
+      setAnalytics(data as PaymentAnalytics);
     } catch (error) {
       console.error('Error fetching payment analytics:', error);
       toast({
@@ -63,14 +66,61 @@ export default function PaymentsPage() {
     }
   };
 
+  useEffect(() => {
+    fetchAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange, paymentMethod, currency]);
+
+
+    const {
+      data: analytics,
+      isLoading,
+      error,
+    } = useQuery({
+      queryKey: ["Payment Analytics"],
+      queryFn: () => PaymentAnalyticsService.getHostPaymentAnalytics(user?.id),
+      
+    });
+  // Default fallback object for analytics
+  const defaultAnalytics: PaymentAnalytics = {
+    revenueByTimePeriod: [],
+    revenueByPaymentMethod: [],
+    overallSuccessRate: 0,
+    successRateGrowth: 0,
+    stripeSuccessRate: 0,
+    stripeSuccessRateGrowth: 0,
+    paystackSuccessRate: 0,
+    paystackSuccessRateGrowth: 0,
+    fraudRate: 0,
+    fraudRateChange: 0,
+    highRiskTransactions: 0,
+    highRiskTransactionsChange: 0,
+    averageRiskScore: 0,
+    riskScoreChange: 0,
+    averageTransactionTime: 0,
+    transactionTimeChange: 0,
+    paymentProcessingRate: 0,
+    processingRateChange: 0,
+    errorRate: 0,
+    errorRateChange: 0,
+    totalRevenue: 0,
+    revenueGrowthRate: 0,
+    averageTransactionAmount: 0,
+    averageTransactionGrowth: 0
+  };
+
   return (
-    <div className="container mx-auto p-6 space-y-6">      <div className="flex justify-between items-center">
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Payment Dashboard</h1>
         <div className="flex gap-4">
           <DateRangePicker
             initialDateFrom={dateRange.from}
             initialDateTo={dateRange.to}
-            onUpdate={({ range }) => setDateRange({ from: range.from, to: range.to })}
+            onUpdate={({ range }) => setDateRange({ 
+              from: range.from, 
+              to: range.to || new Date() // Fallback to current date if to is undefined
+            })}
           />
           <Select value={paymentMethod} onValueChange={setPaymentMethod}>
             <SelectTrigger className="w-[180px]">
@@ -94,10 +144,9 @@ export default function PaymentsPage() {
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <PaymentStats analytics={analytics} loading={loading} />
+      </div>      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+       
+        <PaymentStats analytics={analytics ?? defaultAnalytics} loading={false} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -107,7 +156,7 @@ export default function PaymentsPage() {
           </CardHeader>
           <CardContent>
             <PaymentChart
-              data={analytics?.revenueByTimePeriod}
+              data={analytics?.revenueByTimePeriod ?? []}
               loading={loading}
             />
           </CardContent>
@@ -118,8 +167,10 @@ export default function PaymentsPage() {
             <CardTitle>Payment Methods Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <PaymentChart
-              data={analytics?.revenueByPaymentMethod}
+            <PaymentChart              data={analytics?.revenueByPaymentMethod?.map((item: { name: string; label: string; value: string | number }) => ({
+                name: item.name || item.label,
+                value: typeof item.value === 'string' ? parseFloat(item.value) : item.value
+              })) ?? []}
               loading={loading}
               type="pie"
             />
@@ -132,7 +183,7 @@ export default function PaymentsPage() {
           <CardTitle>Payment Analytics</CardTitle>
         </CardHeader>
         <CardContent>
-          <PaymentAnalytics analytics={analytics} loading={loading} />
+          <PaymentAnalyticsComponent analytics={analytics ?? defaultAnalytics} loading={loading} />
         </CardContent>
       </Card>
 
@@ -146,4 +197,4 @@ export default function PaymentsPage() {
       </Card>
     </div>
   );
-} 
+}

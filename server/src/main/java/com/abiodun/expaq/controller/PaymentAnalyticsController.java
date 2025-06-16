@@ -41,6 +41,13 @@ public class PaymentAnalyticsController {
         return ResponseEntity.ok(paymentAnalyticsService.getUserAnalytics(userId));
     }
 
+    @GetMapping("/host/{hostId}")
+    @PreAuthorize("hasRole('HOST')")
+    public ResponseEntity<PaymentAnalyticsDTO> getHostAnalytics(@PathVariable UUID userId) {
+        return ResponseEntity.ok(paymentAnalyticsService.getUserAnalytics(userId));
+    }
+
+
     @GetMapping("/booking/{bookingId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PaymentAnalyticsDTO> getBookingAnalytics(@PathVariable UUID bookingId) {

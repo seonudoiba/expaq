@@ -1,41 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
+import { PaymentAnalyticsProps, AnalyticsItem } from '@/types/payments';
 
-interface AnalyticsItem {
-  label: string;
-  value: string | number;
-  percentage: number;
-  isNegative?: boolean;
-}
 
-interface PaymentAnalyticsProps {
-  analytics: {
-    revenueByPaymentMethod?: Array<{
-      name: string;
-      value: number;
-      percentage: number;
-    }>;
-    overallSuccessRate: number;
-    successRateGrowth: number;
-    stripeSuccessRate: number;
-    stripeSuccessRateGrowth: number;
-    paystackSuccessRate: number;
-    paystackSuccessRateGrowth: number;
-    fraudRate: number;
-    fraudRateChange: number;
-    highRiskTransactions: number;
-    highRiskTransactionsChange: number;
-    averageRiskScore: number;
-    riskScoreChange: number;
-    averageTransactionTime: number;
-    transactionTimeChange: number;
-    paymentProcessingRate: number;
-    processingRateChange: number;
-    errorRate: number;
-    errorRateChange: number;
-  };
-  loading: boolean;
-}
 
 export function PaymentAnalytics({ analytics, loading }: PaymentAnalyticsProps) {
   if (loading) {
@@ -59,9 +26,9 @@ export function PaymentAnalytics({ analytics, loading }: PaymentAnalyticsProps) 
   const sections = [
     {
       title: 'Payment Methods',
-      data: analytics.revenueByPaymentMethod?.map((method: { name: string; value: number; percentage: number }) => ({
+      data: analytics.revenueByPaymentMethod?.map((method: AnalyticsItem) => ({
         label: method.name,
-        value: formatCurrency(method.value),
+        value: formatCurrency(Number(method.value)),
         percentage: method.percentage,
       })),
     },
@@ -138,7 +105,7 @@ export function PaymentAnalytics({ analytics, loading }: PaymentAnalyticsProps) 
         <div key={index} className="space-y-4">
           <h3 className="text-lg font-semibold">{section.title}</h3>
           <div className="space-y-2">
-            {(section.data ?? []).map((item: AnalyticsItem, itemIndex: number) => (
+            {(section.data ?? []).map((item: { label: string; value: string | number; percentage: number; isNegative?: boolean }, itemIndex: number) => (
               <div
                 key={itemIndex}
                 className="flex items-center justify-between p-4 bg-muted rounded-lg"

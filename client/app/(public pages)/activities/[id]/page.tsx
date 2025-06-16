@@ -8,24 +8,35 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { activityService } from "@/lib/api/services";
+import { publicApiService } from "@/lib/api/public-services";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
+import { PublicHostResponse } from "@/types/host";
 
 export default function ActivityDetailsPage() {
   const params = useParams();
   const [selectedDate, setSelectedDate] = useState("");
   const [participants, setParticipants] = useState(1);
 
-  // This would be fetched from the API in a real application
-
   const {
     data: activity,
     error,
     isLoading,
   } = useQuery({
-    queryKey: ["activity"],
-    queryFn: () => activityService.getById(params.id as string),
+    queryKey: ["activity", params.id],
+    queryFn: () => publicApiService.getActivityById(params.id as string),
+  });
+  const {
+    data: host,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    isLoading: isHostLoading,
+  } = useQuery<PublicHostResponse>({
+    queryKey: ["host", activity?.hostId],
+    queryFn: () => {
+      if (!activity?.hostId) throw new Error('Host ID is required');
+      return publicApiService.getHostById(activity.hostId);
+    },
+    enabled: !!activity?.hostId,
   });
 
 
@@ -104,23 +115,40 @@ export default function ActivityDetailsPage() {
               </div>
             </div>
 
-
   {/* Host Info */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4 mb-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarImage src={activity.hostProfilePicture ?? undefined} alt={activity.hostName} />
-                    <AvatarFallback>{activity.hostName.charAt(0)}</AvatarFallback>
+                    <AvatarImage 
+                      src={host?.profilePictureUrl || activity.hostProfilePicture || undefined} 
+                      alt={host?.userName || activity.hostName} 
+                    />
+                    <AvatarFallback>
+                      {(host?.userName || activity.hostName || 'Host').charAt(0)}
+                    </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-lg font-semibold">Hosted by {activity.hostName}</h3>
+                    <h3 className="text-lg font-semibold">
+                      Hosted by {host?.userName || activity.hostName}
+                    </h3>
                     <div className="flex items-center space-x-4 text-sm text-gray-600">
                       <span>Host</span>
-                      <span>Member since {new Date(activity.hostCreatedAt).getFullYear()}</span>
+                      <span>
+                        Member since {new Date(host?.createdAt || activity.hostCreatedAt).getFullYear()}
+                      </span>
+                      {host?.verified && (
+                        <span className="flex items-center">
+                          <Star className="h-4 w-4 text-blue-500 mr-1" />
+                          Verified
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
+                {host?.bio && (
+                  <p className="text-gray-700 mb-4">{host.bio}</p>
+                )}
                 <Button variant="outline">Contact Host</Button>
               </CardContent>
             </Card>

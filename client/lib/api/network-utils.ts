@@ -1,9 +1,7 @@
 import { apiClient } from './client';
 import type {
-  AuthResponse,
-  Review,
+
   User,
-  ActivityType,
   PaginatedUsersResponse,
 } from '@/types';
 

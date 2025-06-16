@@ -13,6 +13,7 @@ interface ReviewsListProps {
 
 const ReviewsList = ({ activityId }: ReviewsListProps) => {
   const [showAll, setShowAll] = useState(false);
+  console.log(activityId)
   
   // Mock reviews data
   const reviews = [

@@ -12,12 +12,7 @@ import {
   Cell,
 } from 'recharts';
 import { formatCurrency } from '@/lib/utils';
-
-interface PaymentChartProps {
-  data: any[];
-  loading: boolean;
-  type?: 'line' | 'pie';
-}
+import { PaymentChartProps } from '@/types/payments';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 

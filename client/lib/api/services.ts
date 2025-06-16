@@ -50,8 +50,7 @@ export const authService = {
   getCurrentUser: async (): Promise<User> => {
     const response = await apiClient.get<User>('/api/auth/me');
     return response.data;
-  },
-  getHostById: async (id: string): Promise<User> => {
+  },  getHostById: async (id: string): Promise<User> => {
     const response = await apiClient.get<User>(`/api/auth/${id}`);
     return response.data;
   },
