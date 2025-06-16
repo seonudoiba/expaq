@@ -30,8 +30,8 @@ export const PaymentAnalyticsService = {
 //     const response = await apiClient.get<User>('/api/auth/me');
 //     return response.data;
 //   },  
-  getHostPaymentAnalytics: async (hostId: string): Promise<PaymentAnalytics[]> => {
-    const response = await apiClient.get<PaymentAnalytics[]>(`/api/payments/analytics/host/${hostId}`);
+  getHostPaymentAnalytics: async (hostId: string): Promise<PaymentAnalytics> => {
+    const response = await apiClient.get<PaymentAnalytics>(`/api/payments/analytics/host/${hostId}`);
     return response.data;
   },
 
