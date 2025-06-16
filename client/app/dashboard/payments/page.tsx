@@ -1,86 +1,60 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { useState} from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
-import { PaymentAnalytics as PaymentAnalyticsComponent } from '@/components/payments/PaymentAnalytics';
-import { PaymentList } from '@/components/payments/PaymentList';
-import { PaymentChart } from '@/components/payments/PaymentChart';
-import { PaymentStats } from '@/components/payments/PaymentStats';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuthStore } from '@/lib/store/auth';
+} from "@/components/ui/select";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { PaymentAnalytics as PaymentAnalyticsComponent } from "@/components/payments/PaymentAnalytics";
+import { PaymentList } from "@/components/payments/PaymentList";
+import { PaymentChart } from "@/components/payments/PaymentChart";
+import { PaymentStats } from "@/components/payments/PaymentStats";
+import { useAuthStore } from "@/lib/store/auth";
 
 // Import types
-import { PaymentAnalytics } from '@/types/payments';
+import { PaymentAnalytics } from "@/types/payments";
 import { useQuery } from "@tanstack/react-query";
-import { PaymentAnalyticsService } from '@/lib/api/payment-service';
-
+import { PaymentAnalyticsService } from "@/lib/api/payment-service";
 
 export default function PaymentsPage() {
-  const [dateRange, setDateRange] = useState({ from: new Date(), to: new Date() });
-  const [paymentMethod, setPaymentMethod] = useState('all');
-  const [currency, setCurrency] = useState('all');
-  const {user} = useAuthStore()
-  // const [analytics, setAnalytics] = useState<PaymentAnalytics | null>(null);
-  // const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const [dateRange, setDateRange] = useState({
+    from: new Date(),
+    to: new Date(),
+  });
+  const [paymentMethod, setPaymentMethod] = useState("all");
+  const [currency, setCurrency] = useState("all");
+  const { user } = useAuthStore();
 
-  const fetchAnalytics = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/payments/analytics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          startDate: dateRange.from,
-          endDate: dateRange.to,
-          paymentMethod: paymentMethod !== 'all' ? paymentMethod : undefined,
-          currency: currency !== 'all' ? currency : undefined,
-        }),
-      });
+  const {
+    data: analytics,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["Payment Analytics", user?.id],
+    queryFn: () => {
+      if (!user?.id) {
+        throw new Error("User ID is required");
+      }
+      return PaymentAnalyticsService.getHostPaymentAnalytics(user.id);
+    },
+    enabled: !!user?.id,
+  });
 
-      if (!response.ok) throw new Error('Failed to fetch analytics');
-      const data = await response.json();
-      setAnalytics(data as PaymentAnalytics);
-    } catch (error) {
-      console.error('Error fetching payment analytics:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch payment analytics',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAnalytics();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateRange, paymentMethod, currency]);
-
-
-    const {
-      data: analytics,
-      isLoading,
-      error,
-    } = useQuery({
-      queryKey: ["Payment Analytics"],
-      queryFn: () => PaymentAnalyticsService.getHostPaymentAnalytics(user?.id),
-      
-    });
+  if (!user?.id) {
+    return (
+      <div className="container mx-auto p-6">
+        <h1 className="text-3xl font-bold">Payment Dashboard</h1>
+        <p className="mt-4 text-red-500">
+          You must be logged in to view this page.
+        </p>
+      </div>
+    );
+  }
   // Default fallback object for analytics
   const defaultAnalytics: PaymentAnalytics = {
     revenueByTimePeriod: [],
@@ -106,8 +80,28 @@ export default function PaymentsPage() {
     totalRevenue: 0,
     revenueGrowthRate: 0,
     averageTransactionAmount: 0,
-    averageTransactionGrowth: 0
+    averageTransactionGrowth: 0,
   };
+  const loading = isLoading || !analytics;
+
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-6">
+        <h1 className="text-3xl font-bold">Loading Payment Analytics...</h1>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <h1 className="text-3xl font-bold text-red-500">Error Loading Data</h1>
+        <p className="mt-4 text-red-500">
+          {error instanceof Error ? error.message : "An error occurred"}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -117,10 +111,12 @@ export default function PaymentsPage() {
           <DateRangePicker
             initialDateFrom={dateRange.from}
             initialDateTo={dateRange.to}
-            onUpdate={({ range }) => setDateRange({ 
-              from: range.from, 
-              to: range.to || new Date() // Fallback to current date if to is undefined
-            })}
+            onUpdate={({ range }) =>
+              setDateRange({
+                from: range.from,
+                to: range.to || new Date(), // Fallback to current date if to is undefined
+              })
+            }
           />
           <Select value={paymentMethod} onValueChange={setPaymentMethod}>
             <SelectTrigger className="w-[180px]">
@@ -144,9 +140,12 @@ export default function PaymentsPage() {
             </SelectContent>
           </Select>
         </div>
-      </div>      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-       
-        <PaymentStats analytics={analytics ?? defaultAnalytics} loading={false} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <PaymentStats
+          analytics={analytics ?? defaultAnalytics}
+          loading={loading}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -167,10 +166,22 @@ export default function PaymentsPage() {
             <CardTitle>Payment Methods Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <PaymentChart              data={analytics?.revenueByPaymentMethod?.map((item: { name: string; label: string; value: string | number }) => ({
-                name: item.name || item.label,
-                value: typeof item.value === 'string' ? parseFloat(item.value) : item.value
-              })) ?? []}
+            <PaymentChart
+              data={
+                analytics?.revenueByPaymentMethod?.map(
+                  (item: {
+                    name: string;
+                    label: string;
+                    value: string | number;
+                  }) => ({
+                    name: item.name || item.label,
+                    value:
+                      typeof item.value === "string"
+                        ? parseFloat(item.value)
+                        : item.value,
+                  })
+                ) ?? []
+              }
               loading={loading}
               type="pie"
             />
@@ -183,7 +194,10 @@ export default function PaymentsPage() {
           <CardTitle>Payment Analytics</CardTitle>
         </CardHeader>
         <CardContent>
-          <PaymentAnalyticsComponent analytics={analytics ?? defaultAnalytics} loading={loading} />
+          <PaymentAnalyticsComponent
+            analytics={analytics ?? defaultAnalytics}
+            loading={loading}
+          />
         </CardContent>
       </Card>
 
