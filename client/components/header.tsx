@@ -40,7 +40,8 @@ import {
 import { useMobile } from "@/hooks/use-mobile";
 import { useAuthStore } from "@/lib/store/auth";
 
-export function Header() {  const isMobile = useMobile();
+export function Header() {
+  const isMobile = useMobile();
   const [showSearch, setShowSearch] = useState(false);
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -69,6 +70,14 @@ export function Header() {  const isMobile = useMobile();
                             className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
                             href="/activities"
                           >
+                            {/* <div className="max-h-6">
+                              <Image
+                                src="/discover.jpg"
+                                alt="Discover"
+                                width={200} height={60}
+                              
+                              />
+                            </div> */}
                             <div className="mt-4 mb-2 text-lg font-medium text-white">
                               Featured Activities
                             </div>
@@ -96,7 +105,8 @@ export function Header() {  const isMobile = useMobile();
                       </ListItem>
                     </ul>
                   </NavigationMenuContent>
-                </NavigationMenuItem>                <NavigationMenuItem>
+                </NavigationMenuItem>{" "}
+                <NavigationMenuItem>
                   <Link href="/activities" legacyBehavior passHref>
                     <NavigationMenuLink
                       className={navigationMenuTriggerStyle()}
@@ -114,7 +124,7 @@ export function Header() {  const isMobile = useMobile();
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
-                  {/* Additional menu items that match mobile */}
+                {/* Additional menu items that match mobile */}
                 {isAuthenticated && (
                   <>
                     <NavigationMenuItem>
@@ -135,13 +145,13 @@ export function Header() {  const isMobile = useMobile();
                         </NavigationMenuLink>
                       </Link>
                     </NavigationMenuItem>
-                  
                   </>
                 )}
               </NavigationMenuList>
             </NavigationMenu>
           )}
-        </div>        <div className="flex items-center gap-1">
+        </div>{" "}
+        <div className="flex items-center gap-1">
           {!isMobile && !showSearch && (
             <Button
               variant="ghost"
@@ -178,7 +188,8 @@ export function Header() {  const isMobile = useMobile();
                 <span className="sr-only">Close search</span>
               </Button>
             </div>
-          )}{!isMobile && isAuthenticated ? (
+          )}
+          {!isMobile && isAuthenticated ? (
             <Navbar />
           ) : !isMobile && !isAuthenticated ? (
             <>
@@ -190,10 +201,8 @@ export function Header() {  const isMobile = useMobile();
               </Link>
             </>
           ) : null}
-          
-          {isMobile && isAuthenticated ? (
-            <ProfileMobile />
-          ) : null}
+
+          {isMobile && isAuthenticated ? <ProfileMobile /> : null}
 
           {/* Mobile Menu Toggle */}
           {isMobile && (
@@ -224,7 +233,8 @@ export function Header() {  const isMobile = useMobile();
                         placeholder="Search activities..."
                         className="pl-9"
                       />
-                    </div>                    <nav className="grid gap-2">
+                    </div>{" "}
+                    <nav className="grid gap-2">
                       <Link
                         href="/activities"
                         className="flex items-center gap-2 text-lg font-medium"
@@ -237,7 +247,7 @@ export function Header() {  const isMobile = useMobile();
                       >
                         <Calendar className="h-5 w-5" /> All Activities
                       </Link>
-                      
+
                       {/* Links that are always visible */}
                       <Link
                         href="/become-a-host"
@@ -245,7 +255,7 @@ export function Header() {  const isMobile = useMobile();
                       >
                         <Users className="h-5 w-5" /> Become a Host
                       </Link>
-                      
+
                       {/* Auth-only links */}
                       {isAuthenticated && (
                         <>
@@ -275,7 +285,8 @@ export function Header() {  const isMobile = useMobile();
                           </Link>
                         </>
                       )}
-                    </nav>{!isAuthenticated ? (
+                    </nav>
+                    {!isAuthenticated ? (
                       <div className="grid gap-2 mt-4">
                         <Link href="/login">
                           <Button variant="outline" className="w-full">
@@ -294,8 +305,12 @@ export function Header() {  const isMobile = useMobile();
                               {user?.userName?.[0]}
                             </div>
                             <div>
-                              <div className="text-sm font-medium">{user?.userName}</div>
-                              <div className="text-xs text-muted-foreground">{user?.email}</div>
+                              <div className="text-sm font-medium">
+                                {user?.userName}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {user?.email}
+                              </div>
                             </div>
                           </div>
                         )}
@@ -303,12 +318,13 @@ export function Header() {  const isMobile = useMobile();
                           <Button variant="outline" className="w-full">
                             Your Profile
                           </Button>
-                        </Link>                        <Button 
-                          variant="destructive" 
+                        </Link>{" "}
+                        <Button
+                          variant="destructive"
                           className="w-full"
                           onClick={() => {
                             logout();
-                            router.push('/login');
+                            router.push("/login");
                           }}
                         >
                           Sign out
