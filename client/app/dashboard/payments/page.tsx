@@ -52,6 +52,7 @@ export default function PaymentsPage() {
       const data = await response.json();
       setAnalytics(data);
     } catch (error) {
+      console.error('Error fetching payment analytics:', error);
       toast({
         title: 'Error',
         description: 'Failed to fetch payment analytics',
@@ -63,13 +64,13 @@ export default function PaymentsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto p-6 space-y-6">      <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Payment Dashboard</h1>
         <div className="flex gap-4">
           <DateRangePicker
-            value={dateRange}
-            onChange={setDateRange}
+            initialDateFrom={dateRange.from}
+            initialDateTo={dateRange.to}
+            onUpdate={({ range }) => setDateRange({ from: range.from, to: range.to })}
           />
           <Select value={paymentMethod} onValueChange={setPaymentMethod}>
             <SelectTrigger className="w-[180px]">
