@@ -1,13 +1,13 @@
 import React from "react";
 import {
-  BoxCubeIcon,
-  CalenderIcon,
+//   BoxCubeIcon,
+//   CalenderIcon,
   GridIcon,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
-  PlugInIcon,
-  TableIcon,
+//   ListIcon,
+//   PageIcon,
+//   PieChartIcon,
+//   PlugInIcon,
+//   TableIcon,
   UserCircleIcon,
 } from "@/icons/index";
 
