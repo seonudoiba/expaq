@@ -117,9 +117,9 @@ const AdminSidebar: React.FC = () => {
 
                 {/* Submenu */}
                 <div
-                  ref={(el) =>
-                    (subMenuRefs.current[`${menuType}-${index}`] = el)
-                  }
+                  ref={(el) => {
+                    subMenuRefs.current[`${menuType}-${index}`] = el;
+                  }}
                   className={`overflow-hidden transition-all duration-300 ${
                     !isExpanded && !isHovered
                       ? "absolute left-full ml-1 top-0 w-[230px] rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 lg:invisible lg:group-hover:visible"
