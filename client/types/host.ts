@@ -2,45 +2,38 @@
  * Host related types
  */
 
-import { Role, Activity } from './index';
+import { Role } from './index';
 
 export interface Host {
   id: string;
   userName: string;
   email: string;
-  profilePictureUrl: string;
-  bio: string;
-  firstName: string;
-  lastName: string;
+  avatar?: string;
   roles: Role[];
-  activitiesHosted: number;
-  averageRating: number;
-  totalReviews: number;
-  totalBookings: number;
-  verified: boolean;
-  active: boolean;
   createdAt: string;
   updatedAt: string;
-  activities?: Activity[];
+  profilePictureUrl: string | null;
+  bio: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  verified: boolean;
+
 }
 
 export interface HostProfile {
-  id: string;
-  userName: string;
+ id: string;
   email: string;
   firstName: string;
+  userName: string;
   lastName: string;
-  profilePictureUrl: string;
-  bio: string;
+  profilePictureUrl: string | "/default-avatar.png";
+  bio: string | "";
   roles: Role[];
-  activitiesHosted: number;
-  averageRating: number;
-  totalReviews: number;
-  totalBookings: number;
   verified: boolean;
   active: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  
 }
 
 export interface PublicHostResponse {

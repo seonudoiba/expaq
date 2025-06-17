@@ -1,51 +1,83 @@
+import { apiClient } from './client';
+import type {
+  AuthResponse,
+  CreateActivityRequest,
+  UpdateActivityRequest,
+  CreateReviewRequest,
+  LoginRequest,
+  RegisterRequest,
+  Review,
+  User,
+  Activity,
+  City,
+  ActivityType,
+  PaginatedUsersResponse,
+} from '@/types';
+
 /**
  * Public API services for unauthenticated access
  */
-import { PublicHostResponse } from '@/types/host';
-import { Activity } from '@/types/activity';
-import { PaginatedResponse } from '@/types';
 
-export const publicApiService = {
-  getHostById: async (id: string): Promise<PublicHostResponse> => {
-    const response = await fetch(`/api/public/hosts/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch host data');
-    }
-    return response.json();
-  },
+
+export const ActivityService = {
+  getAll: async (params?: {
+      city?: string;
+      country?: string;
+      activityType?: string;
+      minPrice?: number;
+      maxPrice?: number;
+      sortBy?: string;
+      querySearch?: string;
+      when?: string;
+      numOfPeople?: string;
+    }): Promise<Activity[]> => {
+      const response = await apiClient.get<Activity[]>('/api/activities', { params });
+      console.log('Activities:', response.data);
+      return response.data;
+    },
+    getAllFeaturedActivities: async (params?: {
+      location?: string;
+      type?: string;
+      minPrice?: number;
+      maxPrice?: number;
+    }): Promise<Activity[]> => {
+      const response = await apiClient.get<Activity[]>('/api/activities/featured', { params });
+      console.log('Featured Activities:', response.data);
+      return response.data;
+    },
   
-  getActivityById: async (id: string): Promise<Activity> => {
-    const response = await fetch(`/api/public/activities/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch activity data');
-    }
-    return response.json();
-  },
   
-  getActivities: async (params?: { 
-    page?: number; 
-    size?: number;
-    search?: string;
-    cityId?: string;
-    countryId?: string;
-    activityTypeId?: string;
-    minPrice?: number;
-    maxPrice?: number;
-  }): Promise<PaginatedResponse<Activity>> => {
-    const queryParams = new URLSearchParams();
-    
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
-        }
-      });
-    }
-    
-    const response = await fetch(`/api/public/activities?${queryParams.toString()}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch activities');
-    }
-    return response.json();
-  }
+    getAllHostActivities: async (host:string ,params?: {
+      location?: string;
+      type?: string;
+      minPrice?: number;
+      maxPrice?: number;
+    }): Promise<Activity[]> => {
+      const response = await apiClient.get<Activity[]>(`/api/activities/host/${host}`, { params });
+      console.log('Activities:', response.data);
+      return response.data;
+    },
+  
+    getById: async (id: string): Promise<Activity> => {
+      const response = await apiClient.get<Activity>(`/api/activities/${id}`);
+      return response.data;
+    },
+  
+};
+
+// Auth Services
+export const AuthService = {
+
+  getHostById: async (id: string): Promise<User> => {
+    const response = await apiClient.get<User>(`/api/auth/${id}`);
+    return response.data;
+  },
+
+
+
+  getHosts: async (): Promise<PaginatedUsersResponse> => {
+    const response = await apiClient.get<PaginatedUsersResponse>('/api/auth/users-by-role?roleName=HOST');
+    return response.data;
+  },
+
 };

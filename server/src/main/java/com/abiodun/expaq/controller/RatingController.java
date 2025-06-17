@@ -1,11 +1,11 @@
 package com.abiodun.expaq.controller;
 
+import com.abiodun.expaq.dto.RatingRequest;
 import com.abiodun.expaq.model.ExpaqUserDetails;
-import com.abiodun.expaq.model.Rating;
 import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.response.RatingResponse;
-import com.abiodun.expaq.service.RatingService;
+import com.abiodun.expaq.service.impl.RatingService;
 import com.abiodun.expaq.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +28,13 @@ public class RatingController {
 
 
     @PostMapping("/activity/{activityId}/ratings")
-    public ResponseEntity<RatingResponse> createNewRating(@PathVariable UUID activityId, @RequestBody Rating rating,
+    public ResponseEntity<RatingResponse> createNewRating(@PathVariable UUID activityId, @RequestBody RatingRequest rating,
                                                           @AuthenticationPrincipal ExpaqUserDetails currentUser
                                                           ) {
 
         // Fetch the logged-in user (assuming you have a method to get the current user)
-        User loggedInUser = userRepository.findByUsername(currentUser.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + currentUser.getUsername()));
+        User loggedInUser = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentUser.getUsername()));
 
 
         // Set the activity and user for the rating

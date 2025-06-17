@@ -1,6 +1,7 @@
-package com.abiodun.expaq.service;
+package com.abiodun.expaq.service.impl;
 
 import com.abiodun.expaq.dto.ActivityDTO;
+import com.abiodun.expaq.dto.RatingRequest;
 import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.response.RatingResponse;
 import com.abiodun.expaq.exception.ActivityNotFoundException;
@@ -9,12 +10,13 @@ import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Rating;
 import com.abiodun.expaq.repository.ActivityRepository;
 import com.abiodun.expaq.repository.RatingRepository;
+import com.abiodun.expaq.service.IActivityService;
+import com.abiodun.expaq.service.IRatingService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,13 +35,15 @@ public class RatingService implements IRatingService {
 
     @Transactional
     @Override
-    public RatingResponse createRating(UUID activityId, Rating rating, User loggedInUser) {
+    public RatingResponse createRating(UUID activityId, RatingRequest requestRating, User loggedInUser) {
         // Fetch the activity by ID
         Activity activity = activityRepository.findById(activityId)
                 .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
 
         // Map Activity to ActivityDTO
         ActivityDTO activityDTO = activityService.mapToActivityDTO(activity);
+
+        Rating rating = new Rating();
 
         // Check if the user has already rated this activity
         boolean hasUserRated = ratingRepository.existsByActivityAndUser(ActivityDTO.fromActivity(activity), loggedInUser);
@@ -48,6 +52,9 @@ public class RatingService implements IRatingService {
         }
 
         // Set the activity and user for the rating
+        rating.setContent(requestRating.getContent());
+        rating.setTitle(requestRating.getTitle());
+        rating.setStars(requestRating.getStars());
         rating.setActivity(activity);
         rating.setUser(loggedInUser); // Ensure the Rating entity has a reference to the User
 

@@ -8,11 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { publicApiService } from "@/lib/api/public-services";
+import { ActivityService} from "@/lib/api/public-services";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
-import { PublicHostResponse } from "@/types/host";
-
+import { useAuthStore } from "@/lib/store/auth";
 export default function ActivityDetailsPage() {
   const params = useParams();
   const [selectedDate, setSelectedDate] = useState("");
@@ -24,20 +23,9 @@ export default function ActivityDetailsPage() {
     isLoading,
   } = useQuery({
     queryKey: ["activity", params.id],
-    queryFn: () => publicApiService.getActivityById(params.id as string),
+    queryFn: () => ActivityService.getById(params.id as string),
   });
-  const {
-    data: host,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isLoading: isHostLoading,
-  } = useQuery<PublicHostResponse>({
-    queryKey: ["host", activity?.hostId],
-    queryFn: () => {
-      if (!activity?.hostId) throw new Error('Host ID is required');
-      return publicApiService.getHostById(activity.hostId);
-    },
-    enabled: !!activity?.hostId,
-  });
+
 
 
   if (error) {
@@ -121,23 +109,23 @@ export default function ActivityDetailsPage() {
                 <div className="flex items-center space-x-4 mb-4">
                   <Avatar className="h-16 w-16">
                     <AvatarImage 
-                      src={host?.profilePictureUrl || activity.hostProfilePicture || undefined} 
-                      alt={host?.userName || activity.hostName} 
+                      src={activity.hostProfilePicture} 
+                      alt={activity.hostName} 
                     />
                     <AvatarFallback>
-                      {(host?.userName || activity.hostName || 'Host').charAt(0)}
+                      {(activity.hostName || 'Host').charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <h3 className="text-lg font-semibold">
-                      Hosted by {host?.userName || activity.hostName}
+                      Hosted by {activity.hostName}
                     </h3>
                     <div className="flex items-center space-x-4 text-sm text-gray-600">
                       <span>Host</span>
                       <span>
-                        Member since {new Date(host?.createdAt || activity.hostCreatedAt).getFullYear()}
+                        Member since {new Date(activity.hostCreatedAt).getFullYear()}
                       </span>
-                      {host?.verified && (
+                      {activity.verified && (
                         <span className="flex items-center">
                           <Star className="h-4 w-4 text-blue-500 mr-1" />
                           Verified
@@ -146,8 +134,8 @@ export default function ActivityDetailsPage() {
                     </div>
                   </div>
                 </div>
-                {host?.bio && (
-                  <p className="text-gray-700 mb-4">{host.bio}</p>
+                {activity.hostBio && (
+                  <p className="text-gray-700 mb-4">{activity.hostBio}</p>
                 )}
                 <Button variant="outline">Contact Host</Button>
               </CardContent>

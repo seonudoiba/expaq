@@ -2,10 +2,9 @@
 
 import { useSidebar } from "@/contexts/admin/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
-import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
-import RequireAdmin from "@/components/auth/RequireAdmin";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export default function AdminLayout({
   children,
@@ -22,23 +21,21 @@ export default function AdminLayout({
     : "lg:ml-[90px]";
 
   return (
-    <RequireAdmin adminRoles={["ADMIN", "super-admin", "editor"]}>
-      <div className="min-h-screen xl:flex">
-        {/* Sidebar and Backdrop */}
-        <AppSidebar />
-        <Backdrop />
-        {/* Main Content Area */}
-        <div
-          className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
-        >
-          {/* Header */}
-          <AppHeader />
-          {/* Page Content */}
-          <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
-            {children}
-          </div>
+    <div className="min-h-screen xl:flex">
+      {/* Admin Sidebar and Backdrop */}
+      <AdminSidebar />
+      <Backdrop />
+      {/* Main Content Area */}
+      <div
+        className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}
+      >
+        {/* Header */}
+        <AppHeader />
+        {/* Page Content */}
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          {children}
         </div>
       </div>
-    </RequireAdmin>
+    </div>
   );
 }
