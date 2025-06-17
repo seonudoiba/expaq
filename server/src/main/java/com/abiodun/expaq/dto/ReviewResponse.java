@@ -32,6 +32,11 @@ public class ReviewResponse {
         ReviewResponse response = new ReviewResponse();
         response.setId(review.getId());
         response.setBookingId(review.getBooking().getId());
+        if (review.getBooking() != null) {
+            response.setBookingId(review.getBooking().getId());
+        } else {
+            response.setBookingId(null);
+        }
         response.setActivityId(review.getActivity().getId());
         response.setActivityTitle(review.getActivity().getTitle());
         response.setUserId(review.getUser().getId());

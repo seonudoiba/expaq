@@ -45,7 +45,7 @@ public class ActivityDTO {
     private LocalDateTime updatedAt;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private Rating[] ratings;
+    private List<ReviewDTO> reviews;
 
     public static ActivityDTO fromActivity(Activity activity) {
         if (activity == null) {
@@ -79,7 +79,17 @@ public class ActivityDTO {
         if (activity.getActivityType() != null) {
             dto.setActivityType(ActivityTypeDTO.fromActivityType(activity.getActivityType()));
         }
-        
+        // Reviews
+        if (activity.getReviews() != null) {
+            List<ReviewDTO> reviewDTOs = activity.getReviews().stream()
+                    .map(ReviewDTO::fromReview)
+                    .toList();
+            dto.setReviews(reviewDTOs);
+        } else {
+            dto.setReviews(List.of());
+        }
+
+
         dto.setSchedule(activity.getSchedule());
         dto.setMediaUrls(activity.getMediaUrls());
         dto.setMaxParticipants(activity.getMaxParticipants());

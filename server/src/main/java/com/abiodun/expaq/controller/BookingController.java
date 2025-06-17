@@ -33,7 +33,7 @@ public class BookingController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADNIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<BookingDTO>> getAllBookings() {
         return ResponseEntity.ok(bookingService.getAllBookings());
     }

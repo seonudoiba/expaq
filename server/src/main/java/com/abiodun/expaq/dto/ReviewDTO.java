@@ -31,7 +31,12 @@ public class ReviewDTO {
     public static ReviewDTO fromReview(Review review) {
         ReviewDTO dto = new ReviewDTO();
         dto.setId(review.getId());
-        dto.setBookingId(review.getBooking().getId());
+//        dto.setBookingId(review.getBooking().getId());
+        if (review.getBooking() != null) {
+            dto.setBookingId(review.getBooking().getId());
+        } else {
+            dto.setBookingId(null);
+        }
         dto.setActivityId(review.getActivity().getId());
         dto.setActivityTitle(review.getActivity().getTitle());
         dto.setUserId(review.getUser().getId());

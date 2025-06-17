@@ -1,6 +1,7 @@
 package com.abiodun.expaq.controller;
 
 import com.abiodun.expaq.dto.*;
+import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.service.IReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -28,8 +30,9 @@ public class ReviewController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ReviewResponse> createReview(
             @RequestBody @Valid CreateReviewRequest request,
-            Authentication authentication) {
-        UUID userId = UUID.fromString(authentication.getName());
+            @AuthenticationPrincipal ExpaqUserDetails currentUser
+            ) {
+        UUID userId = currentUser.getId();
         ReviewResponse response = reviewService.createReview(request, userId);
         return ResponseEntity.ok(response);
     }

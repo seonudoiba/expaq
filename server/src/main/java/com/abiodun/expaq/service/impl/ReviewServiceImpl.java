@@ -13,6 +13,7 @@ import com.abiodun.expaq.repository.ReviewRepository;
 import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.service.IReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,6 +44,7 @@ public class ReviewServiceImpl implements IReviewService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+
         // Verify user has completed a booking for this activity
         List<Booking> userBookings = bookingRepository.findByUserIdAndActivityId(userId, request.getActivityId());
         if (userBookings.isEmpty()) {
@@ -52,7 +55,9 @@ public class ReviewServiceImpl implements IReviewService {
         if (reviewRepository.existsByActivityIdAndUserId(request.getActivityId(), userId)) {
             throw new RuntimeException("User has already reviewed this activity");
         }
-
+        Booking booking = bookingRepository.findById(request.getBookingId())
+                .orElseThrow( () -> new ResourceNotFoundException("Booking not found"));
+//                .orElseThrow(() -> new ChangeSetPersister.NotFoundException("Booking not found"));
         // Create review
         Review review = reviewMapper.toReview(request);
         review.setActivity(activity);
@@ -60,6 +65,7 @@ public class ReviewServiceImpl implements IReviewService {
         review.setHost(activity.getHost());
         review.setVerified(false);
         review.setEdited(false);
+        review.setBooking(booking);
         review.setCreatedAt(LocalDateTime.now());
 
         // Save review
