@@ -45,6 +45,7 @@ public class ActivityDTO {
     private LocalDateTime updatedAt;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private Rating[] ratings;
 
     public static ActivityDTO fromActivity(Activity activity) {
         if (activity == null) {

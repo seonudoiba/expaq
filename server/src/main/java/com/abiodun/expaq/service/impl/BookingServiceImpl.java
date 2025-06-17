@@ -216,6 +216,14 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
+    public List<BookingDTO> getAllBookings() {
+        return bookingRepository.findAll()
+                .stream()
+                .map(BookingDTO::fromBooking)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<BookingDTO> getUpcomingBookings(UUID userId) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getUpcomingBookings'");

@@ -23,4 +23,6 @@ public interface IBookingService {
     List<BookingDTO> getBookingsByDateRange(UUID userId, LocalDateTime start, LocalDateTime end);
     void updateBookingPayment(UUID bookingId, String paymentId, String paymentStatus);
     void updateBookingWeather(UUID bookingId, String weatherForecast);
+
+    List<BookingDTO> getAllBookings();
 }

@@ -32,6 +32,12 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.createBooking(request, userId));
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADNIN')")
+    public ResponseEntity<List<BookingDTO>> getAllBookings() {
+        return ResponseEntity.ok(bookingService.getAllBookings());
+    }
+
     @PutMapping("/{bookingId}/cancel")
     public ResponseEntity<Void> cancelBooking(
             @AuthenticationPrincipal ExpaqUserDetails currentUser,
