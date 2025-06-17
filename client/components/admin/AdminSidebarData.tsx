@@ -83,6 +83,34 @@ export const ReportsIcon = () => (
   </svg>
 );
 
+export const SystemMonitorIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
+  </svg>
+);
+
+export const ModerationIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+  </svg>
+);
+
 export type NavItem = {
   name: string;
   icon: React.ReactNode;
@@ -133,8 +161,7 @@ export const adminNavItems: NavItem[] = [
       { name: "Refunds", path: "/admin/payments/refunds", pro: false },
       { name: "Payouts", path: "/admin/payments/payouts", pro: false },
     ],
-  },
-  {
+  },  {
     icon: <ReportsIcon />,
     name: "Analytics",
     subItems: [
@@ -145,13 +172,31 @@ export const adminNavItems: NavItem[] = [
     ],
   },
   {
-    icon: <SettingsIcon />,
+    icon: <ModerationIcon />,
+    name: "Moderation",
+    subItems: [
+      { name: "User Activity", path: "/admin/moderation/user-activity", pro: false },
+      { name: "Reported Content", path: "/admin/moderation/reported-content", pro: false },
+      { name: "Content Filters", path: "/admin/moderation/content-filters", pro: false },
+    ],
+  },
+  {    icon: <SettingsIcon />,
     name: "Settings",
     subItems: [
       { name: "General", path: "/admin/settings/general", pro: false },
       { name: "Appearance", path: "/admin/settings/appearance", pro: false },
       { name: "Fees & Commission", path: "/admin/settings/fees", pro: false },
       { name: "Email Templates", path: "/admin/settings/emails", pro: false },
+    ],
+  },
+  {
+    icon: <SystemMonitorIcon />,
+    name: "System",
+    subItems: [
+      { name: "Monitoring", path: "/admin/system/monitoring", pro: false },
+      { name: "Logs", path: "/admin/system/logs", pro: false },
+      { name: "Audit Trail", path: "/admin/system/audit", pro: false },
+      { name: "Health Status", path: "/admin/system/health", pro: false },
     ],
   },
 ];

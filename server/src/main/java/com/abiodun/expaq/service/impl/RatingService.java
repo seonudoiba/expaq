@@ -46,7 +46,7 @@ public class RatingService implements IRatingService {
         Rating rating = new Rating();
 
         // Check if the user has already rated this activity
-        boolean hasUserRated = ratingRepository.existsByActivityAndUser(ActivityDTO.fromActivity(activity), loggedInUser);
+        boolean hasUserRated = ratingRepository.existsByActivityAndUser(activity, loggedInUser);
         if (hasUserRated) {
             throw new RuntimeException("You have already rated this activity.");
         }
@@ -77,7 +77,7 @@ public class RatingService implements IRatingService {
         Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new RatingNotFoundException("Rating with associate activity not found"));
 
         if(rating.getActivity().getId() != activity.getId()) {
-            throw new RatingNotFoundException("This Rating does not belong to a activity");
+            throw new RatingNotFoundException("This Rating" + ratingId + "does not belong to a activity" + " with id: " + activityId);
         }
 
         return mapToDto(rating);
