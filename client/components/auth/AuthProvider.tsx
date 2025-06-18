@@ -2,7 +2,7 @@
 
 import { useAuthStore } from "@/lib/store/auth";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // Define which paths should be protected and which are public
 const PUBLIC_PATHS = [
@@ -22,25 +22,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Check if the current path is public
   const isPublicPath = PUBLIC_PATHS.some((path) => 
     pathname === path || pathname.startsWith(`${path}/`)
-  );
+  );  // Use a ref to track if we've already tried to get the current user
+  const authAttemptedRef = useRef(false);
 
   useEffect(() => {
     const initializeAuth = async () => {
-      // Only check current user if not already loaded
-      if (!user && !isLoading) {
-        try {
-          await getCurrentUser();
-        } catch (error) {
-          console.error("Failed to get current user:", error);
-        }
+      // Skip if already loading or we already have a user or we've already tried
+      if (authAttemptedRef.current || isLoading || user) {
+        setIsAuthReady(true);
+        return;
       }
+
+      // Mark that we've attempted auth to prevent multiple API calls
+      authAttemptedRef.current = true;
+      
+      try {
+        await getCurrentUser();
+      } catch (error) {
+        console.error("Failed to get current user:", error);
+      }
+      
       setIsAuthReady(true);
     };
 
     initializeAuth();
-  }, [getCurrentUser, user, isLoading]);
+    
+    // Don't include getCurrentUser in dependencies as it would cause constant re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isLoading]);
 
-  // Show nothing until auth is ready, but only for protected routes
+  // Only show loading state for protected routes during initialization
   if (!isAuthReady && !isPublicPath) {
     return (
       <div className="flex items-center justify-center min-h-screen">

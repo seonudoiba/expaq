@@ -50,10 +50,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
-          {/* <Link href="/" className="flex items-center space-x-2">
-            <Compass className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">Expaq</span>
-          </Link> */}
+     
           <Link href="/" className="flex items-center space-x-2">
             <Image src="/expaqlogo.png" alt={"Expaq"} width={120} height={30} />
           </Link>
@@ -70,14 +67,7 @@ export function Header() {
                             className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
                             href="/activities"
                           >
-                            {/* <div className="max-h-6">
-                              <Image
-                                src="/discover.jpg"
-                                alt="Discover"
-                                width={200} height={60}
-                              
-                              />
-                            </div> */}
+                          
                             <div className="mt-4 mb-2 text-lg font-medium text-white">
                               Featured Activities
                             </div>
@@ -87,22 +77,19 @@ export function Header() {
                             </p>
                           </Link>
                         </NavigationMenuLink>
-                      </li>
-                      <ListItem
-                        href="/activities/outdoor"
-                        title="Outdoor Adventures"
+                      </li>                      <ListItem
+                        href="/activity-types"
+                        title="Experience Categories"
                       >
-                        Hiking, kayaking, and more outdoor activities
+                        Browse activities by categories and interests
                       </ListItem>
-                      <ListItem href="/activities/food" title="Food & Drink">
-                        Cooking classes, food tours, and tastings
+                      <ListItem href="/cities" title="Explore Cities">
+                        Find experiences in cities around the world
                       </ListItem>
-                      <ListItem
-                        href="/activities/culture"
-                        title="Cultural Experiences"
-                      >
-                        Art, history, and local traditions
+                      <ListItem href="/countries" title="Discover Countries">
+                        Explore destinations across the globe
                       </ListItem>
+                    
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>{" "}

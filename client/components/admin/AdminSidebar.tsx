@@ -5,8 +5,10 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "@/contexts/admin/SidebarContext";
 import { adminNavItems } from "@/components/admin/AdminSidebarData";
-import { ChevronDownIcon, HorizontaLDots } from "@/icons/index";
 import SidebarWidget from "@/layout/SidebarWidget";
+import { ChevronDownIcon, HorizontalDotsIcon } from "@/components/svg-icons";
+
+// Importing icon components from svg-icons.tsx instead
 
 const AdminSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -305,9 +307,8 @@ const AdminSidebar: React.FC = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Admin Menu"
-                ) : (
-                  <HorizontaLDots />
+                  "Admin Menu"                ) : (
+                  <HorizontalDotsIcon />
                 )}
               </h2>
               {renderMenuItems("main")}

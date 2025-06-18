@@ -22,9 +22,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByEmail(String email);
 
-    boolean existsByUsername(String username);
+    boolean existsByDisplayName(String username);
 
-    Optional<User> findByUsername(String username);
+
+//    boolean existsByUsername(String username);
 
     // OAuth2 related queries
     Optional<User> findByProviderAndProviderId(String provider, String providerId);

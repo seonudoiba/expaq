@@ -262,7 +262,7 @@ public class AuthServiceImpl implements IAuthService {
         String username = baseUsername;
         int counter = 1;
         
-        while (userRepository.existsByUsername(username)) {
+        while (userRepository.existsByEmail(username)) {
             username = baseUsername + counter;
             counter++;
         }
@@ -278,7 +278,7 @@ public class AuthServiceImpl implements IAuthService {
             throw new UserAlreadyExistsException("Email already in use");
 
         }
-        if (userRepository.existsByUsername((request.getUserName()))) {
+        if (userRepository.existsByEmail((request.getDisplayName()))) {
             throw new UserAlreadyExistsException("Username already taken");
         }
 
@@ -287,7 +287,7 @@ public class AuthServiceImpl implements IAuthService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
-        user.setUsername(request.getUserName());
+        user.setDisplayName(request.getDisplayName());
         user.setBio(request.getBio());
         user.setProfilePictureUrl(request.getProfilePictureUrl());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -641,11 +641,11 @@ public class AuthServiceImpl implements IAuthService {
         if (request.getRoles() != null && !request.getRoles().isEmpty()) {
             user.setRoles(request.getRoles());
         }
-        if (request.getUserName() != null && !request.getUserName().equals(user.getUsername())) {
-            if (userRepository.existsByUsername(request.getUserName())) {
+        if (request.getDisplayName() != null && !request.getDisplayName().equals(user.getUsername())) {
+            if (userRepository.existsByDisplayName(request.getDisplayName())) {
                 throw new UserAlreadyExistsException("Username is already taken");
             }
-            user.setUsername(request.getUserName());
+            user.setDisplayName(request.getDisplayName());
         }
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {

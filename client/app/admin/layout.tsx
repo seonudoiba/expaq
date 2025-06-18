@@ -1,26 +1,55 @@
-import './admin.css';
+"use client";
 
-import { SidebarProvider } from '@/contexts/admin/SidebarContext';
-import { ThemeProvider } from '@/contexts/admin/ThemeContext';
-import { ProtectedComponent } from '@/components/auth/ProtectedComponent';
+import { useSidebar, SidebarProvider } from "@/contexts/admin/SidebarContext";
+import AppHeader from "@/layout/AppHeader";
+import Backdrop from "@/layout/Backdrop";
+import React from "react";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 
-export default function RootLayout({
+// This component is wrapped by SidebarProvider
+function AdminLayoutContent({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+
+  // Dynamic class for main content margin based on sidebar state
+  const mainContentMargin = isMobileOpen
+    ? "ml-0"
+    : isExpanded || isHovered
+    ? "lg:ml-[290px]"
+    : "lg:ml-[90px]";
+
   return (
-    <html lang="en">
-      <body className={`dark:bg-gray-900`}>
-        <ThemeProvider>
-          <SidebarProvider>
-            {/* All admin pages are protected by ProtectedComponent */}
-            <ProtectedComponent requiredRoles={["ADMIN", "super-admin"]}>
-              {children}
-            </ProtectedComponent>
-          </SidebarProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <div className="min-h-screen xl:flex">
+      {/* Admin Sidebar and Backdrop */}
+      <AdminSidebar />
+      <Backdrop />
+      {/* Main Content Area */}
+      <div
+        className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}
+      >
+        {/* Header */}
+        <AppHeader />
+        {/* Page Content */}
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main layout component that wraps the content with the SidebarProvider
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <SidebarProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </SidebarProvider>
   );
 }

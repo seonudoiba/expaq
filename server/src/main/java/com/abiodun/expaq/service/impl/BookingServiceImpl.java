@@ -5,14 +5,12 @@ import com.abiodun.expaq.dto.CreateBookingRequest;
 import com.abiodun.expaq.exception.ResourceNotFoundException;
 import com.abiodun.expaq.model.Activity;
 import com.abiodun.expaq.model.Booking;
-import com.abiodun.expaq.model.BookingStatus;
 import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.repository.ActivityRepository;
 import com.abiodun.expaq.repository.BookingRepository;
 import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.service.IBookingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -168,7 +166,7 @@ public class BookingServiceImpl implements IBookingService {
     
 
     @Override
-    public List<BookingDTO> getBookingsByStatus(UUID userId, BookingStatus status) {
+    public List<BookingDTO> getBookingsByStatus(UUID userId, Booking.BookingStatus status) {
         // Add Pageable parameter - using unpaged as default
         return bookingRepository.findByUserIdAndStatus(userId, Booking.BookingStatus.valueOf(status.name()), Pageable.unpaged())
                 .stream()

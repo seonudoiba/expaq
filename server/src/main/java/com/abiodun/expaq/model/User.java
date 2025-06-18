@@ -46,8 +46,8 @@ public class User implements UserDetails {
     @Column
     private String profilePicture;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(unique = true)
+    private String displayName;
 
     @Column
     private String phoneNumber;

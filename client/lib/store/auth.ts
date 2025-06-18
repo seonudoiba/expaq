@@ -137,9 +137,12 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           error: null,
         });
-      },
+      },      getCurrentUser: async () => {
+        // Skip if already loading or we already have a user
+        if (get().isLoading || get().user) {
+          return;
+        }
 
-      getCurrentUser: async () => {
         const token = get().token;
         if (!token && typeof window !== 'undefined') {
           const cookieToken = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];

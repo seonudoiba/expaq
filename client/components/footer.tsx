@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image";
 import { Compass, Facebook, Instagram, Twitter } from "lucide-react"
 
 export function Footer() {
@@ -8,8 +9,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <Compass className="h-6 w-6 text-primary" />
-              <span className="font-bold text-xl">Expaq</span>
+
+              <Link href="/" className="flex items-center space-x-2">
+                          <Image src="/expaqlogo.png" alt={"Expaq"} width={120} height={30} />
+                        </Link>
             </div>
             <p className="text-muted-foreground">
               Connecting adventure seekers with unforgettable experiences around the world.

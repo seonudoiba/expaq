@@ -47,7 +47,8 @@ public class ReviewServiceImpl implements IReviewService {
 
         // Verify user has completed a booking for this activity
         List<Booking> userBookings = bookingRepository.findByUserIdAndActivityId(userId, request.getActivityId());
-        if (userBookings.isEmpty()) {
+        if (userBookings.isEmpty() ||
+                userBookings.stream().noneMatch(booking -> Booking.BookingStatus.COMPLETED.equals(booking.getStatus()))) {
             throw new RuntimeException("User has not completed any bookings for this activity");
         }
 

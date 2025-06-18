@@ -61,7 +61,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight">Popular Activity Types</h2>
             <p className="text-muted-foreground mt-2">Find activities that match your interests</p>
           </div>
-          <Link href="/activities" className="flex items-center text-primary mt-4 md:mt-0">
+          <Link href="/activity-types" className="flex items-center text-primary mt-4 md:mt-0">
             View all Activity Types <ChevronRight className="ml-1 h-4 w-4" />
           </Link>
         </div>
@@ -74,7 +74,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold tracking-tight">Top Cities</h2>
               <p className="text-muted-foreground mt-2">Handpicked cities you&apos;ll love</p>
             </div>
-            <Link href="/activities" className="flex items-center text-primary mt-4 md:mt-0">
+            <Link href="/cities" className="flex items-center text-primary mt-4 md:mt-0">
               Explore all cities <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </div>
@@ -88,7 +88,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold tracking-tight">Top Countries</h2>
               <p className="text-muted-foreground mt-2">Handpicked countries you&apos;ll love</p>
             </div>
-            <Link href="/activities" className="flex items-center text-primary mt-4 md:mt-0">
+            <Link href="/countries" className="flex items-center text-primary mt-4 md:mt-0">
               Explore all countries <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </div>

@@ -4,12 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../contexts/admin/SidebarContext";
-import { adminNavItems } from "@/components/admin/AdminSidebarData";
-import {
-  ChevronDownIcon,
-  HorizontaLDots,
-} from "../icons/index";
+import { NavItem, adminNavItems } from "@/components/admin/AdminSidebarData";
 import SidebarWidget from "./SidebarWidget";
+import { ChevronDownIcon, HorizontalDotsIcon } from "@/components/svg-icons";
+
+// Define the navItems and othersItems using the same structure as NavItem type
+const navItems: NavItem[] = adminNavItems;
+const othersItems: NavItem[] = [];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -267,7 +268,7 @@ const AppSidebar: React.FC = () => {
                 {isExpanded || isHovered || isMobileOpen ? (
                   "Menu"
                 ) : (
-                  <HorizontaLDots />
+                  <HorizontalDotsIcon />
                 )}
               </h2>
               {renderMenuItems(navItems, "main")}
@@ -284,7 +285,7 @@ const AppSidebar: React.FC = () => {
                 {isExpanded || isHovered || isMobileOpen ? (
                   "Others"
                 ) : (
-                  <HorizontaLDots />
+                  <HorizontalDotsIcon />
                 )}
               </h2>
               {renderMenuItems(othersItems, "others")}

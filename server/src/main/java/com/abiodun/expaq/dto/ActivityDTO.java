@@ -19,7 +19,7 @@ public class ActivityDTO {
     private UUID id;
     private UUID hostId;
     private String hostName;
-    private String hostProfilePicture;
+    private String hostProfilePictureUrl;
     private String hostBio;
     private String hostCreatedAt;
     private String title;
@@ -59,10 +59,9 @@ public class ActivityDTO {
         if (activity.getHost() != null) {
             dto.setHostId(activity.getHost().getId());
             dto.setHostName(activity.getHost().getFirstName() + " " + activity.getHost().getLastName());
-            dto.setHostProfilePicture(activity.getHost().getProfilePictureUrl());
+            dto.setHostProfilePictureUrl(activity.getHost().getProfilePictureUrl());
             dto.setHostCreatedAt(activity.getHost().getCreatedAt().toString());
             dto.setHostBio(activity.getHost().getBio());
-
         }
         
         dto.setTitle(activity.getTitle());

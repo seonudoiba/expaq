@@ -13,7 +13,7 @@ import java.util.Set;
 public class UpdateProfileRequest {
 
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    private String userName;
+    private String displayName;
 
     private String firstName;
 

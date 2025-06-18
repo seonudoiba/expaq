@@ -2,7 +2,7 @@ package com.abiodun.expaq.controller;
 
 import com.abiodun.expaq.dto.BookingDTO;
 import com.abiodun.expaq.dto.CreateBookingRequest;
-import com.abiodun.expaq.model.BookingStatus;
+import com.abiodun.expaq.model.Booking;
 import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.service.IBookingService;
 import jakarta.validation.Valid;
@@ -98,7 +98,7 @@ public class BookingController {
     public ResponseEntity<List<BookingDTO>> getBookingsByStatus(
             @RequestAttribute("userId") UUID userId,
             @PathVariable String status) {
-        BookingStatus bookingStatus = BookingStatus.valueOf(status);
+        Booking.BookingStatus bookingStatus = Booking.BookingStatus.valueOf(status);
         return ResponseEntity.ok(bookingService.getBookingsByStatus(userId, bookingStatus));
     }
 

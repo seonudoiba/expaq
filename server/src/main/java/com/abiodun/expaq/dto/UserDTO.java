@@ -2,6 +2,7 @@ package com.abiodun.expaq.dto;
 
 import com.abiodun.expaq.model.Role;
 import com.abiodun.expaq.model.User;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,6 +35,7 @@ public class UserDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String profilePictureUrl;
+    private String displayName;
 
     public static UserDTO fromUser(User user) {
         return UserDTO.builder()
@@ -54,6 +56,7 @@ public class UserDTO {
                 .timeZone(user.getTimeZone())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
+                .displayName(user.getDisplayName())
                 .build();
     }
 }

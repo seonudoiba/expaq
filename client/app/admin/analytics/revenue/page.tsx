@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   LineChart,
   Line,
@@ -21,7 +21,8 @@ import {
 } from "recharts";
 import { ArrowDown, ArrowUp, DollarSign, Percent, CreditCard, Calendar } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DateRangePicker, DateRange } from "@/components/ui/date-picker";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { DateRange } from "react-day-picker";
 
 // Mock data for revenue analytics
 const monthlyRevenueData = [
@@ -119,8 +120,16 @@ const kpiCardsData = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
 
 export default function RevenueAnalyticsPage() {
-  const [timeRange, setTimeRange] = useState("year");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  // const [timeRange, setTimeRange] = useState("year");
+  
+  const [bookingDates, setBookingDates] = useState<DateRange>({
+    from: new Date(), // Default to today
+    to: new Date(new Date().setDate(new Date().getDate() + 2)) // Default to 2 days from now
+  });
+
+  const handleUpdate = (values: { range: DateRange }) => {
+    setBookingDates(values.range);
+  };
 
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -130,11 +139,14 @@ export default function RevenueAnalyticsPage() {
           <p className="text-gray-500">Detailed analysis of platform revenue and financial metrics</p>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-4">
-          <DateRangePicker
-            value={dateRange}
-            onChange={setDateRange}
-            placeholder="Select date range"
-          />
+        
+
+            <DateRangePicker
+              initialDateFrom={bookingDates.from}
+              initialDateTo={bookingDates.to}
+              onUpdate={handleUpdate}
+              showCompare={false}
+            />
           <Button variant="outline">Export Data</Button>
         </div>
       </div>

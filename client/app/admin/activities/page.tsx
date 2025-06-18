@@ -440,10 +440,10 @@ export default function ActivitiesPage() {
                           <TableCell>{formatDuration(activity.durationMinutes || 0)}</TableCell>
                           <TableCell>
                             <div className="flex flex-col gap-1">
-                              <Badge variant={activity.active ? "success" : "default"}>
+                              <Badge variant={activity.active ? "secondary" : "default"}>
                                 {activity.active ? "Active" : "Inactive"}
                               </Badge>
-                              <Badge variant={activity.verified ? "outline" : "warning"}>
+                              <Badge variant={activity.verified ? "outline" : "secondary"}>
                                 {activity.verified ? "Verified" : "Unverified"}
                               </Badge>
                             </div>
@@ -573,7 +573,7 @@ export default function ActivitiesPage() {
                           <TableCell>
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm">View Details</Button>
-                              <Button variant="success" size="sm">Approve</Button>
+                              <Button variant="default" size="sm">Approve</Button>
                               <Button variant="destructive" size="sm">Reject</Button>
                             </div>
                           </TableCell>
