@@ -12,6 +12,7 @@ import { ActivityService} from "@/lib/api/public-services";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/lib/store/auth";
+import BookingWidget from "@/components/BookingWidget";
 export default function ActivityDetailsPage() {
   const params = useParams();
   const [selectedDate, setSelectedDate] = useState("");
@@ -143,6 +144,16 @@ export default function ActivityDetailsPage() {
         </div>
 
         {/* Booking Sidebar */}
+        <BookingWidget activity={{
+          id: activity.id,
+          title: activity.title,
+          price: activity.price,
+          rating: activity.averageRating,
+          reviews: activity.totalReviews,
+          maxGuests: activity.maxParticipants,
+          duration: `${activity.durationMinutes} minutes`,
+          images: activity.mediaUrls
+        }} />
         <div className="lg:col-span-1">
           <Card>
             <CardContent className="p-6 space-y-6">

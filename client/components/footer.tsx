@@ -4,7 +4,7 @@ import { Compass, Facebook, Instagram, Twitter } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-muted py-12 border-t">
+    <footer className="bg-muted py-12 border-t my-12">
       <div className="container px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">

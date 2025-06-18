@@ -166,6 +166,15 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface BecomeHostRequest {
+  displayName: string;
+  phoneNumber: string;
+  address: string;
+  bio: string;
+  identificationDocument: string;
+  languages?: string;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

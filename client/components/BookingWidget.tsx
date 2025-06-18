@@ -1,24 +1,18 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/lib/store/auth';
-// import { useToast } from '@/hooks/use-toast';
 import { CalendarIcon, Users, Clock, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/components/ui/use-toast";
-// import { useCart } from '@/contexts/CartContext';
-
-
-
-
+import { useCreateBooking } from '@/hooks/use-bookings';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface BookingWidgetProps {
   activity: {
@@ -40,11 +34,9 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const router = useRouter();
-  
-  
   const { user } = useAuthStore();
-  // const { addItem } = useCart();
   const { toast } = useToast();
+  const { mutate: createBooking, isLoading } = useCreateBooking();
 
   const availableTimes = [
     '09:00 AM',
@@ -79,51 +71,33 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
       return;
     }
 
-    // const bookingItem = {
-    //   id: `${activity.id}-${Date.now()}`,
-    //   activityId: activity.id,
-    //   activityName: activity.title,
-    //   date: format(selectedDate, 'yyyy-MM-dd'),
-    //   time: selectedTime,
-    //   participants: guests,
-    //   price: activity.price,
-    //   image: activity.images[0]
-    // };
-
-    // addItem(bookingItem);
-    
-    toast({
-      title: "Added to cart!",
-      description: "Your booking has been added to cart. Proceed to checkout to confirm.",
+    createBooking({
+      activityId: activity.id,
+      date: format(selectedDate, 'yyyy-MM-dd'),
+      time: selectedTime,
+      numberOfGuests: guests,
+    }, {
+      onSuccess: (booking) => {
+        router.push(`/bookings/${booking.id}`);
+      }
     });
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="w-full max-w-md">
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-2xl">
-              ${activity.price}
-              <span className="text-base font-normal text-gray-600">/person</span>
-            </CardTitle>
-            <div className="flex items-center mt-1">
-              <Star className="h-4 w-4 text-yellow-400 fill-current" />
-              <span className="ml-1 text-sm font-medium">{activity.rating}</span>
-              <span className="ml-1 text-sm text-gray-600">({activity.reviews} reviews)</span>
-            </div>
+        <CardTitle className="flex items-center justify-between">
+          <span>${activity.price} / person</span>
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 fill-current text-yellow-400" />
+            <span>{activity.rating}</span>
+            <span className="text-gray-500">({activity.reviews} reviews)</span>
           </div>
-          <Badge variant="secondary">
-            <Clock className="h-3 w-3 mr-1" />
-            {activity.duration}
-          </Badge>
-        </div>
+        </CardTitle>
       </CardHeader>
-      
       <CardContent className="space-y-4">
-        {/* Date Selection */}
         <div className="space-y-2">
-          <Label>Select Date</Label>
+          <Label>Date</Label>
           <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -131,31 +105,29 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
                 className="w-full justify-start text-left font-normal"
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {selectedDate ? format(selectedDate, "PPP") : "Choose date"}
+                {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-white" align="start">
-         
-<Calendar
-  mode="single"
-  selected={selectedDate}
-  onSelect={(date: Date | undefined) => {
-    setSelectedDate(date);
-    setIsCalendarOpen(false);
-  }}
-  disabled={(date: Date) => date < new Date()}
-  initialFocus={true}
-/>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date);
+                  setIsCalendarOpen(false);
+                }}
+                disabled={(date) => date < new Date()}
+                initialFocus
+              />
             </PopoverContent>
           </Popover>
         </div>
 
-        {/* Time Selection */}
         <div className="space-y-2">
-          <Label>Select Time</Label>
+          <Label>Time</Label>
           <Select value={selectedTime} onValueChange={setSelectedTime}>
             <SelectTrigger>
-              <SelectValue placeholder="Choose time" />
+              <SelectValue placeholder="Select time" />
             </SelectTrigger>
             <SelectContent>
               {availableTimes.map((time) => (
@@ -167,66 +139,64 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
           </Select>
         </div>
 
-        {/* Guest Selection */}
         <div className="space-y-2">
-          <Label>Number of Guests</Label>
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setGuests(Math.max(1, guests - 1))}
-              disabled={guests <= 1}
-            >
-              -
-            </Button>
-            <div className="flex items-center space-x-2">
-              <Users className="h-4 w-4 text-gray-400" />
-              <span className="font-medium">{guests} guest{guests > 1 ? 's' : ''}</span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setGuests(Math.min(activity.maxGuests, guests + 1))}
-              disabled={guests >= activity.maxGuests}
-            >
-              +
-            </Button>
-          </div>
-          <p className="text-xs text-gray-500">Maximum {activity.maxGuests} guests</p>
+          <Label>Guests</Label>
+          <Select
+            value={guests.toString()}
+            onValueChange={(value) => setGuests(parseInt(value))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Number of guests" />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: activity.maxGuests }, (_, i) => i + 1).map(
+                (num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num} {num === 1 ? 'guest' : 'guests'}
+                  </SelectItem>
+                )
+              )}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Price Breakdown */}
-        <div className="space-y-2 pt-4 border-t">
-          <div className="flex justify-between text-sm">
-            <span>${activity.price} x {guests} guest{guests > 1 ? 's' : ''}</span>
+        <div className="space-y-3 pt-4">
+          <div className="flex justify-between">
+            <span>${activity.price} × {guests} guests</span>
             <span>${totalPrice}</span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between">
             <span>Service fee</span>
             <span>${serviceFee}</span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between">
             <span>Taxes</span>
             <span>${taxes}</span>
           </div>
-          <div className="flex justify-between font-semibold text-lg pt-2 border-t">
+          <div className="flex justify-between font-semibold pt-2 border-t">
             <span>Total</span>
             <span>${finalTotal}</span>
           </div>
         </div>
 
-        {/* Book Button */}
-        <Button 
+        <Button
           className="w-full" 
           size="lg" 
           onClick={handleBooking}
+          disabled={isLoading}
         >
-          {user ? 'Add to Cart' : 'Log in to Book'}
+          {isLoading ? (
+            <LoadingSpinner className="mr-2" />
+          ) : null}
+          {isLoading ? 'Creating Booking...' : 'Book Now'}
         </Button>
 
-        <p className="text-xs text-gray-500 text-center">
-          You won&apos;t be charged yet. Review your booking before final confirmation.
-        </p>
+        <div className="text-center text-sm text-gray-500">
+          <div className="flex items-center justify-center gap-2">
+            <Clock className="w-4 h-4" />
+            <span>Duration: {activity.duration}</span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

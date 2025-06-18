@@ -2,6 +2,7 @@ import { apiClient } from './client';
 import type {
   Activity,
   AuthResponse,
+  BecomeHostRequest,
   CreateActivityRequest,
   UpdateActivityRequest,
   CreateReviewRequest,
@@ -37,15 +38,11 @@ export const authService = {
     const response = await apiClient.post<AuthResponse>('/api/auth/login', data);
     return response.data;
   },
-
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
     return response.data;
   },
-  // becomeHost: async (data: becomeHostRequest): Promise<AuthResponse> => {
-  //   const response = await apiClient.post<AuthResponse>('/api/auth/become-host', data);
-  //   return response.data;
-  // },
+  
 
   getCurrentUser: async (): Promise<User> => {
     const response = await apiClient.get<User>('/api/auth/me');
@@ -66,11 +63,10 @@ export const authService = {
   getHosts: async (): Promise<PaginatedUsersResponse> => {
     const response = await apiClient.get<PaginatedUsersResponse>('/api/auth/users-by-role?roleName=HOST');
     return response.data;
-  },
-  becomeHost: async (): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/api/auth/become-host');
+  },  becomeHost: async (data?: BecomeHostRequest): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/api/auth/become-host', data);
     return response.data;
-},
+  },
 };
 
 // Activity Services
@@ -186,7 +182,6 @@ export const fileService = {
     });
     return response.data;
   },
-
   uploadMultiple: async (files: File[], type?: string): Promise<string[]> => {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
@@ -195,6 +190,33 @@ export const fileService = {
     const response = await apiClient.post<string[]>('/api/files/upload-multiple', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return response.data;
+  },
+    uploadFile: async (file: File, type?: string): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (type) formData.append('type', type);
+    
+    // Get the current user ID from localStorage to pass as a query parameter
+    // This solves the "Missing request attribute 'userId' of type UUID" error
+    const token = localStorage.getItem('auth-storage');
+    let userId = null;
+    if (token) {
+      try {
+        const authData = JSON.parse(token);
+        userId = authData.state.user?.id;
+      } catch (error) {
+        console.error('Failed to parse user data:', error);
+      }
+    }
+    
+    const response = await apiClient.post<{ url: string }>(
+      `/api/files/upload${userId ? `?userId=${userId}` : ''}`, 
+      formData, 
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
     return response.data;
   },
 };

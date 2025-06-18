@@ -44,7 +44,7 @@ export function Header() {
   const isMobile = useMobile();
   const [showSearch, setShowSearch] = useState(false);
   const router = useRouter();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -101,18 +101,56 @@ export function Header() {
                       All Activities
                     </NavigationMenuLink>
                   </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link href="/become-a-host" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
-                      Become a Host
-                    </NavigationMenuLink>
-                  </Link>
+                </NavigationMenuItem>                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Become a Host</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px]">
+                      <li className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <Link
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                            href="/become-a-host"
+                          >
+                            <div className="mb-2 mt-4 text-lg font-medium">
+                              Start Hosting
+                            </div>
+                            <p className="text-sm leading-tight text-muted-foreground">
+                              Share your passions, earn income, and connect with travelers from around the world.
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href="/become-a-host/apply"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">Apply Now</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Fill out the application form to become a host
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href="/host/faq"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">Host FAQ</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Get answers to common questions about hosting
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
                 </NavigationMenuItem>
                 {/* Additional menu items that match mobile */}
-                {isAuthenticated && (
+                {user && (
                   <>
                     <NavigationMenuItem>
                       <Link href="/bookings" legacyBehavior passHref>
@@ -149,7 +187,7 @@ export function Header() {
               <span className="sr-only">Search</span>
             </Button>
           )}
-          {!isMobile && isAuthenticated && (
+          {!isMobile && user && (
             <Link href="/favorites">
               <Button variant="ghost" size="icon">
                 <Heart className="h-5 w-5" />
@@ -176,9 +214,9 @@ export function Header() {
               </Button>
             </div>
           )}
-          {!isMobile && isAuthenticated ? (
+          {!isMobile && user ? (
             <Navbar />
-          ) : !isMobile && !isAuthenticated ? (
+          ) : !isMobile && !user ? (
             <>
               <Link href="/login">
                 <Button variant="outline">Log in</Button>
@@ -189,7 +227,7 @@ export function Header() {
             </>
           ) : null}
 
-          {isMobile && isAuthenticated ? <ProfileMobile /> : null}
+          {isMobile && user ? <ProfileMobile /> : null}
 
           {/* Mobile Menu Toggle */}
           {isMobile && (
@@ -244,7 +282,7 @@ export function Header() {
                       </Link>
 
                       {/* Auth-only links */}
-                      {isAuthenticated && (
+                      {user && (
                         <>
                           <Link
                             href="/favorites"
@@ -273,7 +311,7 @@ export function Header() {
                         </>
                       )}
                     </nav>
-                    {!isAuthenticated ? (
+                    {!user ? (
                       <div className="grid gap-2 mt-4">
                         <Link href="/login">
                           <Button variant="outline" className="w-full">

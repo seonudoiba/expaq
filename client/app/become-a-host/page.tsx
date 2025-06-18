@@ -16,35 +16,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Calendar, DollarSign, Users, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth";
-// import { useQuery } from "@tanstack/react-query";
-import { authService } from "@/lib/api/services";
-import toast from "react-hot-toast";
 import { useState } from "react";
+import { BecomeHostForm } from "@/components/forms/become-host-form";
 
 export default function BecomeAHostPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+  const [showForm, setShowForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGetStartedClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); 
+  const handleGetStartedClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     setIsLoading(true);
-
-    if (isAuthenticated) {
-
-    try {
-      const response = await authService.becomeHost();
-      toast.success("You are now a host!");
-      console.log("Become Host Response:", response);
-      router.push("/activities/create"); 
-    } catch (error) {
-      console.error("Error becoming host:", error);
-      toast.error("Failed to become a host. Please try again later.");
-      // router.push("/");
-    } finally {
+    
+    if (!isAuthenticated) {
+      router.push("/auth?redirect=/become-a-host");
       setIsLoading(false);
+      return;
     }
-  }
+    
+    // Show the form instead of immediately making the user a host
+    setShowForm(true);
+    setIsLoading(false);
+    
+    // Scroll to the form section
+    const formSection = document.getElementById("become-host-form");
+    if (formSection) {
+      formSection.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -327,27 +326,36 @@ export default function BecomeAHostPage() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* CTA */}
-      <section className="container px-4 md:px-6 py-12 md:py-24">
-        <div className="max-w-3xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Ready to become a host?
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Join our community of passionate hosts and start sharing your
-            experiences with the world.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">
-              Create Your Listing <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="lg">
-              Learn More
-            </Button>
+      </section>      {/* CTA or Form Section */}
+      <section id="become-host-form" className="container px-4 md:px-6 py-12 md:py-24 bg-gray-50">
+        {!showForm ? (
+          <div className="max-w-3xl mx-auto text-center space-y-6">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Ready to become a host?
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Join our community of passionate hosts and start sharing your
+              experiences with the world.
+            </p>            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" onClick={handleGetStartedClick} disabled={isLoading}>
+                {isLoading ? "Loading..." : "Get Started"} <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="lg" onClick={() => router.push("/become-a-host/apply")}>
+                Go to Application Form
+              </Button>
+              <Button variant="ghost" size="lg" onClick={() => router.push("/host/faq")}>
+                Learn More
+              </Button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-center mb-8">
+              Complete Your Host Profile
+            </h2>
+            <BecomeHostForm />
+          </div>
+        )}
       </section>
     </div>
   );
