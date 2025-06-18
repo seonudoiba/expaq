@@ -84,7 +84,7 @@ export default function BecomeAHostApplicationPage() {
         )}
 
         {/* Case 2: User is already a host */}
-        {isAuthenticated && user?.roles?.includes("HOST") && (
+{isAuthenticated && user?.roles?.some(role => role.name === "HOST") && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="text-center">You&apos;re Already a Host!</CardTitle>
@@ -112,7 +112,7 @@ export default function BecomeAHostApplicationPage() {
         )}
 
         {/* Case 3: User is authenticated but not a host */}
-        {isAuthenticated && !user?.roles?.includes("HOST") && (
+        {isAuthenticated && !user?.roles?.some(role => role.name === "HOST") && (
           <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-100">
             <BecomeHostForm />
           </div>

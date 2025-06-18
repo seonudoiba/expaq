@@ -260,6 +260,53 @@ export const geocodingService = {
       throw new Error(`No results found for the given location: ${query}`);
     }
   },
+  
+  verifyAddress: async (query: string): Promise<{
+    isValid: boolean;
+    suggestions: Array<{
+      display_name: string;
+      lat: number;
+      lon: number;
+    }>;
+    formattedAddress?: string;
+  }> => {
+    try {
+      const response = await apiClient.get('https://nominatim.openstreetmap.org/search', {
+        params: {
+          q: query,
+          format: 'json',
+          addressdetails: 1,
+          limit: 5,
+        },
+        headers: {
+          'User-Agent': 'ExpaqApp'
+        }
+      });
+
+      if (response.data.length > 0) {
+        return {
+          isValid: true,
+          suggestions: response.data.map((item: any) => ({
+            display_name: item.display_name,
+            lat: parseFloat(item.lat),
+            lon: parseFloat(item.lon),
+          })),
+          formattedAddress: response.data[0].display_name,
+        };
+      } else {
+        return {
+          isValid: false,
+          suggestions: [],
+        };
+      }
+    } catch (error) {
+      console.error('Address verification error:', error);
+      return {
+        isValid: false,
+        suggestions: [],
+      };
+    }
+  },
 };
 
 export const uploadActivityImages = async (activityId: string, images: File[]) => {

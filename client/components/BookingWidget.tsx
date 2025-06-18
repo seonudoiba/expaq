@@ -12,8 +12,8 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/components/ui/use-toast";
 import { useCreateBooking } from '@/hooks/use-bookings';
+// import { LoadingSpinner } from '@/components/ui';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-
 interface BookingWidgetProps {
   activity: {
     id: string;

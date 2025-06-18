@@ -34,16 +34,19 @@ export default function BecomeAHostPage() {
       setIsLoading(false);
       return;
     }
-    
+ 
+      router.push("/become-a-host/apply");
+      setIsLoading(false);
+ 
     // Show the form instead of immediately making the user a host
     setShowForm(true);
     setIsLoading(false);
     
-    // Scroll to the form section
-    const formSection = document.getElementById("become-host-form");
-    if (formSection) {
-      formSection.scrollIntoView({ behavior: "smooth" });
-    }
+    // // Scroll to the form section
+    // const formSection = document.getElementById("become-host-form");
+    // if (formSection) {
+    //   formSection.scrollIntoView({ behavior: "smooth" });
+    // }
   };
 
   return (
@@ -259,7 +262,7 @@ export default function BecomeAHostPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-muted py-12 md:py-24">
+      <section className="bg-muted py-12 md:py-24" id="faq-section">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tight">
