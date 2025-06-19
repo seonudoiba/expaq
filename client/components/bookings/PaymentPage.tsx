@@ -1,3 +1,5 @@
+"use client";
+
 import { useBookingDetails, useInitiatePayment } from '@/hooks/use-bookings';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

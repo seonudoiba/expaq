@@ -1,55 +1,12 @@
 import { create } from 'zustand';
-import { activityService } from '@/lib/api/services';
+import { ActivitiesState } from '@/types/activity';
+import { ActivityService } from '../../services/public-services';
 
-export interface Activity {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  mediaUrls: string[];
-  city: { name: string; id: string };
-  country: { name: string; id: string };
-  activityType: { name: string; id: string };
-  startDate: string | Date;
-  endDate: string | Date;
-  averageRating: number;
-  totalReviews: number;
-  hostName: string;
-  durationMinutes: number;
-}
+// Import Activity type from main types file instead of redefining
+// import { Activity as ActivityType } from '@/types';
 
-export interface ActivityFilters {
-  city: string;
-  country: string;
-  activityType: string;
-  minPrice: string;
-  maxPrice: string;
-  sortBy: string;
-  querySearch?: string;
-  when?: string;
-  numOfPeople?: string;
-}
-
-export interface PaginationState {
-  currentPage: number;
-  totalPages: number;
-  pageSize: number;
-  totalItems: number;
-}
-
-interface ActivitiesState {
-  activities: Activity[];
-  filters: ActivityFilters;
-  isLoading: boolean;
-  error: Error | null;
-  pagination: PaginationState;
-  fetchActivities: () => Promise<void>;
-  applyFilters: (filters: ActivityFilters) => Promise<void>;
-  setFilters: (filters: Partial<ActivityFilters>) => void;
-  clearFilters: () => void;
-  setPage: (page: number) => void;
-  setPageSize: (size: number) => void;
-}
+// Use the imported type
+// export type Activity = ActivityType;
 
 export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
   activities: [],
@@ -114,23 +71,22 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
     }));
     get().fetchActivities();
   },
-  
-  fetchActivities: async () => {
+    fetchActivities: async () => {
     try {
       set({ isLoading: true });
       const { pagination } = get();
-      const response = await activityService.getAll({
-        page: pagination.currentPage,
+      const response = await ActivityService.getAll({
+        page: pagination.currentPage - 1, // API uses 0-based indexing
         limit: pagination.pageSize
       });
       
       set({ 
-        activities: response.activities, 
+        activities: response.content, // Extract activities from content array
         pagination: {
-          currentPage: response.currentPage,
+          currentPage: response.number + 1, // Convert from 0-based to 1-based
           totalPages: response.totalPages,
-          pageSize: response.pageSize,
-          totalItems: response.totalItems
+          pageSize: response.size,
+          totalItems: response.totalElements
         },
         isLoading: false, 
         error: null 
@@ -142,13 +98,12 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
       });
     }
   },
-  
-  applyFilters: async () => {
+    applyFilters: async () => {
     try {
       const { filters, pagination } = get();
       set({ isLoading: true });
       
-      const response = await activityService.getAll({
+      const response = await ActivityService.getAll({
         city: filters.city || undefined,
         country: filters.country || undefined,
         activityType: filters.activityType || undefined,
@@ -158,17 +113,17 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
         querySearch: filters.querySearch || undefined,
         when: filters.when || undefined,
         numOfPeople: filters.numOfPeople || undefined,
-        page: pagination.currentPage,
+        page: pagination.currentPage - 1, // API uses 0-based indexing
         limit: pagination.pageSize
       });
       
       set({ 
-        activities: response.activities, 
+        activities: response.content, // Extract activities from content array
         pagination: {
-          currentPage: response.currentPage,
+          currentPage: response.number + 1, // Convert from 0-based to 1-based
           totalPages: response.totalPages,
-          pageSize: response.pageSize,
-          totalItems: response.totalItems
+          pageSize: response.size,
+          totalItems: response.totalElements
         },
         isLoading: false, 
         error: null 

@@ -1,11 +1,16 @@
-import { useUserBookings } from '@/hooks/use-bookings';
+"use client";
+
+// import { useUserBookings } from '@/hooks/use-bookings';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { Calendar, Clock, Users } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useQuery } from '@tanstack/react-query';
+import { bookingService } from '@/services/services';
 
 const BookingCard = ({ booking }: { booking: any }) => {
   const getStatusColor = (status: string) => {
@@ -25,10 +30,10 @@ const BookingCard = ({ booking }: { booking: any }) => {
     <Card className="p-6 hover:shadow-lg transition-shadow">
       <div className="flex gap-4">
         <div className="w-32 h-32 relative rounded-lg overflow-hidden">
-          <img
-            src={booking.activity.images[0]}
+          <Image
+            src={booking.activity.mediaUrls[0]}
             alt={booking.activity.title}
-            className="object-cover w-full h-full"
+            fill
           />
         </div>
         <div className="flex-1 space-y-2">
@@ -107,7 +112,16 @@ const BookingsListSkeleton = () => (
 );
 
 export default function BookingsList() {
-  const { data: bookings, isLoading, error } = useUserBookings();
+  // const { data: bookings, isLoading, error } = useUserBookings();
+
+    const {
+      data: bookings,
+      error,
+      isLoading,
+    } = useQuery({
+      queryKey: ["bookings"],
+      queryFn: () => bookingService.getAllBookings(),
+    });
 
   if (isLoading) {
     return <BookingsListSkeleton />;

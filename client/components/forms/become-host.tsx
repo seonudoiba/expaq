@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth";
 import toast from "react-hot-toast";
-import { fileService } from "@/lib/api/services";
+import { fileService } from "@/services/services";
 
 // Extended schema for become host that matches your DTO
 const becomeHostSchema = z.object({

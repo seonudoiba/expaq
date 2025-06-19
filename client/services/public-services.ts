@@ -1,17 +1,9 @@
-import { apiClient } from './client';
+import { Activity } from '@/types/activity';
+import { apiClient } from '../lib/api/client';
 import type {
-  AuthResponse,
-  CreateActivityRequest,
-  UpdateActivityRequest,
-  CreateReviewRequest,
-  LoginRequest,
-  RegisterRequest,
-  Review,
   User,
-  Activity,
-  City,
-  ActivityType,
   PaginatedUsersResponse,
+  PaginatedResponse,
 } from '@/types';
 
 /**
@@ -19,8 +11,7 @@ import type {
  */
 
 
-export const ActivityService = {
-  getAll: async (params?: {
+export const ActivityService = {  getAll: async (params?: {
       city?: string;
       country?: string;
       activityType?: string;
@@ -30,31 +21,35 @@ export const ActivityService = {
       querySearch?: string;
       when?: string;
       numOfPeople?: string;
-    }): Promise<Activity[]> => {
-      const response = await apiClient.get<Activity[]>('/api/activities', { params });
-      console.log('Activities:', response.data);
+      page?: number;
+      limit?: number;
+    }): Promise<PaginatedResponse<Activity>> => {
+      const response = await apiClient.get<PaginatedResponse<Activity>>('/api/activities', { params });
+      console.log('Activities response:', response.data);
       return response.data;
-    },
-    getAllFeaturedActivities: async (params?: {
+    },    getAllFeaturedActivities: async (params?: {
       location?: string;
       type?: string;
       minPrice?: number;
       maxPrice?: number;
-    }): Promise<Activity[]> => {
-      const response = await apiClient.get<Activity[]>('/api/activities/featured', { params });
-      console.log('Featured Activities:', response.data);
+      page?: number;
+      limit?: number;
+    }): Promise<PaginatedResponse<Activity>> => {
+      const response = await apiClient.get<PaginatedResponse<Activity>>('/api/activities/featured', { params });
+      console.log('Featured Activities response:', response.data);
       return response.data;
     },
-  
   
     getAllHostActivities: async (host:string ,params?: {
       location?: string;
       type?: string;
       minPrice?: number;
       maxPrice?: number;
-    }): Promise<Activity[]> => {
-      const response = await apiClient.get<Activity[]>(`/api/activities/host/${host}`, { params });
-      console.log('Activities:', response.data);
+      page?: number;
+      limit?: number;
+    }): Promise<PaginatedResponse<Activity>> => {
+      const response = await apiClient.get<PaginatedResponse<Activity>>(`/api/activities/host/${host}`, { params });
+      console.log('Host activities response:', response.data);
       return response.data;
     },
   

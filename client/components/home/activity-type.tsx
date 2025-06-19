@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { useState, useRef, useEffect, TouchEvent } from "react"
 import { useQuery } from "@tanstack/react-query";
-import { activityTypeService } from "@/lib/api/services";
+import { activityTypeService } from "@/services/services";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function ActivityType() {

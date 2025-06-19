@@ -5,14 +5,15 @@ import {
   activityTypeService,
   cityService,
   countryService,
-} from "@/lib/api/services";
+} from "@/services/services";
 import { Label } from "@/components/ui/label";
-import type { ActivityType, City, Country } from "@/types";
+import type { City, Country } from "@/types";
 import { useActivitiesStore } from "@/lib/store/useActivitiesStore";
 
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Users } from "lucide-react";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
+import { ActivityType } from "@/types/activity";
 
 export function ActivityFilters() {
   const {

@@ -26,7 +26,7 @@ public interface IActivityService {
 
     ActivityDTO getActivityById(UUID activityId);
 
-    List<ActivityDTO> getAllActivities(Specification<Activity> spec, String sortBy);
+    Page<ActivityDTO> getAllActivities(Specification<Activity> spec, String sortBy, Pageable pageable);
 
     ActivityDTO getActivity(UUID activityId);
 
@@ -36,7 +36,7 @@ public interface IActivityService {
 
 //    List<ActivityDTO> findNearbyActivitiesByCategory(ActivityCategory category, double latitude, double longitude, double distance);
 
-    List<ActivityDTO> findFeaturedActivities();
+    Page<ActivityDTO> findFeaturedActivities(Pageable pageable);
 
     List<ActivityDTO> findHostActivities(UUID hostId);
 

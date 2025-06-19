@@ -1,3 +1,4 @@
+import { Activity } from "./activity";
 import { PaymentAnalytics } from "./payments";
 
 export interface User {
@@ -39,12 +40,12 @@ export interface Location {
   image: string;
   countryId: string;
 }
-export interface activityType {
-  id: string;
-  name: string;
-  image: string;
-  countryId: string;
-}
+// export interface activityType {
+//   id: string;
+//   name: string;
+//   image: string;
+//   countryId: string;
+// }
 
 export interface City {
   id: string;
@@ -60,48 +61,44 @@ export interface Country {
   cityCount: number;
   activityCount: number;
 }
-export interface Schedule {
-  timeSlots: string[] | null;
-  availableDays: string[] | null;
-  timeZone: string | null;
-}
-export interface ActivityType {
-  id: string;
-  name: string;
-  image: string;
-  activityCount: number;
-}
-export interface Activity {
-  id: string;
-  hostId: string;
-  hostName: string;
-  hostProfilePicture: string;
-  hostCreatedAt: string;
-  hostBio: string;
-  title: string;
-  description: string;
-  price: number;
-  latitude: number;
-  longitude: number;
-  activityType: activityType;
-  schedule: Schedule;
-  mediaUrls: string[];
-  maxParticipants: number;
-  minParticipants: number;
-  durationMinutes: number;
-  averageRating: number;
-  totalReviews: number;
-  createdAt: string;
-  updatedAt: string;
-  active: boolean;
-  verified: boolean;
-  startDate: string;
-  endDate: string;
-  locationPoint: string;
-  address: string;
-  city: City;
-  country: Country;
-}
+// export interface Schedule {
+//   timeSlots: string[] | null;
+//   availableDays: string[] | null;
+//   timeZone: string | null;
+// }
+
+// export interface Activity {
+//   id: string;
+//   hostId: string;
+//   hostName: string;
+//   hostProfilePictureUrl: string;
+//   hostCreatedAt: string;
+//   hostBio: string;
+//   title: string;
+//   description: string;
+//   price: number;
+//   latitude: number;
+//   longitude: number;
+//   activityType: activityType;
+//   schedule: Schedule;
+//   mediaUrls: string[];
+//   maxParticipants: number;
+//   minParticipants: number;
+//   durationMinutes: number;
+//   isActive: boolean;
+//   isFeatured: boolean;
+//   isVerified: boolean;
+//   averageRating: number;
+//   totalReviews: number;
+//   address: string;
+//   city: City;
+//   country: Country;
+//   createdAt: Array<number> | string;  updatedAt: Array<number> | string;
+//   startDate: Array<number> | string;
+//   endDate: Array<number> | string;
+//   reviews: Review[];
+//   locationPoint?: string;
+// }
 
 export interface Review {
   id: string;
@@ -327,25 +324,34 @@ export interface Review {
 
 export interface PaginatedResponse<T> {
   content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      sorted: boolean;
+      unsorted: boolean;
+      empty: boolean;
+    };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
   totalElements: number;
   totalPages: number;
-  number: number;
-  size: number;
-  first: boolean;
   last: boolean;
+  size: number;
+  number: number;
+  sort: {
+    sorted: boolean;
+    unsorted: boolean;
+    empty: boolean;
+  };
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
 }
 
-export interface ActivitySearchParams {
-  search?: string;
-  location?: string;
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  page?: number;
-  size?: number;
-  sortBy?: string;
-  sortDirection?: "ASC" | "DESC";
-}
+
 
 export interface AnalyticsItem {
   label: string;

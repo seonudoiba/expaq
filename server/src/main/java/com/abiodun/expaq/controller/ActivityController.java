@@ -50,7 +50,7 @@ public class ActivityController {
 //    }
     // GET /activities - List activities (publicly accessible, filtering added)
     @GetMapping
-    public ResponseEntity<List<ActivityDTO>> getAllActivities(
+    public ResponseEntity<Page<ActivityDTO>> getAllActivities(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String activityType,
@@ -59,7 +59,8 @@ public class ActivityController {
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String querySearch,
             @RequestParam(required = false) String when,
-            @RequestParam(required = false) String numOfPeople
+            @RequestParam(required = false) String numOfPeople,
+            @PageableDefault(size = 24) Pageable pageable
             ) {
         Specification<Activity> spec = Specification.where(null);
 
@@ -126,7 +127,7 @@ public class ActivityController {
         }
 
 
-        List<ActivityDTO> activities = activityService.getAllActivities(spec, sortBy);
+        Page<ActivityDTO> activities = activityService.getAllActivities(spec, sortBy, pageable);
         return ResponseEntity.ok(activities);
     }
 
@@ -211,7 +212,7 @@ public class ActivityController {
     @GetMapping("/search")
     public ResponseEntity<Page<ActivityDTO>> searchActivities(
             @RequestParam String query,
-            Pageable pageable) {
+            @PageableDefault(size = 24) Pageable pageable) {
         return ResponseEntity.ok(activityService.searchActivities(query, pageable));
     }
 
@@ -228,28 +229,28 @@ public class ActivityController {
             @RequestParam(required = false) Double latitude,
             @RequestParam(required = false) Double longitude,
             @RequestParam(required = false) Double distance,
-            Pageable pageable) {
+            @PageableDefault(size = 24) Pageable pageable) {
         Page<ActivityDTO> activities = activityService.getSortedActivities(sortBy, latitude, longitude, distance, pageable);
         return ResponseEntity.ok(activities);
     }
         @GetMapping("/by-type/{typeId}")
     public ResponseEntity<Page<ActivityDTO>> getActivitiesByType(
             @PathVariable UUID typeId,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 24) Pageable pageable) {
         return ResponseEntity.ok(activityService.findActivitiesByActivityType(typeId, pageable));
     }
 
     @GetMapping("/by-city/{city}")
     public ResponseEntity<Page<ActivityDTO>> getActivitiesByCity(
             @PathVariable String city,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 24) Pageable pageable) {
         return ResponseEntity.ok(activityService.findActivitiesByCity(city, pageable));
     }
 
     @GetMapping("/by-country/{country}")
     public ResponseEntity<Page<ActivityDTO>> getActivitiesByCountry(
             @PathVariable String country,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 24) Pageable pageable) {
         return ResponseEntity.ok(activityService.findActivitiesByCountry(country, pageable));
     }
         @GetMapping("/nearby/{type}")
@@ -263,8 +264,8 @@ public class ActivityController {
     }
 
     @GetMapping("/featured")
-    public ResponseEntity<List<ActivityDTO>> findFeaturedActivities() {
-        return ResponseEntity.ok(activityService.findFeaturedActivities());
+    public ResponseEntity<Page<ActivityDTO>> findFeaturedActivities(@PageableDefault(size = 24) Pageable pageable) {
+        return ResponseEntity.ok(activityService.findFeaturedActivities(pageable));
     }
 
     @GetMapping("/host/{hostId}")
@@ -273,12 +274,12 @@ public class ActivityController {
     }
 
     @GetMapping("/upcoming")
-    public ResponseEntity<Page<ActivityDTO>> findUpcomingActivities(Pageable pageable) {
+    public ResponseEntity<Page<ActivityDTO>> findUpcomingActivities(@PageableDefault(size = 24) Pageable pageable) {
         return ResponseEntity.ok(activityService.findUpcomingActivities(pageable));
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<Page<ActivityDTO>> findPopularActivities(Pageable pageable) {
+    public ResponseEntity<Page<ActivityDTO>> findPopularActivities(@PageableDefault(size = 24) Pageable pageable) {
         return ResponseEntity.ok(activityService.findPopularActivities(pageable));
     }
 

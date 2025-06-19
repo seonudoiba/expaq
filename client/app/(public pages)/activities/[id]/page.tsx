@@ -8,15 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ActivityService} from "@/lib/api/public-services";
+import { ActivityService} from "@/services/public-services";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
-import { useAuthStore } from "@/lib/store/auth";
+// import { useAuthStore } from "@/lib/store/auth";
 import BookingWidget from "@/components/BookingWidget";
 export default function ActivityDetailsPage() {
   const params = useParams();
-  const [selectedDate, setSelectedDate] = useState("");
-  const [participants, setParticipants] = useState(1);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const {
     data: activity,
@@ -38,6 +37,7 @@ export default function ActivityDetailsPage() {
   if (!activity) {
     return <div>Activity not found</div>;
   }
+
   return (
     <div className="container mx-auto py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -46,7 +46,7 @@ export default function ActivityDetailsPage() {
           {/* Image Gallery */}
           <div className="relative h-[400px] rounded-lg overflow-hidden">
             <Image
-              src={activity.mediaUrls[0]}
+              src={activity.mediaUrls[activeImageIndex] || "https://res.cloudinary.com/do0rdj8oj/image/upload/v1750338649/vt3nisp4gn62vnpy39zr.webp"}
               alt={activity.title}
               fill
               className="object-cover"
@@ -58,22 +58,26 @@ export default function ActivityDetailsPage() {
               <Button variant="secondary" size="sm">
                 <Share2 className="h-4 w-4" />
               </Button>
-            </div>
-            {/* {activity.mediaUrls.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
-                {activity.images.map((image, index) => (
-                  <Image
+            </div>            {activity.mediaUrls.length > 1 && (
+              <div className="absolute bottom-4 left-4 right-4 flex overflow-x-auto space-x-2 p-2 bg-black/30 rounded">
+                {activity.mediaUrls.map((url: string, index:number) => (
+                  <div 
                     key={index}
-                    src={image}
-                    alt={`${activity.title} ${index + 1}`}
-                    className={`h-20 object-cover rounded cursor-pointer ${
-                      index === 0 ? "ring-2 ring-primary" : ""
-                    }`}
+                    className="relative h-20 w-20 flex-shrink-0"
                     onClick={() => setActiveImageIndex(index)}
-                  />
+                  >
+                    <Image
+                      src={url}
+                      alt={`${activity.title} ${index + 1}`}
+                      fill
+                      className={`object-cover rounded cursor-pointer transition-all ${
+                        index === activeImageIndex ? "ring-2 ring-primary ring-offset-2" : "opacity-70 hover:opacity-100"
+                      }`}
+                    />
+                  </div>
                 ))}
               </div>
-            )} */}
+            )}
           </div>
 
 
@@ -92,10 +96,19 @@ export default function ActivityDetailsPage() {
                 <MapPin className="h-4 w-4 mr-1" />
                 {activity.address}, {activity.city.name}, {activity.country.name}
               </div>
-              <div className="flex items-center space-x-6 text-sm text-gray-600">
-                <div className="flex items-center">
+              <div className="flex items-center space-x-6 text-sm text-gray-600">                <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-1" />
-                  {activity.durationMinutes}
+                  {activity.durationMinutes >= 60 ? (
+                    <>
+                      {Math.floor(activity.durationMinutes / 60)}
+                      {Math.floor(activity.durationMinutes / 60) === 1 ? " hour" : " hours"}
+                      {activity.durationMinutes % 60 > 0 && (
+                        <> {activity.durationMinutes % 60} {activity.durationMinutes % 60 === 1 ? "minute" : "minutes"}</>
+                      )}
+                    </>
+                  ) : (
+                    `${activity.durationMinutes} ${activity.durationMinutes === 1 ? "minute" : "minutes"}`
+                  )}
                 </div>
                 <div className="flex items-center">
                   <Users className="h-4 w-4 mr-1" />
@@ -107,10 +120,9 @@ export default function ActivityDetailsPage() {
   {/* Host Info */}
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-center space-x-4 mb-4">
-                  <Avatar className="h-16 w-16">
+                <div className="flex items-center space-x-4 mb-4">                  <Avatar className="h-16 w-16">
                     <AvatarImage 
-                      src={activity.hostProfilePicture} 
+                      src={activity.hostProfilePictureUrl} 
                       alt={activity.hostName} 
                     />
                     <AvatarFallback>
@@ -125,8 +137,7 @@ export default function ActivityDetailsPage() {
                       <span>Host</span>
                       <span>
                         Member since {new Date(activity.hostCreatedAt).getFullYear()}
-                      </span>
-                      {activity.verified && (
+                      </span>                      {activity.verified && (
                         <span className="flex items-center">
                           <Star className="h-4 w-4 text-blue-500 mr-1" />
                           Verified
@@ -139,6 +150,16 @@ export default function ActivityDetailsPage() {
                   <p className="text-gray-700 mb-4">{activity.hostBio}</p>
                 )}
                 <Button variant="outline">Contact Host</Button>
+              </CardContent>
+            </Card>
+
+            {/* Description Section */}
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-semibold mb-4">About this activity</h2>
+                <div className="prose text-gray-700">
+                  <p>{activity.description}</p>
+                </div>
               </CardContent>
             </Card>
         </div>

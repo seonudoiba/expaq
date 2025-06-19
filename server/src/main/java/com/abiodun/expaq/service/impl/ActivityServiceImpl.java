@@ -15,6 +15,7 @@ import com.abiodun.expaq.service.IActivityService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -336,46 +337,49 @@ public class ActivityServiceImpl implements IActivityService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ActivityDTO> getAllActivities(Specification<Activity> spec, String sortBy) {
+    public Page<ActivityDTO> getAllActivities(Specification<Activity> spec, String sortBy, Pageable pageable) {
+        List<Activity> activities;
+        Sort sort;
+
         if ("lowPrice".equalsIgnoreCase(sortBy)) {
-            List<Activity> activities = activityRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "price"));
-            return activities.stream()
-                    .map(this::mapToActivityDTO)
-                    .collect(Collectors.toList());
+            sort = Sort.by(Sort.Direction.ASC, "price");
         } else if ("highPrice".equalsIgnoreCase(sortBy)) {
-            List<Activity> activities = activityRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "price"));
-            return activities.stream()
-                    .map(this::mapToActivityDTO)
-                    .collect(Collectors.toList());
+            sort = Sort.by(Sort.Direction.DESC, "price");
         } else if ("alphabetical".equalsIgnoreCase(sortBy)) {
-            List<Activity> activities = activityRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "title"));
-            return activities.stream()
-                    .map(this::mapToActivityDTO)
-                    .collect(Collectors.toList());
+            sort = Sort.by(Sort.Direction.ASC, "title");
         } else if ("highRating".equalsIgnoreCase(sortBy)) {
-            List<Activity> activities = activityRepository.findAll(spec, Sort.by("reviews"));
-            return activities.stream()
-                    .map(this::mapToActivityDTO)
-                    .collect(Collectors.toList());
+            sort = Sort.by("reviews");
         } else if ("lowRating".equalsIgnoreCase(sortBy)) {
-            List<Activity> activities = activityRepository.findAll(spec, Sort.by(Sort.Direction.DESC,"reviews"));
-            return activities.stream()
-                    .map(this::mapToActivityDTO)
-                    .collect(Collectors.toList());
+            sort = Sort.by(Sort.Direction.DESC, "reviews");
         } else if ("minParticipants".equalsIgnoreCase(sortBy)) {
-            List<Activity> activities =
-                    activityRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "minParticipants"));
-            return activities.stream()
-                    .map(this::mapToActivityDTO)
-                    .collect(Collectors.toList());
-        } else  {
-            List<Activity> activities = activityRepository.findAll(spec);
-            return activities.stream()
-                    .map(this::mapToActivityDTO)
-                    .collect(Collectors.toList());
+            sort = Sort.by(Sort.Direction.ASC, "minParticipants");
+        } else {
+            sort = Sort.unsorted();
         }
 
+        // If pageable has sort, use it instead
+        if (pageable.getSort().isSorted()) {
+            sort = pageable.getSort();
+        }
 
+        activities = activityRepository.findAll(spec, sort);
+
+        // Convert to DTOs
+        List<ActivityDTO> dtos = activities.stream()
+                .map(this::mapToActivityDTO)
+                .collect(Collectors.toList());
+
+        // Create a proper page
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), dtos.size());
+
+        // Handle case where start might be >= dtos.size()
+        if (start >= dtos.size()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, dtos.size());
+        }
+
+        List<ActivityDTO> pageContent = dtos.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, dtos.size());
     }
 
     @Override
@@ -431,11 +435,9 @@ public class ActivityServiceImpl implements IActivityService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ActivityDTO> findFeaturedActivities() {
-        return activityRepository.findByIsFeaturedTrueAndIsActiveTrue()
-                .stream()
-                .map(this::mapToActivityDTO)
-                .collect(Collectors.toList());
+    public Page<ActivityDTO> findFeaturedActivities(Pageable pageable) {
+        return activityRepository.findByIsFeaturedTrueAndIsActiveTrue(pageable)
+                .map(this::mapToActivityDTO);
     }
 
     @Override

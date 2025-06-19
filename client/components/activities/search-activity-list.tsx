@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useActivitiesStore } from "@/lib/store/useActivitiesStore";
 import { ActivityCard } from "@/components/activities/activity-card";
-import { activityService } from "@/lib/api/services";
 import { 
   Pagination, 
   PaginationContent, 
@@ -13,6 +12,7 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination";
+import { ActivityService } from "@/services/public-services";
 
 // This component replaces ActivityList with search-specific logic
 export const SearchActivityList = () => {
@@ -24,30 +24,29 @@ export const SearchActivityList = () => {
     pagination,
     setPage
   } = useActivitiesStore();
-  
-  useEffect(() => {
+    useEffect(() => {
     const fetchFilteredActivities = async () => {
       try {
         // Set loading state
         useActivitiesStore.setState({ isLoading: true });
         
         // Call the API service directly to get filtered activities
-        const response = await activityService.getAll({
+        const response = await ActivityService.getAll({
           querySearch: filters.querySearch || undefined,
           when: filters.when || undefined,
           numOfPeople: filters.numOfPeople || undefined,
-          page: pagination.currentPage,
+          page: pagination.currentPage - 1, // API uses 0-based indexing
           limit: pagination.pageSize
         });
         
         // Then update the store directly to avoid circular dependencies
         useActivitiesStore.setState({ 
-          activities: response.activities, 
+          activities: response.content, // Extract activities from content array
           pagination: {
-            currentPage: response.currentPage,
+            currentPage: response.number + 1, // Convert from 0-based to 1-based
             totalPages: response.totalPages,
-            pageSize: response.pageSize,
-            totalItems: response.totalItems
+            pageSize: response.size,
+            totalItems: response.totalElements
           },
           isLoading: false, 
           error: null 

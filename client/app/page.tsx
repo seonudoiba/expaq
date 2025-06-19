@@ -3,11 +3,7 @@ import Hosts from "../components/home/Hosts";
 import Blog from "../components/home/Blog";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Search,
-  MapPin,
   Calendar,
   Users,
   ChevronRight,

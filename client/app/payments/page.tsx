@@ -19,7 +19,7 @@ import { useAuthStore } from "@/lib/store/auth";
 // Import types
 import { PaymentAnalytics } from "@/types/payments";
 import { useQuery } from "@tanstack/react-query";
-import { PaymentAnalyticsService } from "@/lib/api/payment-service";
+import { PaymentAnalyticsService } from "@/services/payment-service";
 
 export default function PaymentsPage() {
   const [dateRange, setDateRange] = useState({

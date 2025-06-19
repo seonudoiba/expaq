@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { activityService } from "@/lib/api/services";
+import { activityService } from "@/services/services";
 
 import {
   CardContent
@@ -21,9 +21,8 @@ export function HostActivityList({hostId}: { hostId?: string }) {
       return activityService.getAllHostActivities(hostId);
     },
   });
-  
-  // Extract activities from the paginated response
-  const activities = data?.activities || [];
+    // Extract activities from the paginated response
+  const activities = data?.content || [];
 
   if (isLoading) {
     return (

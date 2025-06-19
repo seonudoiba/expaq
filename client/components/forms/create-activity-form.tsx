@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { activityService, fileService } from '@/lib/api/services';
+import { activityService, fileService } from '@/services/services';
 import toast from 'react-hot-toast';
 
 const createActivitySchema = z.object({

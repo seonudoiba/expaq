@@ -1,4 +1,6 @@
-import { useBookingDetails, useInitiatePayment } from '@/hooks/use-bookings';
+"use client";
+
+// import { useBookingDetails, useInitiatePayment } from '@/hooks/use-bookings';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +9,8 @@ import { format } from 'date-fns';
 import { Calendar, Clock, Users, MapPin, Receipt, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useQuery } from '@tanstack/react-query';
+import { bookingService } from '@/services/booking-service';
 
 interface BookingDetailsProps {
   bookingId: string;
@@ -34,8 +38,25 @@ const BookingDetailsSkeleton = () => (
 );
 
 export default function BookingDetails({ bookingId }: BookingDetailsProps) {
-  const { data: booking, isLoading, error } = useBookingDetails(bookingId);
-  const { mutate: initiatePayment, isLoading: isPaymentLoading } = useInitiatePayment();
+  // const { data: booking, isLoading, error } = useBookingDetails(bookingId);
+  // const { mutate: initiatePayment, isLoading: isPaymentLoading } = useInitiatePayment();
+  const {
+    data: booking,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["booking", bookingId],
+    queryFn: () => bookingService.getBookingById(bookingId),
+  });
+  const {
+    data: payment,
+    error: paymentError,
+    isLoading: isPaymentLoading,
+  } = useQuery({
+    queryKey: ["payment", bookingId],
+    queryFn: () => paymentService.getPaymentByBookingId(bookingId),
+  });
+
 
   if (isLoading) {
     return <BookingDetailsSkeleton />;
@@ -65,6 +86,8 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
         return 'bg-yellow-500';
       case 'CANCELLED':
         return 'bg-red-500';
+      case 'PENDING_PAYMENT':
+        return 'bg-yellow-500';
       default:
         return 'bg-gray-500';
     }
@@ -84,7 +107,7 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
           <div className="flex gap-6">
             <div className="w-96 h-64 relative rounded-lg overflow-hidden">
               <Image
-                src={booking.activity.images[0]}
+                src={booking.activity.mediaUrls[0]}
                 alt={booking.activity.title}
                 fill
                 className="object-cover"
@@ -104,7 +127,7 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-gray-500" />
-                  <span>{booking.numberOfGuests} guests</span>
+                  <span>{booking.participants} guests</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-gray-500" />
@@ -120,26 +143,26 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Receipt className="w-5 h-5 text-gray-500" />
-                  <span>Activity Price ({booking.numberOfGuests} × ${booking.activity.price})</span>
+                  <span>Activity Price ({booking.participants} × ${booking.activity.price})</span>
                 </div>
-                <span>${booking.activity.price * booking.numberOfGuests}</span>
+                <span>${booking.activity.price * booking.participants}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span>Service Fee</span>
-                <span>${Math.round(booking.totalAmount * 0.1)}</span>
+                <span>${Math.round(booking.totalPrice * 0.1)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span>Taxes</span>
-                <span>${Math.round(booking.totalAmount * 0.08)}</span>
+                <span>${Math.round(booking.totalPrice * 0.08)}</span>
               </div>
               <div className="flex justify-between items-center font-semibold pt-2 border-t">
                 <span>Total Amount</span>
-                <span>${booking.totalAmount}</span>
+                <span>${booking.totalPrice}</span>
               </div>
             </div>
-          </div>
+          {booking.status === 'PENDING' && (
 
-          {booking.paymentStatus === 'UNPAID' && (
+          {booking.status === 'UNPAID' && (
             <div className="flex justify-end space-x-4 pt-4">
               <Button asChild variant="outline">
                 <Link href="/bookings">Back to Bookings</Link>
@@ -161,7 +184,7 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
             </div>
           )}
 
-          {booking.paymentStatus === 'PAID' && (
+          {booking.status === 'PAID' && (
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 text-green-700">
                 <Badge className="bg-green-500">Paid</Badge>

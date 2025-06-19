@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Activity } from "@/lib/store/useActivitiesStore";
+import { Activity } from "@/types/activity";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Heart, MapPin, Star } from "lucide-react";
@@ -12,9 +12,20 @@ interface ActivityCardProps {
   activity: Activity;
 }
 
-export function ActivityCard({ activity }: ActivityCardProps) {
-  function formatDateShort(dateString: string | number | Date) {
-    const date = new Date(dateString);
+export function ActivityCard({ activity }: ActivityCardProps) {  function formatDateShort(dateValue: Array<number> | string | Date) {
+    // Handle array format [year, month, day, hour, minute, second, nanosecond]
+    if (Array.isArray(dateValue)) {
+      const [year, month, day] = dateValue;
+      // Month is 1-based in the API but 0-based in JS Date
+      return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+    
+    // Handle string or Date format
+    const date = new Date(dateValue);
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -27,7 +38,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
       <Card className="overflow-hidden hover:shadow-lg transition-shadow group h-full">
         <div className="relative xxl:h-64 h-52 w-full">
           <Image
-            src={activity.mediaUrls[0] || "/default.png"}
+            src={activity.mediaUrls[0] || "https://res.cloudinary.com/do0rdj8oj/image/upload/v1750338649/vt3nisp4gn62vnpy39zr.webp"}
             alt={activity.title}
             fill
             className="object-cover transition-transform group-hover:scale-105"

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { uploadActivityImages } from "@/lib/api/services";
+import { uploadActivityImages } from "@/services/services";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function UploadActivityImagePage() {

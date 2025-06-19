@@ -10,7 +10,7 @@ import { CalendarIcon, Users, Clock, Star } from 'lucide-react';
 import { format, addHours } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/components/ui/use-toast";
-import { bookingService } from '@/services/booking';
+import { bookingService } from '@/services/booking-service';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BookingWidgetProps } from '@/types';

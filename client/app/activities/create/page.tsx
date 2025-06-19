@@ -9,12 +9,12 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { Clock, Users, DollarSign, Image as ImageIcon, MapPin } from "lucide-react"
 import { useAuthStore } from "@/lib/store/auth"
-import { activityService } from "@/lib/api/services"
+import { activityService } from "@/services/services"
 import { useQuery } from "@tanstack/react-query"
 import { useActivityStore } from "@/lib/store/activity"
-import { countryService, cityService, activityTypeService } from "@/lib/api/services"
-import { geocodingService } from '@/lib/api/services';
-import { uploadActivityImages } from '@/lib/api/services';
+import { countryService, cityService, activityTypeService } from "@/services/services"
+import { geocodingService } from '@/services/services';
+import { uploadActivityImages } from '@/services/services';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";

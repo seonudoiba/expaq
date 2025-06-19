@@ -42,7 +42,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
 
     
     // Featured activities
-    List<Activity> findByIsFeaturedTrueAndIsActiveTrue();
+    Page<Activity> findByIsFeaturedTrueAndIsActiveTrue(Pageable pageable);
     
     // Active activities by host
     List<Activity> findByHostIdAndIsActiveTrue(UUID hostId);

@@ -1,33 +1,16 @@
 "use client";
-
-import Link from "next/link";
-import Image from "next/image";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Star, MapPin } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { activityService } from "@/lib/api/services";
+import { ActivityService } from "@/services/public-services";
+import { ActivityCard } from "../activities/activity-card";
 
 export function FeaturedActivities() {
 
-  function formatDateShort(dateString: string | number | Date) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  }  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["activities"],
-    queryFn: () => activityService.getAllFeaturedActivities(),
+    queryFn: () => ActivityService.getAllFeaturedActivities(),
   });
-  
   // Extract activities from the paginated response
-  const activities = data?.activities || [];
+  const activities = data?.content || [];
 
   if (isLoading) {
     return (
@@ -76,70 +59,7 @@ export function FeaturedActivities() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {activities.map((activity) => (
-        <Link
-          href={`/activities/${activity.id}`}
-          key={activity.id}
-          className="group"
-        >
-          <Card className="overflow-hidden h-full transition-all hover:shadow-md">
-            <div className="relative h-64 w-full">
-              <Image
-                src={activity.mediaUrls[0] || "/placeholder.svg"}
-                alt={activity.title}
-                fill
-                className="object-cover transition-transform group-hover:scale-105"
-              />
-              <Badge className="absolute top-3 left-3 z-10">
-                {activity.activityType.name}
-              </Badge>
-            </div>
-            <CardContent className="p-4">
-              <div className="flex items-center text-sm text-muted-foreground mb-2">
-                <MapPin className="h-4 w-4 mr-1" />
-                {activity.city.name}, {activity.country.name}
-              </div>
-              <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                {activity.title}
-              </h3>
-              <p className="text-sm text-gray-800 line-clamp-2">
-                {activity.description}
-              </p>
-              <div className="flex items-center text-base py-2 text-gray-800">
-                <svg
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-800"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 14a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5A.75.75 0 018 14zm0-4a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5A.75.75 0 018 10zm0-4a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5A.75.75 0 018 6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {formatDateShort(activity.startDate)} -{" "}
-                {formatDateShort(activity.endDate)}
-              </div>
-              <div className="flex items-center">
-                <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                <span className="font-medium mr-1">
-                  {activity.averageRating}
-                </span>
-                <span className="text-muted-foreground text-sm">
-                  ({activity.totalReviews} reviews)
-                </span>
-              </div>
-            </CardContent>
-            <CardFooter className="p-4 pt-0 flex justify-between items-center">
-              <div className="font-semibold">
-                ${activity.price}{" "}
-                <span className="text-muted-foreground font-normal text-sm">
-                  / person
-                </span>
-              </div>
-            </CardFooter>
-          </Card>
-        </Link>
+        <ActivityCard key={activity.id} activity={activity} />
       ))}
     </div>
   );

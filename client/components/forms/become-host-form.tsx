@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { authService, fileService } from '@/lib/api/services';
+import { authService, fileService } from '@/services/services';
 import toast from 'react-hot-toast';
 import { FileUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

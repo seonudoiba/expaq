@@ -1,6 +1,6 @@
 "use client";
 
-import { countryService } from "@/lib/api/services";
+import { countryService } from "@/services/services";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Country } from "@/types";

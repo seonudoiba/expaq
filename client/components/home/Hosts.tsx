@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
-import { authService } from '@/lib/api/services';
+import { authService } from '@/services/services';
 import { UserProfile } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 const Hosts: React.FC = () => {
