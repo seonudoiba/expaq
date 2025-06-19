@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { MapPin, Clock, Users, DollarSign, Image as ImageIcon } from "lucide-react"
+import { Clock, Users, DollarSign, Image as ImageIcon, MapPin } from "lucide-react"
 import { useAuthStore } from "@/lib/store/auth"
 import { activityService } from "@/lib/api/services"
 import { useQuery } from "@tanstack/react-query"
@@ -45,6 +45,17 @@ export default function CreateActivityPage() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [images, setImages] = useState<File[]>([])
+  const [addressVerification, setAddressVerification] = useState<{
+    isVerifying?: boolean;
+    isValid?: boolean;
+    suggestions?: Array<{
+      display_name: string;
+      lat: number;
+      lon: number;
+    }>;
+    formattedAddress?: string;
+  } | null>(null)
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
   const {
     countries,
     cities,
@@ -74,25 +85,136 @@ export default function CreateActivityPage() {
     queryKey: ["cities", selectedCountry],
     queryFn: () => cityService.getByCountry(selectedCountry),
     enabled: !!selectedCountry, // Only fetch cities if a country is selected
-  })
+  });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    getValues,
+    watch,
   } = useForm<z.infer<typeof activitySchema>>({
     resolver: zodResolver(activitySchema),
   });
-
-  const onSubmit = async (data: z.infer<typeof activitySchema>) => {
+  
+  // Watch country and city fields to react to their changes
+  const watchCountry = watch("country");
+  const watchCity = watch("city");// Enhanced search for address suggestions with debouncing
+  const debouncedAddressSearch = (address: string) => {
+    if (!address || address.trim() === '') {
+      setAddressVerification(null);
+      return;
+    }
+    
+    // Clear any existing timeout to implement debounce
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    // Set a new timeout to delay the search
+    const newTimeout = setTimeout(async () => {
+      setAddressVerification(prev => ({ ...prev, isVerifying: true }));
+      
+      try {
+        // Get the selected city and country for context
+        const cityValue = getValues("city");
+        const countryValue = getValues("country");
+        
+        // Log the values to help debug
+        console.log("Address search values:", { 
+          address, 
+          cityValue, 
+          countryValue,
+          cityExists: cities.find(c => c.id === cityValue)?.name,
+          countryExists: countries.find(c => c.id === countryValue)?.name
+        });
+        
+        // Make sure city and country are selected
+        if (!cityValue || !countryValue) {
+          console.log("City or country not selected");
+          setAddressVerification(null);
+          return;
+        }
+        
+        const cityName = cities.find((c) => c.id === cityValue)?.name;
+        const countryName = countries.find((c) => c.id === countryValue)?.name;
+        
+        if (!cityName || !countryName) {
+          console.log("City name or country name not found");
+          setAddressVerification(null);
+          return;
+        }
+        
+        // Create a query based on available information, prioritizing specific address details first
+        const query = `${address}, ${cityName}, ${countryName}`;
+        console.log("Searching for address with query:", query);
+        
+        // Fetch address suggestions
+        const result = await geocodingService.verifyAddress(query);
+        console.log("Got address verification result:", result);
+        
+        // Always update the state with what we got
+        setAddressVerification({
+          isVerifying: false,
+          isValid: result.isValid,
+          suggestions: result.suggestions || [],
+          formattedAddress: result.formattedAddress
+        });
+        
+        // Log suggestions for debugging
+        if (result.suggestions?.length) {
+          console.log(`Found ${result.suggestions.length} suggestions for "${address}"`);
+        } else {
+          console.log(`No suggestions found for "${address}"`);
+        }
+      } catch (error) {
+        console.error("Error searching addresses:", error);
+        setAddressVerification({
+          isVerifying: false,
+          isValid: false,
+          suggestions: []
+        });
+      }
+    }, 300); // Faster debounce for better responsiveness
+    
+    // Save the timeout ID to be able to cancel it
+    setSearchTimeout(newTimeout);
+  };const onSubmit = async (data: z.infer<typeof activitySchema>) => {
     console.log("Form submitted with data:", data); // Debugging log
     setIsLoading(true);
 
     try {
-      // Convert isFeatured to boolean
-      // const isFeatured = data.isFeatured === "true";
-
-      const { address, city, country, startDate, endDate, ...rest } = data;
+      // Extract data from form
+      const { address: originalAddress, city, country, startDate, endDate, ...rest } = data;
+      
+      // If we have a verified formatted address, use that instead of the original
+      const address = addressVerification?.formattedAddress || originalAddress;
+      
+      // Make sure city and country are selected
+      if (!city || !country) {
+        toast({
+          title: "Missing information",
+          description: "Please select both a country and city",
+          variant: "destructive",
+          duration: 3000,
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Verify the address if not already verified
+      if (!addressVerification?.isValid) {
+        toast({
+          title: "Address verification needed",
+          description: "Please select a valid address from the suggestions",
+          variant: "destructive",
+          duration: 3000,
+        });
+        setIsLoading(false);
+        return;
+      }
+      
       console.log("Processing data:", { address, city, country, rest }); // Debugging log
 
       const cityName = cities.find((c) => c.id === city)?.name;
@@ -100,10 +222,36 @@ export default function CreateActivityPage() {
 
       if (!cityName || !countryName) {
         throw new Error("Invalid city or country selection.");
-      }
-
-      const query = `${address}, ${cityName}, ${countryName}`;
+      }      // Use verified coordinates from address verification if available
       let latitude, longitude;
+      
+      if (addressVerification?.suggestions && addressVerification.suggestions.length > 0) {
+        // Use the first suggestion's coordinates
+        latitude = addressVerification.suggestions[0].lat;
+        longitude = addressVerification.suggestions[0].lon;
+        console.log("Using verified coordinates:", { latitude, longitude });
+      } else {
+        // Fallback to geocoding the address
+        const query = `${address}, ${cityName}, ${countryName}`;
+        console.log("Geocoding address:", query);
+        
+        try {
+          ({ latitude, longitude } = await geocodingService.getCoordinates(query));
+
+          if (!latitude || !longitude) {
+            console.warn(`No results found for the full address: ${query}. Retrying with city and country only.`);
+            const fallbackQuery = `${cityName}, ${countryName}`;
+            ({ latitude, longitude } = await geocodingService.getCoordinates(fallbackQuery));
+
+            if (!latitude || !longitude) {
+              throw new Error(`No results found for the fallback location: ${fallbackQuery}`);
+            }
+          }
+        } catch (geoError) {
+          console.error("Geocoding error:", geoError);
+          throw new Error("Unable to fetch coordinates. Please check the address and try again.");
+        }
+      }
 
       try {
         ({ latitude, longitude } = await geocodingService.getCoordinates(query));
@@ -205,7 +353,16 @@ export default function CreateActivityPage() {
     if (citiesData) {
       setCities(citiesData);
     }
-  }, [citiesData, setCities]);
+  }, [citiesData, setCities]);  // Reset address when city or country changes
+  useEffect(() => {
+    console.log("Country or City changed:", { watchCountry, watchCity });
+    
+    // Reset address and verification when either city or country changes
+    if (!watchCity || !watchCountry) {
+      setValue("address", "");
+      setAddressVerification(null);
+    }
+  }, [watchCity, watchCountry, setValue]);
 
   if (!user) {
     return null
@@ -231,11 +388,8 @@ export default function CreateActivityPage() {
                   ))}
                 </ul>
               </div>
-            )}
-
-            {/* Country and City Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+            )}            {/* Country and City Selection */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">              <div>
                 <Label htmlFor="country">Country</Label>
                 <select
                   id="country"
@@ -243,16 +397,33 @@ export default function CreateActivityPage() {
                   required
                   className="w-full p-2 border rounded-md"
                   onChange={(e) => {
+                    // Reset the city and address selections when country changes
+                    setValue("city", "");
+                    setValue("address", "");
+                    
+                    // Clear any address verification data
+                    setAddressVerification(null);
+                    
+                    // Update the selected country to trigger city fetch
                     setSelectedCountry(e.target.value);
+                    
+                    if (e.target.value) {
+                      toast({
+                        title: "Country selected",
+                        description: `Now please select a city in ${countries.find(c => c.id === e.target.value)?.name}`,
+                        duration: 3000,
+                      });
+                    }
                   }}
                 >
                   <option value="">Select a country</option>
                   {countries.map((country) => (
-                    <option key={country.id} value={country.name}>
+                    <option key={country.id} value={country.id}>
                       {country.name}
                     </option>
                   ))}
                 </select>
+                {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>}
               </div>
 
               <div>
@@ -262,14 +433,39 @@ export default function CreateActivityPage() {
                   {...register("city")}
                   required
                   className="w-full p-2 border rounded-md"
+                  disabled={!selectedCountry} // Disable until country is selected
+                  onChange={(e) => {
+                    // Reset address when city changes
+                    setValue("address", "");
+                    
+                    // Clear any address verification data
+                    setAddressVerification(null);
+                    
+                    if (e.target.value) {
+                      toast({
+                        title: "City selected",
+                        description: "Now you can enter and select an address",
+                        duration: 3000,
+                      });
+                    }
+                  }}
                 >
                   <option value="">Select a city</option>
                   {cities.map((city) => (
-                    <option key={city.id} value={city.name}>
+                    <option key={city.id} value={city.id}>
                       {city.name}
                     </option>
                   ))}
                 </select>
+                {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>}
+                {!selectedCountry && (
+                  <p className="text-amber-500 text-sm mt-1 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Please select a country first
+                  </p>
+                )}
               </div>
             </div>
 
@@ -315,39 +511,22 @@ export default function CreateActivityPage() {
                 />
                 {errors.description && <p className="text-red-500">{errors.description.message}</p>}
               </div>
-            </div>
-
-            {/* Location and Duration */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="location"
-                    name="location"
-                    required
-                    placeholder="Enter location"
-                    className="pl-10"
-                  />
-                </div>
+            </div>            {/* Duration field */}
+            <div>
+              <Label htmlFor="durationMinutes">Duration (Minutes)</Label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                <Input
+                  id="durationMinutes"
+                  type="number"
+                  {...register("durationMinutes", { valueAsNumber: true })}
+                  required
+                  min="1"
+                  placeholder="Enter duration in minutes"
+                  className="pl-10"
+                />
               </div>
-
-              <div>
-                <Label htmlFor="duration">Duration (hours)</Label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="duration"
-                    name="duration"
-                    type="number"
-                    required
-                    min="1"
-                    placeholder="Enter duration"
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+              {errors.durationMinutes && <p className="text-red-500">{errors.durationMinutes.message}</p>}
             </div>
 
             {/* Capacity and Pricing */}
@@ -403,18 +582,151 @@ export default function CreateActivityPage() {
                 />
                 {errors.bookedCapacity && <p className="text-red-500">{errors.bookedCapacity.message}</p>}
               </div>
-            </div>
-
-            {/* Address */}
-            <div>
+            </div>            {/* Address with Real-time Suggestions */}
+            <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                {...register("address")}
-                required
-                placeholder="Enter address"
-              />
-              {errors.address && <p className="text-red-500">{errors.address.message}</p>}
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="address"
+                    {...register("address")}
+                    required
+                    placeholder={!getValues("city") ? "Select country and city first" : "Enter address"}
+                    className={`w-full pl-10 ${addressVerification?.isValid === false ? 'border-red-500' : addressVerification?.isValid === true ? 'border-green-500' : ''}`}
+                    disabled={!getValues("city") || !getValues("country")} // Disable if city or country isn't selected
+                    onChange={(e) => {
+                      // Clear verification when user starts typing again
+                      if (addressVerification) setAddressVerification(null);
+                      // Make sure the field value is updated
+                      setValue("address", e.target.value);
+                      
+                      // Fetch address suggestions as the user types (with debounce)
+                      if (e.target.value.length > 2 && getValues("city") && getValues("country")) {
+                        // Start searching with just 3 characters to provide faster feedback
+                        debouncedAddressSearch(e.target.value);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Verify address when user leaves the field
+                      const addressValue = getValues("address");
+                      if (addressValue && addressValue.length > 2 && getValues("city") && getValues("country") && !addressVerification?.isValid) {
+                        debouncedAddressSearch(addressValue);
+                      }
+                    }}
+                  />
+                  {addressVerification?.isVerifying && (
+                    <div className="absolute right-3 top-2.5">
+                      <span className="animate-spin inline-block h-4 w-4 border-2 border-gray-300 border-t-primary rounded-full"></span>
+                    </div>
+                  )}
+                </div>
+              </div>
+                {/* Hierarchical selection guidance */}
+                            {/* Show appropriate guidance based on field state */}
+              {(() => {
+                const countryValue = getValues("country");
+                const cityValue = getValues("city");
+                
+                if (!countryValue) {
+                  return (
+                    <p className="text-amber-500 text-sm flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      Please select a country first
+                    </p>
+                  );
+                } else if (!cityValue) {
+                  return (
+                    <p className="text-amber-500 text-sm flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      Please select a city before entering an address
+                    </p>
+                  );
+                }
+                return null;
+              })()}
+              
+              {/* Address validation feedback */}
+              {addressVerification?.isValid === true && getValues("address") && (
+                <p className="text-green-600 text-sm flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Valid address confirmed
+                </p>
+              )}
+              
+              {addressVerification?.isValid === false && getValues("address") && !addressVerification?.isVerifying && (
+                <p className="text-red-500 text-sm flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Could not verify this address
+                </p>
+              )}              {/* Address suggestions dropdown - enhanced UI like Fiverr search */}
+              {addressVerification?.suggestions && addressVerification.suggestions.length > 0 && (
+                <div className="mt-2 bg-white border-2 border-blue-300 rounded-md shadow-2xl relative z-50" 
+                     style={{ width: "100%" }}>
+                  <div className="p-3 border-b bg-blue-50 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <p className="text-sm font-medium text-gray-800">Select an address from suggestions:</p>
+                    <span className="ml-1 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                      {addressVerification.suggestions.length} found
+                    </span>
+                  </div>
+                  <ul className="max-h-72 overflow-auto py-2">
+                    {addressVerification.suggestions.map((suggestion, idx) => (
+                      <li 
+                        key={idx} 
+                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors duration-200 border-b border-gray-100 last:border-0"
+                        onClick={() => {
+                          setValue("address", suggestion.display_name, { shouldValidate: true });
+                          setAddressVerification({
+                            isVerifying: false,
+                            isValid: true,
+                            suggestions: [],
+                            formattedAddress: suggestion.display_name
+                          });
+                          toast({
+                            title: "Address selected",
+                            description: "Valid address confirmed from suggestions",
+                            duration: 3000,
+                          });
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <svg className="w-5 h-5 mt-0.5 text-blue-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <div className="w-full">
+                            <p className="font-medium text-gray-800">{suggestion.display_name.split(',')[0]}</p>
+                            <p className="text-xs text-gray-500 mt-1">{suggestion.display_name.split(',').slice(1).join(',').trim()}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="p-2 border-t bg-gray-50 flex justify-between items-center">
+                    <span className="text-xs text-gray-500">Click an address to select it</span>
+                    <button 
+                      type="button"
+                      className="px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded text-gray-700 transition-colors" 
+                      onClick={() => setAddressVerification({...addressVerification, suggestions: []})}
+                    >
+                      Close suggestions
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
             </div>
             {/* Minimum Participants */}
             <div>

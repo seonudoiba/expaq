@@ -12,6 +12,8 @@ import type {
   User,
   ActivityType,
   PaginatedUsersResponse,
+  Booking,
+  CreateBookingRequest,
 } from '@/types';
 
 // Add an interceptor to include auth details with every request
@@ -69,6 +71,13 @@ export const authService = {
   },
 };
 
+// Booking Services
+export const bookingService = {
+   create: async (bookingData: CreateBookingRequest): Promise<Booking> => {
+    const response = await apiClient.post<Booking>("/api/bookings", bookingData);
+    return response.data;
+  }
+};
 // Activity Services
 export const activityService = {
   getAll: async (params?: {
@@ -137,24 +146,6 @@ export const activityTypeService = {
     return response.data;
   },
 
-  // getById: async (id: string): Promise<Activity> => {
-  //   const response = await apiClient.get<Activity>(`/api/activities/${id}`);
-  //   return response.data;
-  // },
-
-  // create: async (data: CreateActivityRequest): Promise<Activity> => {
-  //   const response = await apiClient.post<Activity>('/api/activities', data);
-  //   return response.data;
-  // },
-
-  // update: async (id: string, data: Partial<CreateActivityRequest>): Promise<Activity> => {
-  //   const response = await apiClient.put<Activity>(`/api/activities/${id}`, data);
-  //   return response.data;
-  // },
-
-  // delete: async (id: string): Promise<void> => {
-  //   await apiClient.delete(`/api/activities/${id}`);
-  // },
 };
 
 // Review Services
@@ -270,8 +261,14 @@ export const geocodingService = {
     }>;
     formattedAddress?: string;
   }> => {
+    interface NominatimResponse {
+      display_name: string;
+      lat: string;
+      lon: string;
+    }
+
     try {
-      const response = await apiClient.get('https://nominatim.openstreetmap.org/search', {
+      const response = await apiClient.get<NominatimResponse[]>('https://nominatim.openstreetmap.org/search', {
         params: {
           q: query,
           format: 'json',
@@ -286,7 +283,7 @@ export const geocodingService = {
       if (response.data.length > 0) {
         return {
           isValid: true,
-          suggestions: response.data.map((item: any) => ({
+          suggestions: response.data.map((item: NominatimResponse) => ({
             display_name: item.display_name,
             lat: parseFloat(item.lat),
             lon: parseFloat(item.lon),

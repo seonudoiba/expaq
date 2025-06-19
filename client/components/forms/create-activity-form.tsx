@@ -53,8 +53,7 @@ export function CreateActivityForm() {
       // Create activity with image URLs
       await activityService.create({
         ...data,
-        mediaUrls, // Use mediaUrls instead of images
-        // Add required fields from CreateActivityRequest that might be missing
+        mediaUrls, 
         latitude: 0,
         longitude: 0,
         schedule: {

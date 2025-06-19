@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 export function HostActivityList({hostId}: { hostId?: string }) {
   const {
-    data: activities,
+    data,
     isLoading,
     error,
   } = useQuery({
@@ -21,6 +21,9 @@ export function HostActivityList({hostId}: { hostId?: string }) {
       return activityService.getAllHostActivities(hostId);
     },
   });
+  
+  // Extract activities from the paginated response
+  const activities = data?.activities || [];
 
   if (isLoading) {
     return (

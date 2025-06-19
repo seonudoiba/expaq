@@ -17,15 +17,17 @@ export function FeaturedActivities() {
       day: "numeric",
       year: "numeric",
     });
-  }
-  const {
-    data: activities,
+  }  const {
+    data,
     isLoading,
     error,
   } = useQuery({
     queryKey: ["activities"],
     queryFn: () => activityService.getAllFeaturedActivities(),
   });
+  
+  // Extract activities from the paginated response
+  const activities = data?.activities || [];
 
   if (isLoading) {
     return (

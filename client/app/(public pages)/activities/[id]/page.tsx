@@ -154,64 +154,6 @@ export default function ActivityDetailsPage() {
           duration: `${activity.durationMinutes} minutes`,
           images: activity.mediaUrls
         }} />
-        <div className="lg:col-span-1">
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div>
-                <h2 className="text-2xl font-bold">${activity.price}</h2>
-                <p className="text-sm text-muted-foreground">per person</p>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Select Date
-                  </label>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                    min={new Date().toISOString().split("T")[0]}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Number of Participants
-                  </label>
-                  <div className="flex items-center space-x-4">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        setParticipants(Math.max(1, participants - 1))
-                      }
-                    >
-                      -
-                    </Button>
-                    <span>{participants}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        setParticipants(
-                          Math.min(activity.maxParticipants, participants + 1)
-                        )
-                      }
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-
-                <Button className="w-full" size="lg">
-                  Book Now
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );

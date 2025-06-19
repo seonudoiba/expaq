@@ -3,12 +3,10 @@ import { ActivityList } from "@/components/activities/activity-list";
 import { ActivityFilters } from "@/components/activities/activity-filters";
 // import { CreateActivityButton } from "@/components/activities/create-activity-button";
 
-
 export default function ActivitiesPage() {
-  
   return (
     <section className=" py-1 md:py-1 lg:py-2 px-6">
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between py-4 container px-4 md:px-6 ">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
@@ -21,10 +19,11 @@ export default function ActivitiesPage() {
         </div>
         {/* <CreateActivityButton /> */}
       </div>
-      <ActivityFilters />
+      <div className="container px-4 md:px-6">
+        <ActivityFilters />
+      </div>
 
-      
-      <div className="">
+      <div className="container px-4 md:px-6 py-4">
         <Suspense fallback={<div>Loading activities...</div>}>
           <ActivityList />
         </Suspense>

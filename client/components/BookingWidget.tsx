@@ -12,20 +12,16 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/components/ui/use-toast";
 import { useCreateBooking } from '@/hooks/use-bookings';
-// import { LoadingSpinner } from '@/components/ui';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-interface BookingWidgetProps {
-  activity: {
-    id: string;
-    title: string;
-    price: number;
-    rating: number;
-    reviews: number;
-    maxGuests: number;
-    duration: string;
-    images: string[];
-  };
-}
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { activityService, fileService } from '@/lib/api/services';
+import toast from 'react-hot-toast';
+import { BookingWidgetProps } from '@/types';
+
+
 
 const BookingWidget = ({ activity }: BookingWidgetProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -47,9 +43,9 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
   ];
 
   const totalPrice = activity.price * guests;
-  const serviceFee = Math.round(totalPrice * 0.1);
-  const taxes = Math.round(totalPrice * 0.08);
-  const finalTotal = totalPrice + serviceFee + taxes;
+  // const serviceFee = Math.round(totalPrice * 0.1);
+  // const taxes = Math.round(totalPrice * 0.08);
+  const finalTotal = totalPrice;
 
   const handleBooking = () => {
     if (!user) {
@@ -83,32 +79,36 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
     });
   };
 
-  return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
+  return (    <Card className="w-full max-w-md shadow-lg border border-gray-200">
+      <CardHeader className="bg-white border-b border-gray-100">
         <CardTitle className="flex items-center justify-between">
-          <span>${activity.price} / person</span>
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 fill-current text-yellow-400" />
-            <span>{activity.rating}</span>
+          <div className="flex items-baseline">
+            <span className="text-xl font-bold">${activity.price}</span>
+            <span className="text-gray-600 ml-1">/ person</span>
+          </div>
+          <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-full">
+            <Star className="w-4 h-4 fill-current text-yellow-500" />
+            <span className="font-medium">{activity.rating}</span>
             <span className="text-gray-500">({activity.reviews} reviews)</span>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label>Date</Label>
+      <CardContent className="space-y-5 pt-5">        <div className="space-y-2">
+          <Label className="text-base font-medium">Date</Label>
           <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full justify-start text-left font-normal"
+                className="w-full justify-start text-left font-normal border-gray-300 hover:bg-gray-50"
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+                <CalendarIcon className="mr-2 h-5 w-5 text-gray-500" />
+                {selectedDate ? format(selectedDate, 'PPP') : <span className="text-gray-500">Pick a date</span>}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 border-gray-200 shadow-lg" align="start">
+              <div className="border-b border-gray-200 bg-gray-50 p-3">
+                <h3 className="text-center font-medium">{selectedDate ? format(selectedDate, 'MMMM yyyy') : format(new Date(), 'MMMM yyyy')}</h3>
+              </div>
               <Calendar
                 mode="single"
                 selected={selectedDate}
@@ -118,72 +118,112 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
                 }}
                 disabled={(date) => date < new Date()}
                 initialFocus
+                fromMonth={new Date()}
+                toYear={new Date().getFullYear() + 1}
               />
+              <div className="border-t border-gray-200 p-3 bg-gray-50">
+                <div className="flex items-center text-xs text-gray-500">
+                  <div className="w-3 h-3 rounded-full bg-blue-50 border border-blue-100 mr-1"></div>
+                  <span>Today</span>
+                  <div className="w-3 h-3 rounded-full bg-primary border border-blue-600 ml-4 mr-1"></div>
+                  <span>Selected</span>
+                </div>
+              </div>
             </PopoverContent>
           </Popover>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Time</Label>
+        </div>        <div className="space-y-2">
+          <Label className="text-base font-medium">Time</Label>
           <Select value={selectedTime} onValueChange={setSelectedTime}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select time" />
+            <SelectTrigger className="border-gray-300">
+              <div className="flex items-center">
+                <Clock className="mr-2 h-4 w-4 text-gray-500" />
+                <SelectValue placeholder="Select time" />
+              </div>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="border-gray-200">
+              <div className="py-2 px-1 border-b border-gray-100">
+                <h4 className="text-sm font-medium text-gray-500 px-2">Available Times</h4>
+              </div>
               {availableTimes.map((time) => (
-                <SelectItem key={time} value={time}>
-                  {time}
+                <SelectItem key={time} value={time} className="hover:bg-blue-50">
+                  <div className="flex items-center">
+                    <Clock className="mr-2 h-4 w-4 text-gray-500" />
+                    {time}
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Guests</Label>
+          {selectedDate && !selectedTime && (
+            <p className="text-xs text-amber-500">Please select a time for your booking</p>
+          )}
+        </div>        <div className="space-y-2">
+          <Label className="text-base font-medium">Guests</Label>
           <Select
             value={guests.toString()}
             onValueChange={(value) => setGuests(parseInt(value))}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Number of guests" />
+            <SelectTrigger className="border-gray-300">
+              <div className="flex items-center">
+                <Users className="mr-2 h-4 w-4 text-gray-500" />
+                <SelectValue placeholder="Number of guests" />
+              </div>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="border-gray-200">
+              <div className="py-2 px-1 border-b border-gray-100">
+                <h4 className="text-sm font-medium text-gray-500 px-2">Select Number of Guests</h4>
+                <p className="text-xs text-gray-400 px-2">Max: {activity.maxGuests} guests</p>
+              </div>
               {Array.from({ length: activity.maxGuests }, (_, i) => i + 1).map(
                 (num) => (
-                  <SelectItem key={num} value={num.toString()}>
-                    {num} {num === 1 ? 'guest' : 'guests'}
+                  <SelectItem key={num} value={num.toString()} className="hover:bg-blue-50">
+                    <div className="flex items-center justify-between w-full">
+                      <span>{num} {num === 1 ? 'guest' : 'guests'}</span>
+                      <span className="text-gray-500">${activity.price * num}</span>
+                    </div>
                   </SelectItem>
                 )
               )}
             </SelectContent>
           </Select>
-        </div>
-
-        <div className="space-y-3 pt-4">
-          <div className="flex justify-between">
-            <span>${activity.price} × {guests} guests</span>
-            <span>${totalPrice}</span>
+        </div>        <div className="space-y-3 pt-4 mt-4">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-700">${activity.price} × {guests} {guests === 1 ? 'guest' : 'guests'}</span>
+            <span className="font-medium">${totalPrice}</span>
           </div>
-          <div className="flex justify-between">
-            <span>Service fee</span>
-            <span>${serviceFee}</span>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <span className="text-gray-700">Service fee</span>
+              <div className="relative group ml-1">
+                <span className="cursor-help text-xs bg-gray-200 text-gray-600 rounded-full h-4 w-4 inline-flex items-center justify-center">?</span>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  Service fee helps us run our platform and provide customer support
+                </div>
+              </div>
+            </div>
+            <span className="font-medium">${serviceFee}</span>
           </div>
-          <div className="flex justify-between">
-            <span>Taxes</span>
-            <span>${taxes}</span>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-700">Taxes</span>
+            <span className="font-medium">${taxes}</span>
           </div>
-          <div className="flex justify-between font-semibold pt-2 border-t">
+          <div className="flex justify-between font-semibold text-base pt-3 mt-2 border-t border-gray-200">
             <span>Total</span>
             <span>${finalTotal}</span>
           </div>
+          
+          {!selectedDate && (
+            <div className="bg-amber-50 border border-amber-100 rounded-md p-2 mt-2">
+              <p className="text-amber-600 text-sm">Please select a date and time to continue</p>
+            </div>
+          )}
         </div>
 
         <Button
-          className="w-full" 
+          className="w-full bg-primary hover:bg-gray-700 text-white shadow-md hover:shadow-lg transition-all mt-4" 
           size="lg" 
           onClick={handleBooking}
-          disabled={isLoading}
+          disabled={isLoading || !selectedDate || !selectedTime}
         >
           {isLoading ? (
             <LoadingSpinner className="mr-2" />
@@ -191,11 +231,12 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
           {isLoading ? 'Creating Booking...' : 'Book Now'}
         </Button>
 
-        <div className="text-center text-sm text-gray-500">
-          <div className="flex items-center justify-center gap-2">
-            <Clock className="w-4 h-4" />
+        <div className="text-center text-sm text-gray-500 mt-4">
+          <div className="flex items-center justify-center gap-2 bg-gray-50 p-2 rounded-md">
+            <Clock className="w-4 h-4 text-blue-500" />
             <span>Duration: {activity.duration}</span>
           </div>
+          <p className="mt-2 text-xs text-gray-400">You won&apos;t be charged yet</p>
         </div>
       </CardContent>
     </Card>

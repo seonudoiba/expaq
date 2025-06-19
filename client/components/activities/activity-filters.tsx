@@ -15,14 +15,14 @@ import { Search, MapPin, Users } from "lucide-react";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
 
 export function ActivityFilters() {
-  const { 
-    filters, 
-    setFilters: updateFilters, 
+  const {
+    filters,
+    setFilters: updateFilters,
     applyFilters,
     clearFilters,
-    isLoading
+    isLoading,
   } = useActivitiesStore();
-  
+
   const [activityTypes, setActivityTypes] = useState<ActivityType[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
@@ -35,9 +35,9 @@ export function ActivityFilters() {
     setSelectedDate(date);
     if (date) {
       // Format date as ISO string (YYYY-MM-DDThh:mm:ss)
-      const formattedDate = date.toISOString().split('.')[0]; // Remove milliseconds
+      const formattedDate = date.toISOString().split(".")[0]; // Remove milliseconds
       updateFilters({ when: formattedDate });
-      
+
       // Apply filters with a small delay
       setTimeout(() => applyFilters(filters), 300);
     } else {
@@ -52,7 +52,7 @@ export function ActivityFilters() {
     { label: "Price: High to Low", value: "highPrice" },
     { label: "Rating: High to Low", value: "highRating" },
     { label: "Rating: Low to High", value: "lowRating" },
-]
+  ];
 
   // Fetch activity types from API
   const { data: activityTypesData, isLoading: isLoadingTypes } = useQuery({
@@ -70,13 +70,17 @@ export function ActivityFilters() {
     queryKey: ["countries"],
     queryFn: () => countryService.getAllCountries(),
   });
-  
+
   // Effect to update selectedDate when filters.when changes (e.g. from clearFilters)
   useEffect(() => {
     // If filters.when is cleared, reset selectedDate
     if (!filters.when) {
       setSelectedDate(undefined);
-    } else if (filters.when && (!selectedDate || filters.when !== selectedDate.toISOString().split('.')[0])) {
+    } else if (
+      filters.when &&
+      (!selectedDate ||
+        filters.when !== selectedDate.toISOString().split(".")[0])
+    ) {
       // If filters.when is set and different from current selectedDate
       setSelectedDate(new Date(filters.when));
     }
@@ -100,18 +104,18 @@ export function ActivityFilters() {
       setCountries(countriesData);
     }
   }, [activityTypesData, citiesData, countriesData]);
-  
+
   const handleFilterChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-      // Update filters with the selected value
+    // Update filters with the selected value
     updateFilters({ [name]: value });
-    
+
     // Apply filters immediately when any input changes
     setTimeout(() => applyFilters(filters), 300); // Debounce for better performance
   };
-  // Form submit handler (for search form) 
+  // Form submit handler (for search form)
   // We'll keep the form for structure, but it doesn't need to do anything special
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,13 +123,20 @@ export function ActivityFilters() {
 
   return (
     <>
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-4">
+      <div className="w-full max-w-6xl md:max-w-full mb-4 bg-white rounded-lg shadow-lg p-4">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input placeholder="Where are you looking for?" value={filters.querySearch} name="querySearch" onChange={handleFilterChange} className="pl-10" />
-            </div>            <div className="relative">
+              <Input
+                placeholder="Where are you looking for?"
+                value={filters.querySearch}
+                name="querySearch"
+                onChange={handleFilterChange}
+                className="pl-10"
+              />
+            </div>{" "}
+            <div className="relative">
               <DateTimePicker
                 date={selectedDate}
                 setDate={handleDateChange}
@@ -134,15 +145,16 @@ export function ActivityFilters() {
             </div>
             <div className="relative">
               <Users className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input 
-                placeholder="Number of people" 
+              <Input
+                placeholder="Number of people"
                 name="numOfPeople"
                 value={filters.numOfPeople}
                 onChange={handleFilterChange}
-                className="pl-10" 
+                className="pl-10"
               />
-            </div>            <div className="w-full flex items-center justify-center bg-primary text-white p-2 rounded-md">
-              <Search className="mr-2 h-4 w-4" /> 
+            </div>{" "}
+            <div className="w-full flex items-center justify-center bg-primary text-white p-2 rounded-md">
+              <Search className="mr-2 h-4 w-4" />
               <span>Search</span>
             </div>
           </div>
@@ -296,11 +308,10 @@ export function ActivityFilters() {
               >
                 <option value="">Default</option>
                 {sortData.map((option) => (
-                    <option key={option.label} value={option.value}>
-                      {option.label}
-                    </option>
-                )
-                )}
+                  <option key={option.label} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
                 <svg
@@ -318,7 +329,6 @@ export function ActivityFilters() {
               </div>
             </div>
           </div>
-
           <div className="flex gap-2">
             <div className="max-w-[140px]">
               <Label
@@ -367,7 +377,8 @@ export function ActivityFilters() {
                 />
               </div>
             </div>
-          </div>          <div className="flex items-center pt-2">
+          </div>{" "}
+          <div className="flex items-center pt-2">
             <button
               type="button"
               onClick={handleClearFilters}
@@ -376,7 +387,8 @@ export function ActivityFilters() {
               Clear All
             </button>
           </div>
-        </div>        {isLoading && (
+        </div>{" "}
+        {isLoading && (
           <div className="mt-4 flex items-center justify-center text-sm text-gray-500">
             <svg
               className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500"
@@ -401,7 +413,6 @@ export function ActivityFilters() {
             Updating results...
           </div>
         )}
-        
         {/* {!isLoading && (
           <div className="mt-4 flex items-center justify-center text-sm text-green-600">
             <span>Filters are applied in real-time</span>

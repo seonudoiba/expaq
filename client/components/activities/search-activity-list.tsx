@@ -1,7 +1,9 @@
 "use client";
+
 import { useEffect } from "react";
 import { useActivitiesStore } from "@/lib/store/useActivitiesStore";
 import { ActivityCard } from "@/components/activities/activity-card";
+import { activityService } from "@/lib/api/services";
 import { 
   Pagination, 
   PaginationContent, 
@@ -12,20 +14,59 @@ import {
   PaginationPrevious 
 } from "@/components/ui/pagination";
 
-export function ActivityList() {
+// This component replaces ActivityList with search-specific logic
+export const SearchActivityList = () => {
   const { 
+    filters, 
     activities, 
     isLoading, 
-    error, 
-    fetchActivities, 
-    clearFilters,
+    error,
     pagination,
     setPage
   } = useActivitiesStore();
   
   useEffect(() => {
-    fetchActivities();
-  }, [fetchActivities]);
+    const fetchFilteredActivities = async () => {
+      try {
+        // Set loading state
+        useActivitiesStore.setState({ isLoading: true });
+        
+        // Call the API service directly to get filtered activities
+        const response = await activityService.getAll({
+          querySearch: filters.querySearch || undefined,
+          when: filters.when || undefined,
+          numOfPeople: filters.numOfPeople || undefined,
+          page: pagination.currentPage,
+          limit: pagination.pageSize
+        });
+        
+        // Then update the store directly to avoid circular dependencies
+        useActivitiesStore.setState({ 
+          activities: response.activities, 
+          pagination: {
+            currentPage: response.currentPage,
+            totalPages: response.totalPages,
+            pageSize: response.pageSize,
+            totalItems: response.totalItems
+          },
+          isLoading: false, 
+          error: null 
+        });
+      } catch (error) {
+        useActivitiesStore.setState({
+          isLoading: false,
+          error: error instanceof Error ? error : new Error('Failed to fetch filtered activities')
+        });
+      }
+    };
+    
+    // Fetch with a small delay to ensure filters are set
+    const timer = setTimeout(() => {
+      fetchFilteredActivities();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [filters.querySearch, filters.when, filters.numOfPeople, pagination.currentPage, pagination.pageSize]);
 
   // Generate pagination items based on current page and total pages
   const renderPaginationItems = () => {
@@ -133,30 +174,24 @@ export function ActivityList() {
     return (
       <div className="text-center">
         <h3 className="mt-2 text-sm font-semibold text-gray-900">
-          No activities
+          No activities found
         </h3>
         <p className="mt-1 text-sm text-gray-500">
-          Get started by creating a new activity.
+          Try adjusting your search filters.
         </p>
       </div>
     );
   }
-  
+
   return (
     <div>
       <div className="flex justify-between items-center my-6">
         <div>
-          <h2 className="text-2xl font-bold">Activities</h2>
+          <h2 className="text-2xl font-bold">Search Results</h2>
           <p className="text-sm text-gray-600 mt-1">
             {pagination.totalItems} activities found
           </p>
         </div>
-        <button
-          onClick={clearFilters}
-          className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
-        >
-          Clear Filters
-        </button>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -192,4 +227,4 @@ export function ActivityList() {
       )}
     </div>
   );
-}
+};

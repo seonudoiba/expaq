@@ -127,6 +127,12 @@ export interface Booking {
   createdAt: string;
   updatedAt: string;
 }
+export interface CreateBookingRequest {
+  activityId: string;
+  startTime: string;
+  endTime: string;
+  participants: number;
+}
 
 export enum BookingStatus {
   PENDING = "PENDING",
@@ -296,6 +302,19 @@ export interface Booking {
   totalPrice: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BookingWidgetProps {
+  activity: {
+    id: string;
+    title: string;
+    price: number;
+    rating: number;
+    reviews: number;
+    maxGuests: number;
+    duration: string;
+    images: string[];
+  };
 }
 
 export interface Review {
