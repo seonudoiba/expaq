@@ -1,0 +1,64 @@
+import { apiClient } from '@/lib/api/client';
+import { Booking, CreateBookingRequest } from '@/types';
+
+export interface CreateBookingDTO {
+  activityId: string;
+  date: string;
+  time: string;
+  numberOfGuests: number;
+}
+
+export interface PaymentResponse {
+  paymentUrl?: string;
+  success: boolean;
+  message: string;
+}
+
+export const bookingService = {
+  createBooking: async (data: CreateBookingRequest): Promise<Booking> => {
+    // const { activityId, date, time, numberOfGuests } = data;
+    
+    // // Convert the date and time to a full datetime string
+    // const startTime = new Date(`${date} ${time}`);
+    
+    // // Calculate end time (assuming end time is based on activity duration)
+    // // For now, we'll just add 2 hours as a default
+    // const endTime = new Date(startTime);
+    // endTime.setHours(endTime.getHours() + 2);
+    
+    // // Format the dates as required by the API
+    // const formattedStartTime = startTime.toISOString().slice(0, 19).replace('T', ' ');
+    // const formattedEndTime = endTime.toISOString().slice(0, 19).replace('T', ' ');
+    
+    // // Prepare the request body according to the API expectations
+    // const requestBody = {
+    //   activityId,
+    //   startTime: formattedStartTime,
+    //   endTime: formattedEndTime,
+    //   numberOfGuests: numberOfGuests.toString()
+    // };
+    
+    const response = await apiClient.post<Booking>('/api/bookings', data);
+    return response.data;
+  },
+  
+  getUserBookings: async (): Promise<Booking[]> => {
+    const response = await apiClient.get<Booking[]>('/api/bookings/user');
+    return response.data;
+  },
+  
+  getBookingById: async (bookingId: string): Promise<Booking> => {
+    const response = await apiClient.get<Booking>(`/api/bookings/${bookingId}`);
+    return response.data;
+  },
+  
+  cancelBooking: async (bookingId: string): Promise<Booking> => {
+    const response = await apiClient.patch<Booking>(`/api/bookings/${bookingId}/cancel`);
+    return response.data;
+  },
+  
+  initiatePayment: async (bookingId: string): Promise<PaymentResponse> => {
+    const response = await apiClient.post<PaymentResponse>(`/api/bookings/${bookingId}/payment`);
+    return response.data;
+  }
+};

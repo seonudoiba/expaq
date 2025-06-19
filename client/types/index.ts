@@ -17,9 +17,7 @@ export interface User {
 export interface Role {
   id: string;
   name: "GUEST" | "ADMIN" | "HOST";
-
 }
-
 
 export interface UserProfile {
   id: string;
@@ -39,13 +37,13 @@ export interface Location {
   id: string;
   name: string;
   image: string;
-  countryId: string;    
+  countryId: string;
 }
 export interface activityType {
   id: string;
   name: string;
   image: string;
-  countryId: string;    
+  countryId: string;
 }
 
 export interface City {
@@ -131,14 +129,14 @@ export interface CreateBookingRequest {
   activityId: string;
   startTime: string;
   endTime: string;
-  participants: number;
+  numberOfGuests: string;
 }
 
 export enum BookingStatus {
   PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
   CANCELLED = "CANCELLED",
-  COMPLETED = "COMPLETED"
+  COMPLETED = "COMPLETED",
 }
 
 export interface Message {
@@ -165,7 +163,7 @@ export enum NotificationType {
   BOOKING_CANCELLED = "BOOKING_CANCELLED",
   NEW_MESSAGE = "NEW_MESSAGE",
   REVIEW_RECEIVED = "REVIEW_RECEIVED",
-  SYSTEM = "SYSTEM"
+  SYSTEM = "SYSTEM",
 }
 
 export interface AuthResponse {
@@ -193,8 +191,8 @@ export interface RegisterRequest {
   password: string;
   firstName: string;
   lastName: string;
-  profilePictureUrl: string,
-  bio: string,
+  profilePictureUrl: string;
+  bio: string;
 }
 export interface becomeHostRequest {
   userName: string;
@@ -202,8 +200,8 @@ export interface becomeHostRequest {
   password: string;
   firstName: string;
   lastName: string;
-  profilePictureUrl: string,
-  bio: string,
+  profilePictureUrl: string;
+  bio: string;
 }
 
 export interface CreateActivityRequest {
@@ -237,7 +235,6 @@ export interface CreateActivityRequest {
   minParticipants: number;
   durationMinutes: number;
   mediaUrls: string[];
-  
 }
 export interface UpdateActivityRequest {
   title: string;
@@ -273,7 +270,6 @@ export interface UpdateActivityRequest {
   locationPoint: string;
   startDate: string;
   endDate: string;
-
 }
 
 export interface CreateReviewRequest {
@@ -348,9 +344,8 @@ export interface ActivitySearchParams {
   page?: number;
   size?: number;
   sortBy?: string;
-  sortDirection?: 'ASC' | 'DESC';
+  sortDirection?: "ASC" | "DESC";
 }
-
 
 export interface AnalyticsItem {
   label: string;
@@ -359,7 +354,6 @@ export interface AnalyticsItem {
   percentage: number;
   isNegative?: boolean;
 }
-
 
 export interface PaymentAnalyticsProps {
   analytics: PaymentAnalytics;

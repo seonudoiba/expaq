@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { bookingService, CreateBookingDTO } from '@/services/booking';
+import { bookingService } from '@/services/booking';
 import { useToast } from '@/components/ui/use-toast';
+import { CreateBookingRequest } from '@/types';
 
 export const useCreateBooking = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateBookingDTO) => bookingService.createBooking(data),
+    mutationFn: (data: CreateBookingRequest) => bookingService.createBooking(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userBookings'] });
       toast({

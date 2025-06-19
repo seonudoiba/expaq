@@ -5,23 +5,15 @@ import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/lib/store/auth';
 import { CalendarIcon, Users, Clock, Star } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, addHours } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/components/ui/use-toast";
-import { useCreateBooking } from '@/hooks/use-bookings';
+import { bookingService } from '@/services/booking';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { activityService, fileService } from '@/lib/api/services';
-import toast from 'react-hot-toast';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BookingWidgetProps } from '@/types';
-
-
 
 const BookingWidget = ({ activity }: BookingWidgetProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -32,7 +24,74 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
   const router = useRouter();
   const { user } = useAuthStore();
   const { toast } = useToast();
-  const { mutate: createBooking, isLoading } = useCreateBooking();
+  const queryClient = useQueryClient();
+
+  // Use the mutation directly here for more control
+  const { mutate: createBooking, isPending: isLoading } = useMutation({
+    mutationFn: async () => {
+      if (!selectedDate || !selectedTime) {
+        throw new Error('Please select a date and time');
+      }
+      
+      // Parse the time string (e.g., "09:00 AM") to get hours and minutes
+      const timeParts = selectedTime.match(/(\d+):(\d+)\s?(AM|PM)/i);
+      if (!timeParts) {
+        throw new Error('Invalid time format');
+      }
+      
+      let hours = parseInt(timeParts[1], 10);
+      const minutes = parseInt(timeParts[2], 10);
+      const period = timeParts[3].toUpperCase();
+      
+      // Convert to 24-hour format
+      if (period === 'PM' && hours < 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      // Create a new date object with the selected date and time
+      const startTime = new Date(selectedDate);
+      startTime.setHours(hours, minutes, 0, 0);
+      
+      // Calculate end time based on activity duration (parse from format like "2 hours")
+      const durationMatch = activity.duration.match(/(\d+)\s*hours?/i);
+      const durationHours = durationMatch ? parseInt(durationMatch[1], 10) : 2; // Default to 2 hours
+      
+      // Add the duration to get the end time
+      const endTime = addHours(startTime, durationHours);
+      
+      // Format dates as required by the API: YYYY-MM-DD HH:MM:SS
+      const formatDateTime = (date: Date) => {
+        return format(date, "yyyy-MM-dd HH:mm:ss");
+      };
+      
+      const bookingData = {
+        activityId: activity.id,
+        startTime: formatDateTime(startTime),
+        endTime: formatDateTime(endTime),
+        numberOfGuests: guests.toString()
+      };
+      
+      // Call the booking service
+      return await bookingService.createBooking(bookingData);
+    },
+    onSuccess: (booking) => {
+      queryClient.invalidateQueries({ queryKey: ['userBookings'] });
+      toast({
+        title: 'Booking Confirmed',
+        description: 'Your booking has been created successfully!',
+      });
+      router.push(`/bookings/${booking.id}`);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Booking Failed',
+        description: error.message || 'Failed to create booking. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  });
 
   const availableTimes = [
     '09:00 AM',
@@ -43,6 +102,8 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
   ];
 
   const totalPrice = activity.price * guests;
+  // Comment out these variables as they aren't used in the current component
+  // but keep the final total
   // const serviceFee = Math.round(totalPrice * 0.1);
   // const taxes = Math.round(totalPrice * 0.08);
   const finalTotal = totalPrice;
@@ -67,16 +128,8 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
       return;
     }
 
-    createBooking({
-      activityId: activity.id,
-      date: format(selectedDate, 'yyyy-MM-dd'),
-      time: selectedTime,
-      numberOfGuests: guests,
-    }, {
-      onSuccess: (booking) => {
-        router.push(`/bookings/${booking.id}`);
-      }
-    });
+    // Trigger the mutation
+    createBooking();
   };
 
   return (    <Card className="w-full max-w-md shadow-lg border border-gray-200">
@@ -201,11 +254,11 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
                 </div>
               </div>
             </div>
-            <span className="font-medium">${serviceFee}</span>
+            {/* <span className="font-medium">${serviceFee}</span> */}
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-700">Taxes</span>
-            <span className="font-medium">${taxes}</span>
+            {/* <span className="font-medium">${taxes}</span> */}
           </div>
           <div className="flex justify-between font-semibold text-base pt-3 mt-2 border-t border-gray-200">
             <span>Total</span>
