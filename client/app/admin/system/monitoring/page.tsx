@@ -355,7 +355,7 @@ export default function SystemMonitoringPage() {
               {systemAlerts.map((alert) => (
                 <Alert
                   key={alert.id}
-                  variant={alert.severity === "critical" ? "destructive" : alert.severity === "warning" ? "warning" : "default"}
+                  variant={alert.severity === "critical" ? "destructive" : "default"}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex items-start gap-2">
