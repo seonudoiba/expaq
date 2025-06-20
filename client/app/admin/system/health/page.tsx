@@ -23,8 +23,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  AreaChart,
-  Area,
+ 
 } from "recharts";
 import {
   RefreshCw,

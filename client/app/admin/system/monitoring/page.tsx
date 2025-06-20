@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -18,36 +17,21 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
   ResponsiveContainer,
-  AreaChart,
-  Area,
+ 
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  BarChart,
-  Bar,
+ 
   Legend,
-  PieChart,
-  Pie,
-  Cell,
+ 
   LineChart,
   Line,
 } from "recharts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, Server, Activity, HardDrive, Cpu, Wifi, RefreshCw, Clock } from "lucide-react";
 
