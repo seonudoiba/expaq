@@ -12,12 +12,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,18 +30,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 // import { DateRangePicker, DateRange } from "@/components/ui/date-picker";
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationEllipsis, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
 } from "@/components/ui/pagination";
-import { AlertCircle, ArrowDown, ArrowUp, MoreHorizontal, Star } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowDown,
+  ArrowUp,
+  MoreHorizontal,
+  Star,
+} from "lucide-react";
 import { format } from "date-fns";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { DateRange } from "react-day-picker";
 
 // Mock data for reviews
 const mockReviews = [
@@ -54,7 +61,8 @@ const mockReviews = [
     hostId: "host-789",
     hostName: "Marco Rossi",
     rating: 5,
-    content: "Amazing experience! Marco was very knowledgeable and patient. The pasta we made was delicious!",
+    content:
+      "Amazing experience! Marco was very knowledgeable and patient. The pasta we made was delicious!",
     status: "published",
     createdAt: new Date("2023-10-15"),
     updatedAt: new Date("2023-10-15"),
@@ -71,7 +79,8 @@ const mockReviews = [
     hostId: "host-101",
     hostName: "Yuki Tanaka",
     rating: 4,
-    content: "Great tour, learned a lot about photography techniques. The spots were fantastic for taking urban photos.",
+    content:
+      "Great tour, learned a lot about photography techniques. The spots were fantastic for taking urban photos.",
     status: "published",
     createdAt: new Date("2023-09-20"),
     updatedAt: new Date("2023-09-20"),
@@ -88,7 +97,8 @@ const mockReviews = [
     hostId: "host-202",
     hostName: "Carlos Mendez",
     rating: 2,
-    content: "The class was too advanced for beginners. The instructor moved too quickly and didn't provide enough guidance.",
+    content:
+      "The class was too advanced for beginners. The instructor moved too quickly and didn't provide enough guidance.",
     status: "published",
     createdAt: new Date("2023-11-05"),
     updatedAt: new Date("2023-11-05"),
@@ -106,7 +116,8 @@ const mockReviews = [
     hostId: "host-404",
     hostName: "Claire Dubois",
     rating: 5,
-    content: "Exceptional wine selection and Claire was an incredible host with deep knowledge of wines. Highly recommend!",
+    content:
+      "Exceptional wine selection and Claire was an incredible host with deep knowledge of wines. Highly recommend!",
     status: "published",
     createdAt: new Date("2023-08-12"),
     updatedAt: new Date("2023-08-12"),
@@ -123,7 +134,8 @@ const mockReviews = [
     hostId: "host-707",
     hostName: "Josef Dvorak",
     rating: 1,
-    content: "The tour was disappointing. The guide was frequently checking his phone and didn't seem to know much about the city's history.",
+    content:
+      "The tour was disappointing. The guide was frequently checking his phone and didn't seem to know much about the city's history.",
     status: "flagged",
     createdAt: new Date("2023-07-28"),
     updatedAt: new Date("2023-07-28"),
@@ -142,7 +154,9 @@ const ReviewRating = ({ rating }: { rating: number }) => {
         <Star
           key={i}
           size={16}
-          className={i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
+          className={
+            i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+          }
         />
       ))}
       <span className="ml-2 text-sm font-medium">{rating}/5</span>
@@ -170,23 +184,28 @@ export default function AdminReviewsPage() {
     .filter((review) => {
       // Tab filter
       if (selectedTab === "flagged" && !review.reported) return false;
-      
+
       // Search query filter
       if (
         searchQuery &&
-        !review.activityTitle.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !review.reviewerName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !review.activityTitle
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) &&
+        !review.reviewerName
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) &&
         !review.content.toLowerCase().includes(searchQuery.toLowerCase())
       ) {
         return false;
       }
-      
+
       // Status filter
       if (selectedStatus && review.status !== selectedStatus) return false;
-      
+
       // Rating filter
-      if (selectedRating && review.rating.toString() !== selectedRating) return false;
-      
+      if (selectedRating && review.rating.toString() !== selectedRating)
+        return false;
+
       // Date range filter
       if (
         dateRange?.from &&
@@ -195,7 +214,7 @@ export default function AdminReviewsPage() {
       ) {
         return false;
       }
-      
+
       return true;
     })
     .sort((a, b) => {
@@ -208,13 +227,15 @@ export default function AdminReviewsPage() {
       }
       return 0;
     });
-  
+
   // Handle sort
   const handleSort = (key: string) => {
     setSortConfig({
       key,
       direction:
-        sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc",
+        sortConfig.key === key && sortConfig.direction === "asc"
+          ? "desc"
+          : "asc",
     });
   };
 
@@ -289,7 +310,11 @@ export default function AdminReviewsPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedTab}>
+      <Tabs
+        defaultValue="all"
+        className="w-full"
+        onValueChange={setSelectedTab}
+      >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="all">All Reviews</TabsTrigger>
           <TabsTrigger value="flagged">
@@ -316,7 +341,10 @@ export default function AdminReviewsPage() {
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                    <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                    <Select
+                      value={selectedStatus}
+                      onValueChange={setSelectedStatus}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
@@ -327,7 +355,10 @@ export default function AdminReviewsPage() {
                         <SelectItem value="rejected">Rejected</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Select value={selectedRating} onValueChange={setSelectedRating}>
+                    <Select
+                      value={selectedRating}
+                      onValueChange={setSelectedRating}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Rating" />
                       </SelectTrigger>
@@ -342,11 +373,11 @@ export default function AdminReviewsPage() {
                     </Select>
                     <div className="col-span-2">
                       <DateRangePicker
-                        value={dateRange}
-                        onChange={setDateRange}
-                        placeholder="Filter by date"
+                        initialDateFrom={dateRange?.from}
+                        initialDateTo={dateRange?.to}
+                        onUpdate={(values) => setDateRange(values.range)}
+                        showCompare={false}
                       />
-                      
                     </div>
                   </div>
                 </div>
@@ -364,39 +395,48 @@ export default function AdminReviewsPage() {
                             onCheckedChange={handleSelectAllReviews}
                           />
                         </TableHead>
-                        <TableHead 
+                        <TableHead
                           className="cursor-pointer"
                           onClick={() => handleSort("activityTitle")}
                         >
                           <div className="flex items-center">
                             Activity
-                            {sortConfig.key === "activityTitle" && (
-                              sortConfig.direction === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />
-                            )}
+                            {sortConfig.key === "activityTitle" &&
+                              (sortConfig.direction === "asc" ? (
+                                <ArrowUp size={16} />
+                              ) : (
+                                <ArrowDown size={16} />
+                              ))}
                           </div>
                         </TableHead>
                         <TableHead>Reviewer</TableHead>
-                        <TableHead 
+                        <TableHead
                           className="cursor-pointer"
                           onClick={() => handleSort("rating")}
                         >
                           <div className="flex items-center">
                             Rating
-                            {sortConfig.key === "rating" && (
-                              sortConfig.direction === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />
-                            )}
+                            {sortConfig.key === "rating" &&
+                              (sortConfig.direction === "asc" ? (
+                                <ArrowUp size={16} />
+                              ) : (
+                                <ArrowDown size={16} />
+                              ))}
                           </div>
                         </TableHead>
                         <TableHead>Content</TableHead>
-                        <TableHead 
+                        <TableHead
                           className="cursor-pointer"
                           onClick={() => handleSort("createdAt")}
                         >
                           <div className="flex items-center">
                             Date
-                            {sortConfig.key === "createdAt" && (
-                              sortConfig.direction === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />
-                            )}
+                            {sortConfig.key === "createdAt" &&
+                              (sortConfig.direction === "asc" ? (
+                                <ArrowUp size={16} />
+                              ) : (
+                                <ArrowDown size={16} />
+                              ))}
                           </div>
                         </TableHead>
                         <TableHead>Status</TableHead>
@@ -411,14 +451,21 @@ export default function AdminReviewsPage() {
                               <Checkbox
                                 checked={selectedReviews.includes(review.id)}
                                 onCheckedChange={(checked) =>
-                                  handleSelectReview(review.id, checked === true)
+                                  handleSelectReview(
+                                    review.id,
+                                    checked === true
+                                  )
                                 }
                               />
                             </TableCell>
                             <TableCell className="font-medium">
                               <div className="flex flex-col">
-                                <span className="font-medium truncate max-w-[200px]">{review.activityTitle}</span>
-                                <span className="text-gray-500 text-xs">Host: {review.hostName}</span>
+                                <span className="font-medium truncate max-w-[200px]">
+                                  {review.activityTitle}
+                                </span>
+                                <span className="text-gray-500 text-xs">
+                                  Host: {review.hostName}
+                                </span>
                               </div>
                             </TableCell>
                             <TableCell>{review.reviewerName}</TableCell>
@@ -426,7 +473,9 @@ export default function AdminReviewsPage() {
                               <ReviewRating rating={review.rating} />
                             </TableCell>
                             <TableCell>
-                              <div className="max-w-[250px] truncate">{review.content}</div>
+                              <div className="max-w-[250px] truncate">
+                                {review.content}
+                              </div>
                             </TableCell>
                             <TableCell>
                               {format(review.createdAt, "MMM dd, yyyy")}
@@ -434,7 +483,11 @@ export default function AdminReviewsPage() {
                             <TableCell>
                               <Badge
                                 className={`
-                                  ${review.reported ? "bg-red-500" : "bg-green-500"}
+                                  ${
+                                    review.reported
+                                      ? "bg-red-500"
+                                      : "bg-green-500"
+                                  }
                                 `}
                               >
                                 {review.reported ? "Flagged" : "Published"}
@@ -449,18 +502,26 @@ export default function AdminReviewsPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                  <DropdownMenuItem onClick={() => handleApprove(review.id)}>
+                                  <DropdownMenuItem
+                                    onClick={() => handleApprove(review.id)}
+                                  >
                                     Approve
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleReject(review.id)}>
+                                  <DropdownMenuItem
+                                    onClick={() => handleReject(review.id)}
+                                  >
                                     Reject
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleFeature(review.id)}>
+                                  <DropdownMenuItem
+                                    onClick={() => handleFeature(review.id)}
+                                  >
                                     Feature Review
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     className="text-red-500"
-                                    onClick={() => console.log(`Delete review: ${review.id}`)}
+                                    onClick={() =>
+                                      console.log(`Delete review: ${review.id}`)
+                                    }
                                   >
                                     Delete
                                   </DropdownMenuItem>
@@ -487,7 +548,9 @@ export default function AdminReviewsPage() {
                         <PaginationPrevious href="#" />
                       </PaginationItem>
                       <PaginationItem>
-                        <PaginationLink href="#" isActive>1</PaginationLink>
+                        <PaginationLink href="#" isActive>
+                          1
+                        </PaginationLink>
                       </PaginationItem>
                       <PaginationItem>
                         <PaginationLink href="#">2</PaginationLink>
@@ -543,8 +606,12 @@ export default function AdminReviewsPage() {
                             </TableCell>
                             <TableCell className="font-medium">
                               <div className="flex flex-col">
-                                <span className="font-medium truncate max-w-[200px]">{review.activityTitle}</span>
-                                <span className="text-gray-500 text-xs">Host: {review.hostName}</span>
+                                <span className="font-medium truncate max-w-[200px]">
+                                  {review.activityTitle}
+                                </span>
+                                <span className="text-gray-500 text-xs">
+                                  Host: {review.hostName}
+                                </span>
                               </div>
                             </TableCell>
                             <TableCell>{review.reviewerName}</TableCell>
@@ -552,7 +619,9 @@ export default function AdminReviewsPage() {
                               <ReviewRating rating={review.rating} />
                             </TableCell>
                             <TableCell>
-                              <div className="max-w-[250px] truncate">{review.content}</div>
+                              <div className="max-w-[250px] truncate">
+                                {review.content}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center">
@@ -565,16 +634,16 @@ export default function AdminReviewsPage() {
                             </TableCell>
                             <TableCell>
                               <div className="flex space-x-2">
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
+                                <Button
+                                  size="sm"
+                                  variant="outline"
                                   onClick={() => handleApprove(review.id)}
                                 >
                                   Approve
                                 </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="destructive" 
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
                                   onClick={() => handleReject(review.id)}
                                 >
                                   Reject
