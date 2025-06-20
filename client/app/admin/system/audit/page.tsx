@@ -14,11 +14,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DateRangePicker, DateRange } from "@/components/ui/date-picker";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -33,6 +31,8 @@ import {
 } from "@/components/ui/pagination";
 import { Search, Filter, Download, Eye, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { DateRange } from "react-day-picker";
 
 // Mock data for audit trail
 const auditLogs = [
@@ -228,7 +228,6 @@ export default function AuditTrailPage() {
   const [actionType, setActionType] = useState("all");
   const [adminUser, setAdminUser] = useState("all");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Format timestamp for display
   const formatTimestamp = (timestamp: string) => {
@@ -329,11 +328,13 @@ export default function AuditTrailPage() {
               </Select>
 
               <DateRangePicker
-                value={dateRange}
-                onChange={setDateRange}
-                placeholder="Select date range"
+                initialDateFrom={dateRange?.from}
+                initialDateTo={dateRange?.to}
+                onUpdate={(values) => setDateRange(values.range)}
+                showCompare={false}
                 align="start"
               />
+              
             </div>
 
             <div className="flex justify-end">
