@@ -40,13 +40,6 @@ export interface Location {
   image: string;
   countryId: string;
 }
-// export interface activityType {
-//   id: string;
-//   name: string;
-//   image: string;
-//   countryId: string;
-// }
-
 export interface City {
   id: string;
   name: string;
@@ -61,44 +54,6 @@ export interface Country {
   cityCount: number;
   activityCount: number;
 }
-// export interface Schedule {
-//   timeSlots: string[] | null;
-//   availableDays: string[] | null;
-//   timeZone: string | null;
-// }
-
-// export interface Activity {
-//   id: string;
-//   hostId: string;
-//   hostName: string;
-//   hostProfilePictureUrl: string;
-//   hostCreatedAt: string;
-//   hostBio: string;
-//   title: string;
-//   description: string;
-//   price: number;
-//   latitude: number;
-//   longitude: number;
-//   activityType: activityType;
-//   schedule: Schedule;
-//   mediaUrls: string[];
-//   maxParticipants: number;
-//   minParticipants: number;
-//   durationMinutes: number;
-//   isActive: boolean;
-//   isFeatured: boolean;
-//   isVerified: boolean;
-//   averageRating: number;
-//   totalReviews: number;
-//   address: string;
-//   city: City;
-//   country: Country;
-//   createdAt: Array<number> | string;  updatedAt: Array<number> | string;
-//   startDate: Array<number> | string;
-//   endDate: Array<number> | string;
-//   reviews: Review[];
-//   locationPoint?: string;
-// }
 
 export interface Review {
   id: string;

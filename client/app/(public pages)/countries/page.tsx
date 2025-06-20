@@ -4,8 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { HeroSection } from "@/components/shared/hero-section";
 import { LocationGrid } from "@/components/shared/location-grid";
 import { Country } from "@/types";
-import { CountryService } from "@/lib/api/location-services";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CountryService } from "@/services/location-services";
 
 export default function CountriesPage() {
   const [countries, setCountries] = useState<Country[]>([]);

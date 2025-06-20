@@ -3,8 +3,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { HeroSection } from "@/components/shared/hero-section";
 import { LocationGrid } from "@/components/shared/location-grid";
-import { ActivityType } from "@/types";
-import { ActivityTypeService } from "@/lib/api/location-services";
+import { ActivityType } from "@/types/activity";
+import { ActivityTypeService } from "@/services/location-services";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ActivityTypesPage() {

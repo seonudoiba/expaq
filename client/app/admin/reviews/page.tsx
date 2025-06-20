@@ -29,7 +29,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DateRangePicker, DateRange } from "@/components/ui/date-picker";
+// import { DateRangePicker, DateRange } from "@/components/ui/date-picker";
 import { 
   Pagination, 
   PaginationContent, 
@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/pagination";
 import { AlertCircle, ArrowDown, ArrowUp, MoreHorizontal, Star } from "lucide-react";
 import { format } from "date-fns";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 // Mock data for reviews
 const mockReviews = [
@@ -199,8 +200,12 @@ export default function AdminReviewsPage() {
     })
     .sort((a, b) => {
       const key = sortConfig.key as keyof typeof a;
-      if (a[key] < b[key]) return sortConfig.direction === "asc" ? -1 : 1;
-      if (a[key] > b[key]) return sortConfig.direction === "asc" ? 1 : -1;
+      const aValue = a[key];
+      const bValue = b[key];
+      if (aValue != null && bValue != null) {
+        if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+      }
       return 0;
     });
   
@@ -341,6 +346,7 @@ export default function AdminReviewsPage() {
                         onChange={setDateRange}
                         placeholder="Filter by date"
                       />
+                      
                     </div>
                   </div>
                 </div>

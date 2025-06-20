@@ -1,16 +1,22 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
-// import { useBookingDetails, useInitiatePayment } from '@/hooks/use-bookings';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
-import { Calendar, Clock, Users, MapPin, Receipt, CreditCard } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useQuery } from '@tanstack/react-query';
-import { bookingService } from '@/services/booking-service';
+import { useBookingDetails, useInitiatePayment } from "@/hooks/use-bookings";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
+import {
+  Calendar,
+  Clock,
+  Users,
+  MapPin,
+  Receipt,
+  CreditCard,
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 interface BookingDetailsProps {
   bookingId: string;
@@ -38,25 +44,26 @@ const BookingDetailsSkeleton = () => (
 );
 
 export default function BookingDetails({ bookingId }: BookingDetailsProps) {
-  // const { data: booking, isLoading, error } = useBookingDetails(bookingId);
-  // const { mutate: initiatePayment, isLoading: isPaymentLoading } = useInitiatePayment();
-  const {
-    data: booking,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["booking", bookingId],
-    queryFn: () => bookingService.getBookingById(bookingId),
-  });
-  const {
-    data: payment,
-    error: paymentError,
-    isLoading: isPaymentLoading,
-  } = useQuery({
-    queryKey: ["payment", bookingId],
-    queryFn: () => paymentService.getPaymentByBookingId(bookingId),
-  });
+  const { data: booking, isLoading, error } = useBookingDetails(bookingId);
+  const { mutate: initiatePayment, isLoading: isPaymentLoading } =
+    useInitiatePayment();
+  // const {
+  //   data: booking,
+  //   error,
+  //   isLoading,
+  // } = useQuery({
+  //   queryKey: ["booking", bookingId],
+  //   queryFn: () => bookingService.getBookingById(bookingId),
+  // });
 
+  // const {
+  //   data: payment,
+  //   error: paymentError,
+  //   isLoading: isPaymentLoading,
+  // } = useQuery({
+  //   queryKey: ["payment", bookingId],
+  //   queryFn: () => PaymentService.getPaymentByBookingId(bookingId),
+  // });
 
   if (isLoading) {
     return <BookingDetailsSkeleton />;
@@ -66,7 +73,10 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
     return (
       <div className="text-center py-8">
         <h3 className="text-xl font-semibold mb-2">Booking not found</h3>
-        <p className="text-gray-600 mb-4">The booking you're looking for doesn't exist or you don't have access to it.</p>
+        <p className="text-gray-600 mb-4">
+          The booking you're looking for doesn't exist or you don't have access
+          to it.
+        </p>
         <Button asChild>
           <Link href="/bookings">Back to My Bookings</Link>
         </Button>
@@ -80,16 +90,16 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'CONFIRMED':
-        return 'bg-green-500';
-      case 'PENDING':
-        return 'bg-yellow-500';
-      case 'CANCELLED':
-        return 'bg-red-500';
-      case 'PENDING_PAYMENT':
-        return 'bg-yellow-500';
+      case "CONFIRMED":
+        return "bg-green-500";
+      case "PENDING":
+        return "bg-yellow-500";
+      case "CANCELLED":
+        return "bg-red-500";
+      case "PENDING_PAYMENT":
+        return "bg-yellow-500";
       default:
-        return 'bg-gray-500';
+        return "bg-gray-500";
     }
   };
 
@@ -114,12 +124,14 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
               />
             </div>
             <div className="flex-1 space-y-4">
-              <h2 className="text-2xl font-semibold">{booking.activity.title}</h2>
+              <h2 className="text-2xl font-semibold">
+                {booking.activity.title}
+              </h2>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-gray-500" />
-                  <span>{format(new Date(booking.date), 'MMMM d, yyyy')}</span>
+                  <span>{format(new Date(booking.date), "MMMM d, yyyy")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-gray-500" />
@@ -143,7 +155,10 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Receipt className="w-5 h-5 text-gray-500" />
-                  <span>Activity Price ({booking.participants} × ${booking.activity.price})</span>
+                  <span>
+                    Activity Price ({booking.participants} × $
+                    {booking.activity.price})
+                  </span>
                 </div>
                 <span>${booking.activity.price * booking.participants}</span>
               </div>
@@ -160,38 +175,37 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
                 <span>${booking.totalPrice}</span>
               </div>
             </div>
-          {booking.status === 'PENDING' && (
-
-          {booking.status === 'UNPAID' && (
-            <div className="flex justify-end space-x-4 pt-4">
-              <Button asChild variant="outline">
-                <Link href="/bookings">Back to Bookings</Link>
-              </Button>
-              <Button
-                onClick={handlePayment}
-                disabled={isPaymentLoading}
-                className="min-w-[150px]"
-              >
-                {isPaymentLoading ? (
-                  <>Processing...</>
-                ) : (
-                  <>
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Pay Now
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-
-          {booking.status === 'PAID' && (
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="flex items-center gap-2 text-green-700">
-                <Badge className="bg-green-500">Paid</Badge>
-                <span>Payment completed successfully</span>
+            {booking.status === "PENDING" && (
+              <div className="flex justify-end space-x-4 pt-4">
+                <Button asChild variant="outline">
+                  <Link href="/bookings">Back to Bookings</Link>
+                </Button>
+                <Button
+                  onClick={handlePayment}
+                  disabled={isPaymentLoading}
+                  className="min-w-[150px]"
+                >
+                  {isPaymentLoading ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Pay Now
+                    </>
+                  )}
+                </Button>
               </div>
-            </div>
-          )}
+            )}
+
+            {booking.status === "COMPLETED" && (
+              <div className="bg-green-50 p-4 rounded-lg">
+                <div className="flex items-center gap-2 text-green-700">
+                  <Badge className="bg-green-500">Paid</Badge>
+                  <span>Payment completed successfully</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Card>
     </div>

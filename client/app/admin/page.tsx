@@ -8,9 +8,28 @@ import {
   ArrowUpIcon, 
   ArrowDownIcon
 } from "@/icons";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  BarChart,
+  Bar,
+  Legend,
+  PieChart, 
+  Pie,
+  Cell
+} from "recharts";
+import { platformMetrics, pendingItems, COLORS, activityCategoryData, growthData } from "@/lib/mockDatas";
+import { UserCircle, Box, PieChart as LucidePieChart } from "lucide-react";
+
 
 // Custom icon components
-const UserCircleIcon = ({ className }: { className?: string }) => (
+export const UserCircleIcon = ({ className }: { className?: string }) => (
   <svg 
     width="24" 
     height="24" 
@@ -28,7 +47,7 @@ const UserCircleIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const BoxIconLine = ({ className }: { className?: string }) => (
+export const BoxIconLine = ({ className }: { className?: string }) => (
   <svg
     width="24"
     height="24"
@@ -46,7 +65,7 @@ const BoxIconLine = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const PieChartIcon = ({ className }: { className?: string }) => (
+export const PieChartIcon = ({ className }: { className?: string }) => (
   <svg
     width="24"
     height="24"
@@ -63,94 +82,21 @@ const PieChartIcon = ({ className }: { className?: string }) => (
     />
   </svg>
 );
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  BarChart,
-  Bar,
-  Legend,
-  PieChart, 
-  Pie,
-  Cell
-} from "recharts";
 
-// Mock data for platform overview
-const platformMetrics = [
-  {
-    title: "Total Users",
-    value: "12,856",
-    change: "+15.3%",
-    trend: "up",
-    icon: <UserCircleIcon className="h-8 w-8" />,
-    description: "Total users on the platform"
-  },
-  {
-    title: "Total Hosts",
-    value: "1,432",
-    change: "+8.7%",
-    trend: "up",
-    icon: <UserCircleIcon className="h-8 w-8" />,
-    description: "Total hosts on the platform"
-  },
-  {
-    title: "Active Activities",
-    value: "3,245",
-    change: "+12.4%",
-    trend: "up",
-    icon: <BoxIconLine className="h-8 w-8" />,
-    description: "Currently active experiences"
-  },
-  {
-    title: "Revenue (Month)",
-    value: "$143,245",
-    change: "+23.6%",
-    trend: "up",
-    icon: <PieChartIcon className="h-8 w-8" />,
-    description: "Platform revenue this month"
+// Function to render icons by name
+const renderIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'UserCircle':
+      return <UserCircle className="h-8 w-8" />;
+    case 'Box':
+      return <Box className="h-8 w-8" />;
+    case 'PieChart':
+      return <LucidePieChart className="h-8 w-8" />;
+    default:
+      return null;
   }
-];
+};
 
-// Mock data for the growth chart
-const growthData = [
-  { month: "Jan", users: 2500, hosts: 350, activities: 1200 },
-  { month: "Feb", users: 3000, hosts: 400, activities: 1300 },
-  { month: "Mar", users: 3400, hosts: 450, activities: 1450 },
-  { month: "Apr", users: 4200, hosts: 480, activities: 1500 },
-  { month: "May", users: 4800, hosts: 520, activities: 1700 },
-  { month: "Jun", users: 5200, hosts: 550, activities: 1900 },
-  { month: "Jul", users: 6100, hosts: 600, activities: 2200 },
-  { month: "Aug", users: 6800, hosts: 700, activities: 2300 },
-  { month: "Sep", users: 7500, hosts: 750, activities: 2500 },
-  { month: "Oct", users: 8300, hosts: 820, activities: 2700 },
-  { month: "Nov", users: 9100, hosts: 950, activities: 2900 },
-  { month: "Dec", users: 10000, hosts: 1000, activities: 3100 },
-];
-
-// Mock data for activity categories
-const activityCategoryData = [
-  { name: "Cooking Classes", value: 30 },
-  { name: "Language Exchange", value: 25 },
-  { name: "Outdoor Adventures", value: 20 },
-  { name: "Local Tours", value: 15 },
-  { name: "Art & Craft", value: 10 }
-];
-
-// Colors for pie chart
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-
-// Mock data for pending items
-const pendingItems = [
-  { type: "Host Verification", count: 24 },
-  { type: "Activity Approval", count: 37 },
-  { type: "Refund Requests", count: 12 },
-  { type: "User Reports", count: 7 },
-];
 
 export default function AdminDashboard() {
   return (
@@ -180,7 +126,7 @@ export default function AdminDashboard() {
                   {metric.title}
                 </CardTitle>
                 <div className="p-2 bg-gray-100 rounded-md dark:bg-gray-800">
-                  {metric.icon}
+                  {renderIcon(metric.icon)}
                 </div>
               </div>
             </CardHeader>

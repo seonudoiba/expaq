@@ -4,8 +4,9 @@ import { Suspense, useEffect, useState } from "react";
 import { HeroSection } from "@/components/shared/hero-section";
 import { LocationGrid } from "@/components/shared/location-grid";
 import { City } from "@/types";
-import { CityService } from "@/lib/api/location-services";
+// import { CityService } from "@/lib/api/location-services";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CityService } from "@/services/location-services";
 
 export default function CitiesPage() {
   const [cities, setCities] = useState<City[]>([]);

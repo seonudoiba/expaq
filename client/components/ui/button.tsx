@@ -18,6 +18,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        success: "bg-green-600 text-white hover:bg-green-700",
+        warning: "bg-yellow-500 text-white hover:bg-yellow-600",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -33,10 +35,14 @@ const buttonVariants = cva(
   }
 )
 
+// Extend the variant type to include our custom variants
+type ExtendedVariants = "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success" | "warning";
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+    Omit<VariantProps<typeof buttonVariants>, "variant"> {
+  asChild?: boolean;
+  variant?: ExtendedVariants | null | undefined;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

@@ -15,7 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DateRangePicker, DateRange } from "@/components/ui/date-picker";
+// import { DateRangePicker, DateRange } from "@/components/ui/";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +38,8 @@ import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { DateRange } from "react-day-picker";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 // Mock data for user activities
 const userActivities = [
@@ -312,7 +315,7 @@ const contentReports = [
 ];
 
 export default function UserActivityPage() {
-  const [selectedTab, setSelectedTab] = useState("activity");
+  const [, setSelectedTab] = useState("activity");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterAction, setFilterAction] = useState("");
   const [filterUserType, setFilterUserType] = useState("");
@@ -452,11 +455,17 @@ export default function UserActivityPage() {
                   </div>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                  <DateRangePicker
+                  {/* <DateRangePicker
                     value={dateRange}
                     onChange={setDateRange}
                     placeholder="Filter by date range"
-                  />
+                  /> */}
+                   <DateRangePicker
+                                initialDateFrom={dateRange?.from}
+                                initialDateTo={dateRange?.to}
+                                onUpdate={(values) => setDateRange(values.range)}
+                                showCompare={false}
+                              />
                   {selectedActivities.length > 0 && (
                     <div className="flex items-center gap-2">
                       <span className="text-sm">
@@ -713,7 +722,7 @@ export default function UserActivityPage() {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Restrict User Account</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    This will restrict {user.name}'s account and prevent them from 
+                                    This will restrict {user.name}&apos;s account and prevent them from 
                                     making bookings, sending messages, or posting reviews. Their 
                                     current activities will remain visible but marked as restricted.
                                   </AlertDialogDescription>

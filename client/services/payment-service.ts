@@ -2,6 +2,7 @@ import { apiClient } from '../lib/api/client';
 // /api/payments/analytics/host/{hostid}
 
 import type {
+  Payment,
 PaymentAnalytics
 } from '@/types/payments';
 
@@ -24,6 +25,17 @@ apiClient.interceptors.request.use((config) => {
 });
 
 // Payment Analytics Services
+export const PaymentService = {
+
+  getPaymentByBookingId: async (bookingId: string): Promise<Payment> =>{
+    const response = await apiClient.get<Payment>(`/api/payments/analytics/${bookingId}`);
+        return response.data;
+  }
+
+
+};
+
+// Payment Analytics Services
 export const PaymentAnalyticsService = {
 
 //   getCurrentUser: async (): Promise<User> => {
@@ -33,7 +45,7 @@ export const PaymentAnalyticsService = {
   getHostPaymentAnalytics: async (hostId: string): Promise<PaymentAnalytics> => {
     const response = await apiClient.get<PaymentAnalytics>(`/api/payments/analytics/host/${hostId}`);
     return response.data;
-  },
+  }
 
 
 };

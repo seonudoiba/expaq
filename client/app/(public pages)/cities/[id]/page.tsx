@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useParams } from "next/navigation";
@@ -5,11 +6,12 @@ import { useState, useEffect } from "react";
 import { DetailHeader } from "@/components/shared/detail-header";
 import { FeaturedActivities, Activity } from "@/components/shared/featured-activities";
 import { City, Country } from "@/types";
-import { CityService, CountryService } from "@/lib/api/location-services";
-import { MapPin, Globe, Calendar, Building2 } from "lucide-react";
+// import { CityService, CountryService } from "@/lib/api/location-services";
+import { MapPin, Globe, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { CityService, CountryService } from "@/services/location-services";
 
 export default function CityDetailPage() {
   const params = useParams();

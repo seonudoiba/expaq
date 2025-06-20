@@ -120,6 +120,7 @@ public class PaymentController {
     }
 
     private UUID getCurrentUserId() {
+
         // TODO: Implement getting current user ID from security context
         return UUID.randomUUID(); // Placeholder
     }

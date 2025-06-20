@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useParams } from "next/navigation";
@@ -6,7 +7,7 @@ import { DetailHeader } from "@/components/shared/detail-header";
 import { FeaturedActivities, Activity } from "@/components/shared/featured-activities";
 import { LocationGrid } from "@/components/shared/location-grid";
 import { Country, City } from "@/types";
-import { CountryService } from "@/lib/api/location-services";
+import { CountryService } from "@/services/location-services";
 import { MapPin, Building, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";

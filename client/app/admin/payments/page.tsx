@@ -43,7 +43,9 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { DatePicker } from "@/components/ui/date-picker";
+import DatePicker from "@/components/admin/form/date-picker";
+
+// import { DatePicker } from "@/components/ui/date-picker";
 
 // Mock transaction data
 const transactions = [
@@ -356,6 +358,7 @@ export default function PaymentsPage() {
                       setDate={setStartDate}
                       placeholder="Start date"
                     />
+                  
                     <span>to</span>
                     <DatePicker
                       date={endDate}

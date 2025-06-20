@@ -59,10 +59,11 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BookingDTO> getBooking(
-            @RequestAttribute("userId") UUID userId,
             @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @PathVariable UUID bookingId) {
+        UUID userId = currentUser.getId();
         return ResponseEntity.ok(bookingService.getBooking(bookingId, userId));
     }
 

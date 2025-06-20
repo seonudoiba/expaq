@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, CreditCard, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface PaymentPageProps {
   bookingId: string;
@@ -41,7 +42,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
     );
   }
 
-  if (booking.paymentStatus === 'PAID') {
+  if (booking.status === 'COMPLETED') {
     return (
       <Card className="p-8">
         <div className="text-center">
@@ -88,9 +89,9 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
                 <p className="text-sm text-gray-500">Pay securely with your card</p>
               </div>
               <div className="flex gap-2">
-                <img src="/visa.svg" alt="Visa" className="h-6" />
-                <img src="/mastercard.svg" alt="Mastercard" className="h-6" />
-                <img src="/amex.svg" alt="American Express" className="h-6" />
+                <Image src="/visa.svg" alt="Visa" fill />
+                <Image src="/mastercard.svg" alt="Mastercard" fill/>
+                <Image src="/amex.svg" alt="American Express"/>
               </div>
             </button>
 
@@ -100,7 +101,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
                 paymentMethod === 'paypal' ? 'border-primary ring-2 ring-primary/10' : ''
               }`}
             >
-              <img src="/paypal.svg" alt="PayPal" className="h-5" />
+              <Image src="/paypal.svg" alt="PayPal" className="h-5" fill/>
               <div className="flex-1">
                 <p className="font-medium">PayPal</p>
                 <p className="text-sm text-gray-500">Pay with your PayPal account</p>
@@ -119,7 +120,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
                 'Processing...'
               ) : (
                 <>
-                  Pay ${booking.totalAmount}
+                  Pay ${booking.totalPrice}
                   <Lock className="w-4 h-4 ml-2" />
                 </>
               )}
@@ -137,20 +138,20 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
           <div className="space-y-3">
             <div className="flex justify-between">
               <span>Activity Price</span>
-              <span>${booking.activity.price * booking.numberOfGuests}</span>
+              <span>${booking.activity.price * booking.participants}</span>
             </div>
             <div className="flex justify-between">
               <span>Service Fee</span>
-              <span>${Math.round(booking.totalAmount * 0.1)}</span>
+              <span>${Math.round(booking.totalPrice * 0.1)}</span>
             </div>
             <div className="flex justify-between">
               <span>Taxes</span>
-              <span>${Math.round(booking.totalAmount * 0.08)}</span>
+              <span>${Math.round(booking.totalPrice * 0.08)}</span>
             </div>
             <div className="pt-3 border-t">
               <div className="flex justify-between font-semibold">
                 <span>Total Amount</span>
-                <span>${booking.totalAmount}</span>
+                <span>${booking.totalPrice}</span>
               </div>
             </div>
           </div>
@@ -161,7 +162,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
               <p>Activity: {booking.activity.title}</p>
               <p>Date: {new Date(booking.date).toLocaleDateString()}</p>
               <p>Time: {booking.time}</p>
-              <p>Guests: {booking.numberOfGuests}</p>
+              <p>Guests: {booking.participants}</p>
             </div>
           </div>
         </Card>
