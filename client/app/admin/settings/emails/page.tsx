@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,9 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { 
-  AlertCircle, 
   CheckCircle2, 
   Code, 
   Copy, 
@@ -133,10 +132,10 @@ www.expaq.com`,
     subject: "Your ExpAq Payout Has Been Processed",
     body: `Hello {{host.firstName}},
 
-Good news! We've processed your payout of ${{payout.amount}} for recent bookings on your experience(s).
+Good news! We've processed your payout of payout.amount for recent bookings on your experience(s).
 
 Payout Details:
-- Amount: ${{payout.amount}}
+- Amount: $payout.amount}}
 - Payment Method: {{host.paymentMethod}}
 - Reference: {{payout.reference}}
 - Expected Arrival: {{payout.expectedDate}}

@@ -1,5 +1,5 @@
 import { Activity, ActivityType } from '@/types/activity';
-import { apiClient } from '../lib/api/client';
+import { apiClient } from '@/lib/api/client';
 import type {
   AuthResponse,
   BecomeHostRequest,
@@ -17,21 +17,70 @@ import type {
 
 // Add an interceptor to include auth details with every request
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth-storage'); // Replace with your auth token retrieval logic
+  // First try to get token from localStorage
+  const token = localStorage.getItem('auth-storage');
   let tokenObject = null;
+
   if (token) {
     try {
       tokenObject = JSON.parse(token);
       tokenObject = tokenObject.state.token; 
+      console.log("Token found in localStorage:", tokenObject ? "Token exists" : "No token");
     } catch (error) {
-      console.error('Failed to parse token:', error);
+      console.error('Failed to parse token from localStorage:', error);
     }
   }
+
+  // If no token in localStorage, try cookies as fallback
+  if (!tokenObject) {
+    const cookies = document.cookie.split(';');
+    const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+    if (tokenCookie) {
+      tokenObject = tokenCookie.split('=')[1];
+      console.log("Token found in cookies:", tokenObject ? "Token exists" : "No token");
+    }
+  }
+
   if (tokenObject) {
+    console.log("Using authorization header with token");
     config.headers.Authorization = `Bearer ${tokenObject}`;
+  } else {
+    console.warn("No authentication token found for request");
   }
   return config;
 });
+
+// Add response interceptor to handle 401 errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      console.error('Authentication error (401):', error.response?.data);
+      
+      // Check if we should redirect to login
+      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+        // Save current URL to redirect back after login
+        localStorage.setItem('redirectTo', window.location.pathname);
+        
+        // Display notification (if using toast notification system)
+        const event = new CustomEvent('auth:unauthorized', {
+          detail: { 
+            message: 'Your session has expired. Please log in again.',
+            from: window.location.pathname
+          }
+        });
+        window.dispatchEvent(event);
+        
+        // Delay redirect slightly to allow notification to show
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1000);
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 // Auth Services
 export const authService = {
@@ -118,15 +167,52 @@ export const activityService = {
     console.log('Activities:', response.data);
     return response.data;
   },
+  getHostDashboardActivities: async (host:string ,params?: {
+    location?: string;
+    type?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<Activity[]> => {
+    const response = await apiClient.get<Activity[]>(`/api/activities/host/${host}`, { params });
+    console.log('Activities:', response.data);
+    return response.data;
+  },
 
   getById: async (id: string): Promise<Activity> => {
     const response = await apiClient.get<Activity>(`/api/activities/${id}`);
     return response.data;
   },
-
-  create: async (activityData: CreateActivityRequest): Promise<Activity> => {
-    const response = await apiClient.post<Activity>("/api/activities", activityData);
-    return response.data;
+  create: async (activityData: CreateActivityRequest): Promise<Activity> => {    try {
+      console.log("Creating activity with data:", activityData);
+      
+      // Log authentication status
+      const token = localStorage.getItem('auth-storage');
+      console.log("Auth token exists:", !!token);
+      
+      const response = await apiClient.post<Activity>("/api/activities", activityData);
+      return response.data;
+    } catch (error: any) { // Type as any to handle axios error structure
+      console.error("Activity creation error:", error);
+      
+      // Enhance error with more context for debugging
+      if (error && error.response) {
+        console.error("Error status:", error.response.status);
+        console.error("Error data:", error.response.data);
+        
+        // Special handling for 401 errors
+        if (error.response.status === 401) {
+          console.error("Authentication failed - token may be invalid or expired");
+          
+          // You could dispatch an event or update state here
+          const event = new CustomEvent('auth:unauthorized', { 
+            detail: { message: "Your session has expired" } 
+          });
+          window.dispatchEvent(event);
+        }
+      }
+      
+      throw error;
+    }
   },
 
   update: async (id: string, data: Partial<UpdateActivityRequest>): Promise<Activity> => {
@@ -165,52 +251,41 @@ export const reviewService = {
 // File Services
 export const fileService = {
   upload: async (file: File, type?: string): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (type) formData.append('type', type);
-    
-    const response = await apiClient.post<string>('/api/files/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
-  },
-  uploadMultiple: async (files: File[], type?: string): Promise<string[]> => {
-    const formData = new FormData();
-    files.forEach(file => formData.append('files', file));
-    if (type) formData.append('type', type);
-    
-    const response = await apiClient.post<string[]>('/api/files/upload-multiple', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
-  },
-    uploadFile: async (file: File, type?: string): Promise<{ url: string }> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (type) formData.append('type', type);
-    
-    // Get the current user ID from localStorage to pass as a query parameter
-    // This solves the "Missing request attribute 'userId' of type UUID" error
-    const token = localStorage.getItem('auth-storage');
-    let userId = null;
-    if (token) {
-      try {
-        const authData = JSON.parse(token);
-        userId = authData.state.user?.id;
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
+    try {
+      console.log('Uploading file:', file.name, 'Type:', type || 'default');
+      
+      const formData = new FormData();
+      formData.append("file", file);
+      if (type) {
+        formData.append("type", type);
       }
+
+      const response = await apiClient.post<string>(
+        '/api/files/upload',
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+        console.log('File upload response:', response.data);
+      
+      // Ensure we always return HTTPS URLs
+      const url = response.data;
+      const secureUrl = typeof url === 'string' ? url.replace(/^http:\/\//i, 'https://') : url;
+      
+      console.log('Secure URL:', secureUrl);
+      return secureUrl; // Returns the secure media URL as a string
+    } catch (error: any) {
+      console.error('File upload error:', error);
+      if (error && error.response) {
+        console.error("Error status:", error.response.status);
+        console.error("Error data:", error.response.data);
+      }
+      throw new Error(error?.response?.data?.message || 'Failed to upload file');
     }
-    
-    const response = await apiClient.post<{ url: string }>(
-      `/api/files/upload${userId ? `?userId=${userId}` : ''}`, 
-      formData, 
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
-    );
-    return response.data;
-  },
+  }
 };
 
 // Country Services

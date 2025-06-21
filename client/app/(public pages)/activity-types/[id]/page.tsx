@@ -3,12 +3,12 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { DetailHeader } from "@/components/shared/detail-header";
-import { FeaturedActivities, Activity } from "@/components/shared/featured-activities";
+import { FeaturedActivities } from "@/components/shared/featured-activities";
 import { Tag, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ActivityType } from "@/types/activity";
+import { Activity, ActivityType } from "@/types/activity";
 import { ActivityTypeService } from "@/services/location-services";
 
 export default function ActivityTypeDetailPage() {

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState } from "react";
@@ -20,9 +21,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarIcon, Download, FilterIcon, Clock } from "lucide-react";
+import { Download, FilterIcon, Clock } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
@@ -128,7 +128,7 @@ const getSeasonColor = (season: string) => {
 };
 
 export default function TimingAnalytics() {
-  const [dateRange, setDateRange] = useState<Date | undefined>(new Date());
+  // const [dateRange, setDateRange] = useState<Date | undefined>(new Date());
   const [activityFilter, setActivityFilter] = useState<string>("all");
   const [seasonalView, setSeasonalView] = useState<string>("Winter");
 

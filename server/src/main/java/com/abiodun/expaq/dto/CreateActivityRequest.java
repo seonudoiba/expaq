@@ -1,6 +1,5 @@
 package com.abiodun.expaq.dto;
 
-import com.abiodun.expaq.model.ActivitySchedule;
 import com.abiodun.expaq.model.ActivityType;
 import com.abiodun.expaq.model.City;
 import com.abiodun.expaq.model.Country;
@@ -10,6 +9,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class CreateActivityRequest {
@@ -37,7 +37,7 @@ public class CreateActivityRequest {
 
     @Valid
     @NotNull(message = "Schedule is required")
-    private ActivitySchedule schedule;
+    private ActivityScheduleDTO schedule;
 
     @NotNull(message = "Maximum participants is required")
     @Min(value = 1, message = "Maximum participants must be at least 1")
@@ -71,4 +71,9 @@ public class CreateActivityRequest {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endDate;
+
+    @NotBlank(message = "Media URL is required")
+    private List<String> mediaUrls;
+
+
 }

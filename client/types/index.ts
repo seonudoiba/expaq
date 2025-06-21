@@ -156,73 +156,73 @@ export interface becomeHostRequest {
   bio: string;
 }
 
-export interface CreateActivityRequest {
-  title: string;
-  description: string;
-  price: number;
-  latitude: number;
-  longitude: number;
-  startDate: string;
-  endDate: string;
-  schedule: {
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    daysOfWeek: string[];
-  };
-  maxParticipants: number;
-  // capacity: number;
-  bookedCapacity: number;
-  address: string;
-  // isFeatured: boolean;
-  city: {
-    id: string;
-  };
-  country: {
-    id: string;
-  };
-  activityType: {
-    id: string;
-  };
-  minParticipants: number;
-  durationMinutes: number;
-  mediaUrls: string[];
-}
-export interface UpdateActivityRequest {
-  title: string;
-  description: string;
-  price: number;
-  latitude: number;
-  longitude: number;
-  schedule: {
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    daysOfWeek: string[];
-  };
-  maxParticipants: number;
-  capacity: number;
-  bookedCapacity: number;
-  address: string;
-  isFeatured: boolean;
-  city: {
-    id: string;
-  };
-  country: {
-    id: string;
-  };
-  activityType: {
-    id: string;
-  };
-  minParticipants: number;
-  durationMinutes: number;
-  isActive: boolean;
-  isVerified: boolean;
-  mediaUrls: string[];
-  locationPoint: string;
-  startDate: string;
-  endDate: string;
-}
+// export interface CreateActivityRequest {
+//   title: string;
+//   description: string;
+//   price: number;
+//   latitude: number;
+//   longitude: number;
+//   startDate: string;
+//   endDate: string;
+//   schedule: {
+//     startDate: string;
+//     endDate: string;
+//     startTime: string;
+//     daysOfWeek: string[];
+//   };
+//   maxParticipants: number;
+//   // capacity: number;
+//   bookedCapacity: number;
+//   address: string;
+//   // isFeatured: boolean;
+//   city: {
+//     id: string;
+//   };
+//   country: {
+//     id: string;
+//   };
+//   activityType: {
+//     id: string;
+//   };
+//   minParticipants: number;
+//   durationMinutes: number;
+//   mediaUrls: string[];
+// }
+// export interface UpdateActivityRequest {
+//   title: string;
+//   description: string;
+//   price: number;
+//   latitude: number;
+//   longitude: number;
+//   schedule: {
+//     startDate: string;
+//     endDate: string;
+//     startTime: string;
+//     daysOfWeek: string[];
+//   };
+//   maxParticipants: number;
+//   capacity: number;
+//   bookedCapacity: number;
+//   address: string;
+//   isFeatured: boolean;
+//   city: {
+//     id: string;
+//   };
+//   country: {
+//     id: string;
+//   };
+//   activityType: {
+//     id: string;
+//   };
+//   minParticipants: number;
+//   durationMinutes: number;
+//   isActive: boolean;
+//   isVerified: boolean;
+//   mediaUrls: string[];
+//   locationPoint: string;
+//   startDate: string;
+//   endDate: string;
+// }
 
 export interface CreateReviewRequest {
   activityId: string;

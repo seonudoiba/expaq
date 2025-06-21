@@ -1,10 +1,9 @@
-import { apiClient } from './client';
+import { apiClient } from '@/lib/api/client';
 import type {
   City,
   Country,
-  ActivityType,
-  Activity
 } from '@/types';
+import { Activity, ActivityType } from '@/types/activity';
 
 /**
  * Location-based API services

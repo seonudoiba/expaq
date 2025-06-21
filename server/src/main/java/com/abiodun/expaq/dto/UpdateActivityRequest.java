@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class UpdateActivityRequest {
@@ -56,6 +57,9 @@ public class UpdateActivityRequest {
     @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180")
     @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
     private Double longitude;
+
+    @NotBlank(message = "Media URL is required")
+    private List<String> mediaUrls;
 
     private Boolean isActive;
     private Boolean isFeatured;

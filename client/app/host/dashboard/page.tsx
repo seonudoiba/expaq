@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { activityService } from "@/services/services";
 import { useAuthStore } from "@/lib/store/auth";
-import type { Activity } from "@/types";
+import { Activity } from "@/types/activity";
+// import type { Activity } from "@/types";
 
 export default function HostDashboard() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function HostDashboard() {
       setIsLoading(true);
       try {
         const hostActivities: Activity[] =
-          await activityService.getAllHostActivities(user.id);
+          await activityService.getHostDashboardActivities(user.id);
         setActivities(hostActivities);
       } catch (error) {
         console.error("Error fetching host activities:", error);

@@ -11,14 +11,24 @@ export interface ActivityType {
   activityCount: number;
 }
 
+// export interface Schedule {
+//   timeSlots: string[] | null;
+//   availableDays: string[] | null;
+//   timeZone: string | null;
+//   startDate?: string;
+//   endDate?: string;
+//   startTime?: string;
+//   daysOfWeek?: string[];
+// }
 export interface Schedule {
-  timeSlots: string[] | null;
-  availableDays: string[] | null;
-  timeZone: string | null;
-  startDate?: string;
-  endDate?: string;
-  startTime?: string;
-  daysOfWeek?: string[];
+  availableDays: string[];
+  timeZone: string;
+  timeSlots: {
+    maxParticipants: number;
+    isAvailable: boolean;
+    endTime: string;
+    startTime: string;
+  }
 }
 
 export interface Location {

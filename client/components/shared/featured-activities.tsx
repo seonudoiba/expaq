@@ -2,39 +2,10 @@
 
 import { ActivityCard } from "@/components/activities/activity-card";
 import { Button } from "@/components/ui/button";
+import { Activity } from "@/types/activity";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-
-export interface Activity {
-  id: string;
-  title: string;
-  description: string;
-  city: {
-    id: string;
-    name: string;
-    image: string;
-    countryId: string;
-  };
-  country: {
-    id: string;
-    name: string;
-    image: string;
-  };
-  activityType: {
-    id: string;
-    name: string;
-    image: string;
-    countryId: string;
-  };
-  location: string;
-  price: string;
-  startDate: string;
-  endDate: string;
-  image?: string;
-  rating: number;
-  reviewCount: number;
-}
 
 interface FeaturedActivitiesProps {
   activities: Activity[];
@@ -134,19 +105,7 @@ export function FeaturedActivities({
             className="min-w-[320px] snap-start"
           >
             <ActivityCard
-              id={activity.id}
-              title={activity.title}
-              description={activity.description}
-              city={activity.city}
-              country={activity.country}
-              activityType={activity.activityType}
-              location={activity.location}
-              price={activity.price}
-              startDate={activity.startDate}
-              endDate={activity.endDate}
-              image={activity.image}
-              rating={activity.rating}
-              reviewCount={activity.reviewCount}
+           activity={activity}
             />
           </div>
         ))}

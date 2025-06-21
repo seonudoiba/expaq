@@ -507,7 +507,7 @@ export default function SystemHealthPage() {
                     
                     <div>
                       <h3 className="font-medium mb-2">Expected Impact</h3>
-                      <Alert variant="warning">
+                      <Alert variant="default">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>Service Impact</AlertTitle>
                         <AlertDescription>{maintenance.expectedImpact}</AlertDescription>

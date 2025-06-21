@@ -8,6 +8,7 @@ import {
   ArrowUpIcon, 
   ArrowDownIcon
 } from "@/icons";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   ResponsiveContainer,
@@ -25,7 +26,6 @@ import {
   Cell
 } from "recharts";
 import { platformMetrics, pendingItems, COLORS, activityCategoryData, growthData } from "@/lib/mockDatas";
-import { UserCircle, Box, PieChart as LucidePieChart } from "lucide-react";
 
 
 // Custom icon components
@@ -83,20 +83,6 @@ export const PieChartIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Function to render icons by name
-const renderIcon = (iconName: string) => {
-  switch (iconName) {
-    case 'UserCircle':
-      return <UserCircle className="h-8 w-8" />;
-    case 'Box':
-      return <Box className="h-8 w-8" />;
-    case 'PieChart':
-      return <LucidePieChart className="h-8 w-8" />;
-    default:
-      return null;
-  }
-};
-
 
 export default function AdminDashboard() {
   return (
@@ -126,7 +112,7 @@ export default function AdminDashboard() {
                   {metric.title}
                 </CardTitle>
                 <div className="p-2 bg-gray-100 rounded-md dark:bg-gray-800">
-                  {renderIcon(metric.icon)}
+                  {metric.icon}
                 </div>
               </div>
             </CardHeader>
@@ -135,10 +121,15 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold">{metric.value}</div>
                 <div className={`flex items-center ${metric.trend === "up" ? "text-green-500" : "text-red-500"}`}>
                   {metric.trend === "up" ? (
+                    "ArrowUpIcon"
+                  ) : (
+                    "ArrowDownIcon"
+                  )}
+                  {/* {metric.trend === "up" ? (
                     <ArrowUpIcon className="h-4 w-4 mr-1" />
                   ) : (
                     <ArrowDownIcon className="h-4 w-4 mr-1" />
-                  )}
+                  )} */}
                   <span>{metric.change}</span>
                 </div>
               </div>

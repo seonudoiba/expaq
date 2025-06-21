@@ -7,7 +7,6 @@ import {
   ArrowDownIcon,
   DollarSign,
   TrendingUp,
-  ChevronRight,
   CreditCard,
   Calendar,
   ArrowRight,
@@ -35,8 +34,6 @@ import {
   Area,
   BarChart,
   Bar,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -160,7 +157,7 @@ export default function RevenueAnalytics() {
   const { user } = useAuthStore();
   const [timeRange, setTimeRange] = useState("90days");
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
+  const [stats, ] = useState({
     totalRevenue: 52800,
     revenueChange: 12.4,
     averageBookingValue: 347.37,

@@ -154,12 +154,12 @@ const About = () => {
                         {/* Trust indicators */}
                         <div className="pt-10 border-t border-gray-200 mt-8">
                             <p className="text-sm text-gray-500 mb-4">Trusted by travelers worldwide</p>
-                            <div className="flex flex-wrap items-center gap-6">
+                            {/* <div className="flex flex-wrap items-center gap-6">
                                 <div className="text-gray-400 font-bold">TripAdvisor</div>
                                 <div className="text-gray-400 font-bold">Expedia</div>
                                 <div className="text-gray-400 font-bold">Booking.com</div>
                                 <div className="text-gray-400 font-bold">Airbnb</div>
-                            </div>
+                            </div> */}
                 </div>
                     </div>
                 </div>

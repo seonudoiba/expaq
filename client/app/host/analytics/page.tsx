@@ -106,7 +106,7 @@ export default function AnalyticsDashboard() {
   const { user } = useAuthStore();
   const [timeRange, setTimeRange] = useState("90days");
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalRevenue: 52800,
     revenueChange: 12.4,
     totalBookings: 152,

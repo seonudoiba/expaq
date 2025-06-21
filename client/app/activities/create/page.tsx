@@ -7,18 +7,18 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { Clock, Users, DollarSign, Image as ImageIcon, MapPin } from "lucide-react"
+import { MapPin, Clock, Users, DollarSign, Image as ImageIcon } from "lucide-react"
 import { useAuthStore } from "@/lib/store/auth"
-import { activityService } from "@/services/services"
+import Image from "next/image"
 import { useQuery } from "@tanstack/react-query"
 import { useActivityStore } from "@/lib/store/activity"
-import { countryService, cityService, activityTypeService } from "@/services/services"
-import { geocodingService } from '@/services/services';
-import { uploadActivityImages } from '@/services/services';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format, } from 'date-fns';
+import { countryService, activityTypeService, cityService, geocodingService, activityService, fileService } from "@/services/services"
+import AddressAutocomplete from "@/components/AddressAutocomplete"
+import HostAuthGuard from "@/components/auth/HostAuthGuard"
 
 const activitySchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -39,23 +39,37 @@ const activitySchema = z.object({
   minParticipants: z.number().min(1, "Minimum participants must be at least 1"),
   durationMinutes: z.number().min(1, "Duration must be at least 1 minute"),
 });
+interface Address {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
+}
 
 export default function CreateActivityPage() {
   const { user } = useAuthStore()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [images, setImages] = useState<File[]>([])
-  const [addressVerification, setAddressVerification] = useState<{
-    isVerifying?: boolean;
-    isValid?: boolean;
-    suggestions?: Array<{
-      display_name: string;
-      lat: number;
-      lon: number;
-    }>;
-    formattedAddress?: string;
-  } | null>(null)
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [mediaUrls, setMediaUrls] = useState<string[]>([])
+  const [uploadingImages, setUploadingImages] = useState(false)
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [selectedCityName, setSelectedCityName] = useState<string>("");
+  const [selectedCountryName, setSelectedCountryName] = useState<string>("");
+  
+  const handleAddressSelect = (address: Address) => {
+    setSelectedAddress(address);
+    console.log('Selected address:', address);
+    
+    // Update the form's address field value using setValue from react-hook-form
+    setValue("address", address.display_name, { 
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true
+    });
+  };
+
+
   const {
     countries,
     cities,
@@ -81,301 +95,262 @@ export default function CreateActivityPage() {
     queryFn: () => activityTypeService.getAll(),
   })
 
+  // Fetch cities based on the selected country
   const { data: citiesData } = useQuery({
     queryKey: ["cities", selectedCountry],
     queryFn: () => cityService.getByCountry(selectedCountry),
     enabled: !!selectedCountry, // Only fetch cities if a country is selected
-  });
+  })
 
+  // Initialize form with react-hook-form
+  // and set up validation with zod
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-    getValues,
     watch,
+    setValue,
   } = useForm<z.infer<typeof activitySchema>>({
     resolver: zodResolver(activitySchema),
   });
-  
-  // Watch country and city fields to react to their changes
-  const watchCountry = watch("country");
-  const watchCity = watch("city");// Enhanced search for address suggestions with debouncing
-  const debouncedAddressSearch = (address: string) => {
-    if (!address || address.trim() === '') {
-      setAddressVerification(null);
-      return;
+
+  // Watch for form field changes
+  const watchedCity = watch("city");
+  const watchedCountry = watch("country");
+
+  // Update selected city and country names when form values change
+  useEffect(() => {
+    if (watchedCity) {
+      const cityName = cities.find(city => city.id === watchedCity)?.name || "";
+      setSelectedCityName(cityName);
     }
-    
-    // Clear any existing timeout to implement debounce
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
+  }, [watchedCity, cities]);
+
+  useEffect(() => {
+    if (watchedCountry) {
+      const countryName = countries.find(country => country.id === watchedCountry)?.name || "";
+      setSelectedCountryName(countryName);
     }
-    
-    // Set a new timeout to delay the search
-    const newTimeout = setTimeout(async () => {
-      setAddressVerification(prev => ({ ...prev, isVerifying: true }));
-      
-      try {
-        // Get the selected city and country for context
-        const cityValue = getValues("city");
-        const countryValue = getValues("country");
-        
-        // Log the values to help debug
-        console.log("Address search values:", { 
-          address, 
-          cityValue, 
-          countryValue,
-          cityExists: cities.find(c => c.id === cityValue)?.name,
-          countryExists: countries.find(c => c.id === countryValue)?.name
-        });
-        
-        // Make sure city and country are selected
-        if (!cityValue || !countryValue) {
-          console.log("City or country not selected");
-          setAddressVerification(null);
-          return;
-        }
-        
-        const cityName = cities.find((c) => c.id === cityValue)?.name;
-        const countryName = countries.find((c) => c.id === countryValue)?.name;
-        
-        if (!cityName || !countryName) {
-          console.log("City name or country name not found");
-          setAddressVerification(null);
-          return;
-        }
-        
-        // Create a query based on available information, prioritizing specific address details first
-        const query = `${address}, ${cityName}, ${countryName}`;
-        console.log("Searching for address with query:", query);
-        
-        // Fetch address suggestions
-        const result = await geocodingService.verifyAddress(query);
-        console.log("Got address verification result:", result);
-        
-        // Always update the state with what we got
-        setAddressVerification({
-          isVerifying: false,
-          isValid: result.isValid,
-          suggestions: result.suggestions || [],
-          formattedAddress: result.formattedAddress
-        });
-        
-        // Log suggestions for debugging
-        if (result.suggestions?.length) {
-          console.log(`Found ${result.suggestions.length} suggestions for "${address}"`);
-        } else {
-          console.log(`No suggestions found for "${address}"`);
-        }
-      } catch (error) {
-        console.error("Error searching addresses:", error);
-        setAddressVerification({
-          isVerifying: false,
-          isValid: false,
-          suggestions: []
-        });
-      }
-    }, 300); // Faster debounce for better responsiveness
-    
-    // Save the timeout ID to be able to cancel it
-    setSearchTimeout(newTimeout);
-  };const onSubmit = async (data: z.infer<typeof activitySchema>) => {
+  }, [watchedCountry, countries]);
+
+  const onSubmit = async (data: z.infer<typeof activitySchema>) => {
     console.log("Form submitted with data:", data); // Debugging log
     setIsLoading(true);
 
     try {
-      // Extract data from form
-      const { address: originalAddress, city, country, startDate, endDate, ...rest } = data;
-      
-      // If we have a verified formatted address, use that instead of the original
-      const address = addressVerification?.formattedAddress || originalAddress;
-      
-      // Make sure city and country are selected
-      if (!city || !country) {
-        toast({
-          title: "Missing information",
-          description: "Please select both a country and city",
-          variant: "destructive",
-          duration: 3000,
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      // Verify the address if not already verified
-      if (!addressVerification?.isValid) {
-        toast({
-          title: "Address verification needed",
-          description: "Please select a valid address from the suggestions",
-          variant: "destructive",
-          duration: 3000,
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      console.log("Processing data:", { address, city, country, rest }); // Debugging log
+      // Convert isFeatured to boolean
+      // const isFeatured = data.isFeatured === "true";
 
-      const cityName = cities.find((c) => c.id === city)?.name;
-      const countryName = countries.find((c) => c.id === country)?.name;
+      const {address, startTime, daysOfWeek, city, country, startDate, endDate, ...rest } = data;
+      // console.log("Processing data:", { address, city, country, rest }); // Debugging log
 
-      if (!cityName || !countryName) {
-        throw new Error("Invalid city or country selection.");
-      }      // Use verified coordinates from address verification if available
-      let latitude, longitude;
-      
-      if (addressVerification?.suggestions && addressVerification.suggestions.length > 0) {
-        // Use the first suggestion's coordinates
-        latitude = addressVerification.suggestions[0].lat;
-        longitude = addressVerification.suggestions[0].lon;
-        console.log("Using verified coordinates:", { latitude, longitude });
-      } else {
-        // Fallback to geocoding the address
-        const query = `${address}, ${cityName}, ${countryName}`;
-        console.log("Geocoding address:", query);
+      // const cityName = cities.find((c) => c.id === city)?.name;
+      // const countryName = countries.find((c) => c.id === country)?.name;
+
+      // if (!cityName || !countryName) {
+      //   throw new Error("Invalid city or country selection.");
+      // }      let latitude, longitude;
+
+      // try {
+      //   // If we have a selected address from the autocomplete, use its coordinates directly
+      //   if (selectedAddress && selectedAddress.lat && selectedAddress.lon) {
+      //     latitude = parseFloat(selectedAddress.lat);
+      //     longitude = parseFloat(selectedAddress.lon);
+      //     console.log("Using coordinates from selected address:", { latitude, longitude });
+      //   } 
         
-        try {
-          ({ latitude, longitude } = await geocodingService.getCoordinates(query));
+      //   // else {
+      //   //   // Otherwise use geocoding service with the entered address
+      //   //   const query = `${address}, ${cityName}, ${countryName}`;
+      //   //   ({ latitude, longitude } = await geocodingService.getCoordinates(query));
+      //   // }
 
-          if (!latitude || !longitude) {
-            console.warn(`No results found for the full address: ${query}. Retrying with city and country only.`);
-            const fallbackQuery = `${cityName}, ${countryName}`;
-            ({ latitude, longitude } = await geocodingService.getCoordinates(fallbackQuery));
+      //   // if (!latitude || !longitude) {
+      //   //   const fullAddressQuery = `${address}, ${cityName}, ${countryName}`;
+      //   //   console.warn(`No results found for the full address: ${fullAddressQuery}. Retrying with city and country only.`);
+      //   //   const fallbackQuery = `${cityName}, ${countryName}`;
+      //   //   ({ latitude, longitude } = await geocodingService.getCoordinates(fallbackQuery));
 
-            if (!latitude || !longitude) {
-              throw new Error(`No results found for the fallback location: ${fallbackQuery}`);
-            }
-          }
-        } catch (geoError) {
-          console.error("Geocoding error:", geoError);
-          throw new Error("Unable to fetch coordinates. Please check the address and try again.");
-        }
-      }
+      //   //   if (!latitude || !longitude) {
+      //   //     throw new Error(`No results found for the fallback location: ${fallbackQuery}`);
+      //   //   }
+      //   // }
+      // } catch (geoError) {
+      //   console.error("Geocoding error:", geoError);
+      //   throw new Error("Unable to fetch coordinates. Please check the address and try again.");
+      // }
 
-      try {
-        ({ latitude, longitude } = await geocodingService.getCoordinates(query));
-
-        if (!latitude || !longitude) {
-          console.warn(`No results found for the full address: ${query}. Retrying with city and country only.`);
-          const fallbackQuery = `${cityName}, ${countryName}`;
-          ({ latitude, longitude } = await geocodingService.getCoordinates(fallbackQuery));
-
-          if (!latitude || !longitude) {
-            throw new Error(`No results found for the fallback location: ${fallbackQuery}`);
-          }
-        }
-      } catch (geoError) {
-        console.error("Geocoding error:", geoError);
-        throw new Error("Unable to fetch coordinates. Please check the address and try again.");
-      }
-
-      console.log("Coordinates fetched:", { latitude, longitude }); // Debugging log
+      // console.log("Coordinates fetched:", { latitude, longitude }); // Debugging log
 
       // Format startDate and endDate to include time
       const formattedStartDate = format(new Date(startDate), "yyyy-MM-dd'T'HH:mm:ss");
-      const formattedEndDate = format(new Date(endDate), "yyyy-MM-dd'T'HH:mm:ss");
+      const formattedEndDate = format(new Date(endDate), "yyyy-MM-dd'T'HH:mm:ss");  
 
+      // 
       const activityData = {
         ...rest,
         // isFeatured, // Use the converted boolean value
-        latitude,
-        longitude,
+        latitude: selectedAddress?.lat ? parseInt(selectedAddress.lat) : 0,
+        longitude: selectedAddress?.lon ? parseInt(selectedAddress.lon) : 0,
         startDate: formattedStartDate,
         endDate: formattedEndDate,
         city: { id: city },
         country: { id: country },
-        activityType: { id: data.activityType },
-        address,
-        mediaUrls: [],
+        activityType: { id: data.activityType },        address: address, // Use the selected address or the form address
+        // Ensure all URLs use HTTPS
+        mediaUrls: mediaUrls.map(url => url.replace(/^http:\/\//i, 'https://')), // Use the uploaded media URLs
         schedule: {
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
-          startTime: data.startTime,
-          daysOfWeek: data.daysOfWeek,
+          availableDays: data.daysOfWeek,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Get user's timezone
+          timeSlots:{
+            maxParticipants: data.maxParticipants, // Use formatted dates
+            isAvailable: data.maxParticipants > 0, // Ensure availability if max participants is set
+            endTime: data.endDate, // Use the time from the form
+            startTime: data.startDate, // Use the time from the form
+          }
         },
-      };
-
-      console.log("Final activity data:", activityData); // Debugging log
-
-      // Step 1: Create the activity
-      const createdActivity = await activityService.create(activityData);
-      console.log("Activity created with ID:", createdActivity.id); // Debugging log
-
-      // Step 2: Upload images
-      if (images.length > 0) {
-        try {
-          await uploadActivityImages(createdActivity.id, images);
-          console.log("Images uploaded for activity ID:", createdActivity.id); // Debugging log
-        } catch (imageUploadError) {
-          console.error("Error uploading images:", imageUploadError);
-          throw new Error("Failed to upload images. Please try again.");
-        }
-      }
+      };      // Step 1: Create the activity      // Log debugging information
+      console.log("Current user data:", user);
+      console.log("User roles:", user?.roles);
+      console.log("Submitting activity data:", activityData);
+        const createdActivity = await activityService.create(activityData);
+      console.log("Activity created with ID:", createdActivity.id, "With media URLs:", mediaUrls); // Debugging log
+      
+      // No need to upload images separately anymore as they're already uploaded and included in mediaUrls
 
       toast({
         title: "Success",
         description: "Activity created successfully",
-      });
-
-    } catch (error: unknown) {
+      });    } catch (error: unknown) {
       console.error("Error creating activity:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to create activity. Please try again.";
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      
+      // Check for 401 Unauthorized error
+      if (error && typeof error === 'object' && 'response' in error && (error.response as { status?: number })?.status === 401) {
+        console.log("Authentication error detected - user needs to relogin");
+        
+        // Save current form data to restore after login
+        localStorage.setItem('pendingActivityData', JSON.stringify(data));
+        
+        toast({
+          title: "Session Expired",
+          description: "Your login session has expired. Please log in again to continue.",
+          variant: "destructive",
+        });
+        
+        // Save current URL to redirect back after login
+        localStorage.setItem('redirectTo', window.location.pathname);
+        
+        // Wait a moment for toast to display
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1500);
+      } else {
+        // For other types of errors
+        const errorMessage = error instanceof Error ? error.message : "Failed to create activity. Please try again.";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setImages(Array.from(e.target.files))
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const newFiles = Array.from(e.target.files);
+    setImages(prev => [...prev, ...newFiles]);
+    
+    // Show uploading indicator
+    setUploadingImages(true);
+    toast({
+      title: "Uploading Images",
+      description: `Uploading ${newFiles.length} image(s)...`,
+    });
+    
+    try {
+      // Upload each image as it's selected
+      const uploadPromises = newFiles.map(file => 
+        fileService.upload(file, 'activity')
+      );
+      
+      const urls = await Promise.all(uploadPromises);
+      
+      // Store the media URLs returned from the server
+      setMediaUrls(prev => [...prev, ...urls]);
+      
+      toast({
+        title: "Upload Complete",
+        description: `Successfully uploaded ${urls.length} image(s)`,
+      });
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast({
+        title: "Upload Error",
+        description: error instanceof Error 
+          ? error.message 
+          : "Failed to upload one or more images. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingImages(false);
     }
   }
-
   useEffect(() => {
     if (countriesData) {
       setCountries(countriesData);
+      
+      // If there's only one country or a default country, select it automatically
+      if (countriesData.length === 1) {
+        const defaultCountry = countriesData[0];
+        setSelectedCountry(defaultCountry.id);
+        setSelectedCountryName(defaultCountry.name);
+      }
     }
-  }, [countriesData, setCountries]);
+  }, [countriesData, setCountries, setSelectedCountry]);
 
   useEffect(() => {
     if (activityTypesData) {
       setActivityTypes(activityTypesData);
     }
   }, [activityTypesData, setActivityTypes]);
+  
+  // When cities data changes, update the city dropdown if there's only one city
+  useEffect(() => {
+    if (citiesData && citiesData.length === 1) {
+      const defaultCity = citiesData[0];
+      setSelectedCityName(defaultCity.name);
+      
+      // Set the city in the form if it's the only option
+      const cityField = document.getElementById('city') as HTMLSelectElement;
+      if (cityField) {
+        cityField.value = defaultCity.id;
+        const event = new Event('change', { bubbles: true });
+        cityField.dispatchEvent(event);
+      }
+    }
+  }, [citiesData]);
 
   useEffect(() => {
     if (citiesData) {
       setCities(citiesData);
     }
-  }, [citiesData, setCities]);  // Reset address when city or country changes
-  useEffect(() => {
-    console.log("Country or City changed:", { watchCountry, watchCity });
-    
-    // Reset address and verification when either city or country changes
-    if (!watchCity || !watchCountry) {
-      setValue("address", "");
-      setAddressVerification(null);
-    }
-  }, [watchCity, watchCountry, setValue]);
+  }, [citiesData, setCities]);
 
   if (!user) {
     return null
   }
-
   return (
-    <div className="container mx-auto py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create New Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form
+    <HostAuthGuard>
+      <div className="container mx-auto py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Create New Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form
             onSubmit={handleSubmit(onSubmit)} // Directly pass the onSubmit function
             className="space-y-6"
           >
@@ -388,32 +363,20 @@ export default function CreateActivityPage() {
                   ))}
                 </ul>
               </div>
-            )}            {/* Country and City Selection */}
+            )}
+
+            {/* Country and City Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">              <div>
                 <Label htmlFor="country">Country</Label>
                 <select
                   id="country"
                   {...register("country")}
                   required
-                  className="w-full p-2 border rounded-md"
-                  onChange={(e) => {
-                    // Reset the city and address selections when country changes
-                    setValue("city", "");
-                    setValue("address", "");
-                    
-                    // Clear any address verification data
-                    setAddressVerification(null);
-                    
-                    // Update the selected country to trigger city fetch
-                    setSelectedCountry(e.target.value);
-                    
-                    if (e.target.value) {
-                      toast({
-                        title: "Country selected",
-                        description: `Now please select a city in ${countries.find(c => c.id === e.target.value)?.name}`,
-                        duration: 3000,
-                      });
-                    }
+                  className="w-full p-2 border rounded-md"                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    setSelectedCountry(selectedId);
+                    const countryName = countries.find(country => country.id === selectedId)?.name || "";
+                    setSelectedCountryName(countryName);
                   }}
                 >
                   <option value="">Select a country</option>
@@ -423,31 +386,16 @@ export default function CreateActivityPage() {
                     </option>
                   ))}
                 </select>
-                {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="city">City</Label>
-                <select
+              </div>              <div>
+                <Label htmlFor="city">City</Label>                <select
                   id="city"
                   {...register("city")}
                   required
                   className="w-full p-2 border rounded-md"
-                  disabled={!selectedCountry} // Disable until country is selected
                   onChange={(e) => {
-                    // Reset address when city changes
-                    setValue("address", "");
-                    
-                    // Clear any address verification data
-                    setAddressVerification(null);
-                    
-                    if (e.target.value) {
-                      toast({
-                        title: "City selected",
-                        description: "Now you can enter and select an address",
-                        duration: 3000,
-                      });
-                    }
+                    const selectedId = e.target.value;
+                    const cityName = cities.find(city => city.id === selectedId)?.name || "";
+                    setSelectedCityName(cityName);
                   }}
                 >
                   <option value="">Select a city</option>
@@ -457,15 +405,6 @@ export default function CreateActivityPage() {
                     </option>
                   ))}
                 </select>
-                {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>}
-                {!selectedCountry && (
-                  <p className="text-amber-500 text-sm mt-1 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Please select a country first
-                  </p>
-                )}
               </div>
             </div>
 
@@ -511,22 +450,39 @@ export default function CreateActivityPage() {
                 />
                 {errors.description && <p className="text-red-500">{errors.description.message}</p>}
               </div>
-            </div>            {/* Duration field */}
-            <div>
-              <Label htmlFor="durationMinutes">Duration (Minutes)</Label>
-              <div className="relative">
-                <Clock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                <Input
-                  id="durationMinutes"
-                  type="number"
-                  {...register("durationMinutes", { valueAsNumber: true })}
-                  required
-                  min="1"
-                  placeholder="Enter duration in minutes"
-                  className="pl-10"
-                />
+            </div>
+
+            {/* Location and Duration */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="location">Location</Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="location"
+                    name="location"
+                    required
+                    placeholder="Enter location"
+                    className="pl-10"
+                  />
+                </div>
               </div>
-              {errors.durationMinutes && <p className="text-red-500">{errors.durationMinutes.message}</p>}
+
+              <div>
+                <Label htmlFor="duration">Duration (hours)</Label>
+                <div className="relative">
+                  <Clock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="duration"
+                    name="duration"
+                    type="number"
+                    required
+                    min="1"
+                    placeholder="Enter duration"
+                    className="pl-10"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Capacity and Pricing */}
@@ -582,152 +538,20 @@ export default function CreateActivityPage() {
                 />
                 {errors.bookedCapacity && <p className="text-red-500">{errors.bookedCapacity.message}</p>}
               </div>
-            </div>            {/* Address with Real-time Suggestions */}
-            <div className="space-y-2">
+            </div>            {/* Address */}
+            <div>
               <Label htmlFor="address">Address</Label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="address"
-                    {...register("address")}
-                    required
-                    placeholder={!getValues("city") ? "Select country and city first" : "Enter address"}
-                    className={`w-full pl-10 ${addressVerification?.isValid === false ? 'border-red-500' : addressVerification?.isValid === true ? 'border-green-500' : ''}`}
-                    disabled={!getValues("city") || !getValues("country")} // Disable if city or country isn't selected
-                    onChange={(e) => {
-                      // Clear verification when user starts typing again
-                      if (addressVerification) setAddressVerification(null);
-                      // Make sure the field value is updated
-                      setValue("address", e.target.value);
-                      
-                      // Fetch address suggestions as the user types (with debounce)
-                      if (e.target.value.length > 2 && getValues("city") && getValues("country")) {
-                        // Start searching with just 3 characters to provide faster feedback
-                        debouncedAddressSearch(e.target.value);
-                      }
-                    }}
-                    onBlur={() => {
-                      // Verify address when user leaves the field
-                      const addressValue = getValues("address");
-                      if (addressValue && addressValue.length > 2 && getValues("city") && getValues("country") && !addressVerification?.isValid) {
-                        debouncedAddressSearch(addressValue);
-                      }
-                    }}
-                  />
-                  {addressVerification?.isVerifying && (
-                    <div className="absolute right-3 top-2.5">
-                      <span className="animate-spin inline-block h-4 w-4 border-2 border-gray-300 border-t-primary rounded-full"></span>
-                    </div>
-                  )}
-                </div>
-              </div>
-                {/* Hierarchical selection guidance */}
-                            {/* Show appropriate guidance based on field state */}
-              {(() => {
-                const countryValue = getValues("country");
-                const cityValue = getValues("city");
-                
-                if (!countryValue) {
-                  return (
-                    <p className="text-amber-500 text-sm flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                      Please select a country first
-                    </p>
-                  );
-                } else if (!cityValue) {
-                  return (
-                    <p className="text-amber-500 text-sm flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                      Please select a city before entering an address
-                    </p>
-                  );
-                }
-                return null;
-              })()}
-              
-              {/* Address validation feedback */}
-              {addressVerification?.isValid === true && getValues("address") && (
-                <p className="text-green-600 text-sm flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Valid address confirmed
-                </p>
-              )}
-              
-              {addressVerification?.isValid === false && getValues("address") && !addressVerification?.isVerifying && (
-                <p className="text-red-500 text-sm flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Could not verify this address
-                </p>
-              )}              {/* Address suggestions dropdown - enhanced UI like Fiverr search */}
-              {addressVerification?.suggestions && addressVerification.suggestions.length > 0 && (
-                <div className="mt-2 bg-white border-2 border-blue-300 rounded-md shadow-2xl relative z-50" 
-                     style={{ width: "100%" }}>
-                  <div className="p-3 border-b bg-blue-50 flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    </svg>
-                    <p className="text-sm font-medium text-gray-800">Select an address from suggestions:</p>
-                    <span className="ml-1 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
-                      {addressVerification.suggestions.length} found
-                    </span>
-                  </div>
-                  <ul className="max-h-72 overflow-auto py-2">
-                    {addressVerification.suggestions.map((suggestion, idx) => (
-                      <li 
-                        key={idx} 
-                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors duration-200 border-b border-gray-100 last:border-0"
-                        onClick={() => {
-                          setValue("address", suggestion.display_name, { shouldValidate: true });
-                          setAddressVerification({
-                            isVerifying: false,
-                            isValid: true,
-                            suggestions: [],
-                            formattedAddress: suggestion.display_name
-                          });
-                          toast({
-                            title: "Address selected",
-                            description: "Valid address confirmed from suggestions",
-                            duration: 3000,
-                          });
-                        }}
-                      >
-                        <div className="flex items-start gap-3">
-                          <svg className="w-5 h-5 mt-0.5 text-blue-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <div className="w-full">
-                            <p className="font-medium text-gray-800">{suggestion.display_name.split(',')[0]}</p>
-                            <p className="text-xs text-gray-500 mt-1">{suggestion.display_name.split(',').slice(1).join(',').trim()}</p>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="p-2 border-t bg-gray-50 flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Click an address to select it</span>
-                    <button 
-                      type="button"
-                      className="px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded text-gray-700 transition-colors" 
-                      onClick={() => setAddressVerification({...addressVerification, suggestions: []})}
-                    >
-                      Close suggestions
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
+              <AddressAutocomplete
+                city={selectedCityName}
+                country={selectedCountryName}
+                onSelect={handleAddressSelect}
+                placeholder={`Search for addresses in ${selectedCityName || "selected city"}...`}
+                id="address"
+                {...register("address")}
+              />
+              {errors.address && <p className="text-red-500">{errors.address.message}</p>}
             </div>
+
             {/* Minimum Participants */}
             <div>
               <Label htmlFor="minParticipants">Minimum Participants</Label>
@@ -813,16 +637,15 @@ export default function CreateActivityPage() {
 
             {/* Image Upload */}
             <div>
-              <Label htmlFor="images">Activity Images</Label>
-              <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+              <Label htmlFor="images">Activity Images</Label>              <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                 <div className="text-center">
                   <ImageIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
                   <div className="mt-4 flex text-sm leading-6 text-gray-600">
                     <label
                       htmlFor="images"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/90"
+                      className={`relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/90 ${uploadingImages ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <span>Upload images</span>
+                      <span>{uploadingImages ? 'Uploading...' : 'Upload images'}</span>
                       <input
                         id="images"
                         name="images"
@@ -831,6 +654,7 @@ export default function CreateActivityPage() {
                         accept="image/*"
                         className="sr-only"
                         onChange={handleImageChange}
+                        disabled={uploadingImages}
                       />
                     </label>
                     <p className="pl-1">or drag and drop</p>
@@ -838,10 +662,40 @@ export default function CreateActivityPage() {
                   <p className="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
                 </div>
               </div>
+              {uploadingImages && (
+                <div className="mt-2 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-primary"></div>
+                  <span className="ml-2 text-sm text-muted-foreground">Uploading images...</span>
+                </div>
+              )}
               {images.length > 0 && (
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {images.length} image(s) selected
-                </p>
+                <div className="mt-2 flex flex-col">
+                  <p className="text-sm text-muted-foreground">
+                    {images.length} image(s) selected • {mediaUrls.length} uploaded
+                  </p>
+                  {mediaUrls.length > 0 && (                    <div className="mt-2 flex flex-wrap gap-2">
+                      {mediaUrls.map((url, index) => {
+                        // Ensure URL uses HTTPS
+                        const secureUrl = url.replace(/^http:\/\//i, 'https://');
+                        
+                        return (                          <div key={index} className="relative w-16 h-16 rounded overflow-hidden">                            {/* Using Next.js Image with error handling */}
+                            <Image 
+                              src={secureUrl} 
+                              alt={`Uploaded preview ${index + 1}`}
+                              width={64}
+                              height={64}
+                              className="object-cover w-full h-full"
+                              unoptimized={true} // Skip optimization completely
+                              onError={() => {
+                                console.error(`Failed to load image from ${secureUrl}`);
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
@@ -849,8 +703,8 @@ export default function CreateActivityPage() {
               {isLoading ? "Creating..." : "Create Activity"}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </CardContent>      </Card>
     </div>
+    </HostAuthGuard>
   )
 }

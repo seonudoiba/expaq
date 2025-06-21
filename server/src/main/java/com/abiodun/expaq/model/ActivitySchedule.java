@@ -1,26 +1,34 @@
 package com.abiodun.expaq.model;
 
-import java.util.List;
-
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "activity_schedules")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActivitySchedule {
-    private List<TimeSlot> timeSlots;
-    private List<String> availableDays;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TimeSlot> timeSlots = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "available_days", joinColumns = @JoinColumn(name = "schedule_id"))
+    @Column(name = "day")
+    private List<String> availableDays = new ArrayList<>();
+
+    @Column(nullable = false)
     private String timeZone;
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class TimeSlot {
-        private String startTime;
-        private String endTime;
-        private int maxParticipants;
-        private boolean isAvailable;
-    }
+    @OneToOne(mappedBy = "schedule")
+    private Activity activity;
 }

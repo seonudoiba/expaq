@@ -1,9 +1,11 @@
 package com.abiodun.expaq.controller;
 
+import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.service.IFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,9 +21,10 @@ public class FileController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(
-            @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal ExpaqUserDetails currentUser,
             @RequestParam("file") MultipartFile file,
             @RequestParam(required = false) String type) {
+        UUID userId = currentUser.getId();
         return ResponseEntity.ok(fileService.uploadFile(file, userId, type));
     }
 
