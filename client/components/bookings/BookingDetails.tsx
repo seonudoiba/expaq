@@ -17,6 +17,7 @@ import {
 import { formatBookingDate } from "@/lib/utils/date-utils";
 import Link from "next/link";
 import Image from "next/image";
+import { useToast } from "@/components/ui/use-toast";
 import { getSafeActivityImage, getSafeActivityTitle, getSafeParticipants, getSafeTime } from "@/lib/utils/booking-utils";
 
 interface BookingDetailsProps {
@@ -45,6 +46,7 @@ const BookingDetailsSkeleton = () => (
 );
 
 export default function BookingDetails({ bookingId }: BookingDetailsProps) {
+  const { toast } = useToast();
   const { data: booking, isLoading, error } = useBookingDetails(bookingId);
   const { mutate: initiatePayment, isPending: isPaymentLoading } =
     useInitiatePayment();
@@ -84,9 +86,15 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
       </div>
     );
   }
-
   const handlePayment = () => {
+    // Default to PAYSTACK as the payment method
     initiatePayment(bookingId);
+    
+    // Show a loading toast while payment is being initiated
+    toast({
+      title: "Initiating Payment",
+      description: "You'll be redirected to the payment gateway shortly...",
+    });
   };
 
   const getStatusColor = (status: string) => {

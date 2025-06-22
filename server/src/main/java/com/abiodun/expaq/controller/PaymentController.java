@@ -2,6 +2,7 @@ package com.abiodun.expaq.controller;
 
 import com.abiodun.expaq.dto.PaymentDTO;
 import com.abiodun.expaq.dto.PaymentResponseDTO;
+import com.abiodun.expaq.dto.PaymentInitializeRequest;
 import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.model.Payment.PaymentStatus;
 import com.abiodun.expaq.model.ExpaqUserDetails;
@@ -10,14 +11,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,26 +36,25 @@ public class PaymentController {
 
     private final IPaymentService paymentService;
 
-    @PostMapping("/create")
+    @PostMapping("/initialize")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PaymentResponseDTO> createPayment(
-            @RequestParam UUID bookingId,
-            @RequestParam String paymentMethod) {
+    public ResponseEntity<?> initializePayment(
+            @RequestBody PaymentInitializeRequest request,
+            jakarta.servlet.http.HttpServletRequest servletRequest) {
         try {
-            PaymentDTO payment = paymentService.createPayment(bookingId, getCurrentUserId(), paymentMethod);
-            return ResponseEntity.ok(builder()
+            PaymentDTO payment = paymentService.createPayment(request.getBookingId(), getCurrentUserId(), request.getPaymentMethod());
+            return ResponseEntity.ok(PaymentResponseDTO.builder()
                     .paymentIntentId(payment.getPaymentProviderReference())
                     .status(payment.getStatus())
                     .provider(payment.getPaymentProvider())
-                    .authorizationUrl(payment.getAuthorizationUrl())  // Include the authorization URL
-                    .accessCode(payment.getAccess_code())  // Include the access code for Paystack
+                    .authorizationUrl(payment.getAuthorizationUrl())
+                    .accessCode(payment.getAccess_code())
                     .build());
         } catch (Exception e) {
-            log.error("Error creating payment", e);
-            return ResponseEntity.badRequest().body(builder()
-                    .status("ERROR")
-                    .message(e.getMessage())
-                    .build());
+            log.error("Error initializing payment", e);
+            return ResponseEntity.badRequest()
+                    .body(ErrorResponse.builder(e, HttpStatus.BAD_REQUEST, servletRequest.getRequestURI())
+                            .build());
         }
     }
 
@@ -73,11 +77,19 @@ public class PaymentController {
     }
 
     @PutMapping("/{paymentId}/status")
-    public ResponseEntity<PaymentDTO> updatePaymentStatus(
+    public ResponseEntity<?> updatePaymentStatus(
             @PathVariable UUID paymentId,
             @RequestParam PaymentStatus status,
-            @RequestParam(required = false) String transactionId) {
-        return ResponseEntity.ok(paymentService.updatePaymentStatus(paymentId, status, transactionId));
+            @RequestParam(required = false) String transactionId,
+            jakarta.servlet.http.HttpServletRequest request) {
+        try {
+            return ResponseEntity.ok(paymentService.updatePaymentStatus(paymentId, status, transactionId));
+        } catch (Exception e) {
+            log.error("Error updating payment status", e);
+            return ResponseEntity.badRequest()
+                    .body(ErrorResponse.builder(e, HttpStatus.BAD_REQUEST, request.getRequestURI())
+                            .build());
+        }
     }
 
     @PostMapping("/{paymentId}/refund")
@@ -128,9 +140,10 @@ public class PaymentController {
     }
 
     @GetMapping("/paystack/callback")
-    public ResponseEntity<String> handlePaystackCallback(
+    public ResponseEntity<?> handlePaystackCallback(
             @RequestParam("reference") String reference,
-            @RequestParam("trxref") String transactionReference) {
+            @RequestParam("trxref") String transactionReference,
+            jakarta.servlet.http.HttpServletRequest request) {
         try {
             PaymentDTO payment = paymentService.updatePaymentStatus(
                 UUID.fromString(reference),
@@ -140,7 +153,9 @@ public class PaymentController {
             return ResponseEntity.ok("Payment processed successfully");
         } catch (Exception e) {
             log.error("Error processing Paystack callback", e);
-            return ResponseEntity.badRequest().body("Error processing payment: " + e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ErrorResponse.builder(e, HttpStatus.BAD_REQUEST, request.getRequestURI())
+                            .build());
         }
     }
 

@@ -152,6 +152,7 @@ public class PaymentServiceImpl implements IPaymentService {
                 if ("STRIPE".equals(payment.getPaymentProvider())) {
                     stripePaymentProvider.confirmPayment(payment.getPaymentProviderReference());
                 } else if ("PAYSTACK".equals(payment.getPaymentProvider())) {
+                    System.out.println("Confirming Paystack payment with reference: " + payment.getPaymentProviderReference());
                     paystackPaymentProvider.confirmPayment(payment.getPaymentProviderReference());
                 }
                 payment.getBooking().confirm();

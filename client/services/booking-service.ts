@@ -9,9 +9,16 @@ export interface CreateBookingDTO {
 }
 
 export interface PaymentResponse {
-  paymentUrl?: string;
-  success: boolean;
-  message: string;
+  paymentIntentId?: string;
+  clientSecret?: string | null;
+  redirectUrl?: string | null;
+  status?: string;
+  message?: string | null;
+  access_code?: string | null;
+  provider?: 'PAYSTACK' | 'STRIPE';
+  authorizationUrl?: string | null; // This is equivalent to paymentUrl for Paystack
+  accessCode?: string | null;
+  paymentUrl?: string; // We'll map authorizationUrl to this for consistency
 }
 
 export const bookingService = {
@@ -55,10 +62,42 @@ export const bookingService = {
   cancelBooking: async (bookingId: string): Promise<Booking> => {
     const response = await apiClient.patch<Booking>(`/api/bookings/${bookingId}/cancel`);
     return response.data;
-  },
-  
-  initiatePayment: async (bookingId: string): Promise<PaymentResponse> => {
-    const response = await apiClient.post<PaymentResponse>(`/api/bookings/${bookingId}/payment`);
-    return response.data;
+  },  
+    
+  initiatePayment: async (bookingId: string, paymentMethod: string = 'PAYSTACK'): Promise<PaymentResponse> => {
+    // Based on the error message, the server expects bookingId as a GET query parameter
+    const response = await apiClient.post<PaymentResponse>(
+      `/api/payments/initialize`,{bookingId, paymentMethod} // Sending bookingId and paymentMethod in the request body
+    );
+    
+    // Log the response for debugging
+    console.log("Payment initiation response:", response.data);
+    
+    // For consistency with the useInitiatePayment hook that expects a paymentUrl
+    // Map authorizationUrl to paymentUrl if it exists
+    const responseData = response.data;
+    if (responseData.authorizationUrl && !responseData.paymentUrl) {
+      responseData.paymentUrl = responseData.authorizationUrl;
+    }
+    return responseData;
   }
+  // //   return responseData;
+  //  initiatePayment: async (bookingId: string, paymentMethod: string = 'PAYSTACK'): Promise<PaymentResponse> => {
+  //   // Based on the error, the server expects bookingId as a query parameter
+  //   const response = await apiClient.get<PaymentResponse>(
+  //     `/api/payments/initialize?bookingId=${bookingId}&paymentMethod=${paymentMethod}`
+  //   );
+    
+  //   // Log the response for debugging
+  //   console.log("Payment initiation response:", response.data);
+    
+  //   // For consistency with the useInitiatePayment hook that expects a paymentUrl
+  //   // Map authorizationUrl to paymentUrl if it exists
+  //   const responseData = response.data;
+  //   if (responseData.authorizationUrl && !responseData.paymentUrl) {
+  //     responseData.paymentUrl = responseData.authorizationUrl;
+  //   }
+    
+  //   return responseData;
+  // },
 };

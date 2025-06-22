@@ -44,7 +44,9 @@ export const ActivityService = {
         console.error('Error fetching activities:', error);
         throw error;
       }
-    },getAllFeaturedActivities: async (params?: {
+    },
+    
+    getAllFeaturedActivities: async (params?: {
       location?: string;
       type?: string;
       minPrice?: number;

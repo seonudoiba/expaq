@@ -47,10 +47,11 @@ public class PaystackPaymentProvider implements PaymentProvider {
     @Override
     public void confirmPayment(String paymentIntentId) throws PaymentException {
         try {
+            log.info("Confirming Paystack payment with reference: {}", paymentIntentId);
             paystackClient.verifyPayment(paymentIntentId);
         } catch (Exception e) {
             log.error("Error confirming Paystack payment", e);
-            throw new PaymentException("Failed to confirm payment: " + e.getMessage());
+            throw new PaymentException("Error verifying payment: " + e.getMessage(), e);
         }
     }
 

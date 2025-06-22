@@ -37,10 +37,10 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
       );
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "Payment Verified",
-        description: "Your payment has been successfully verified.",
+        description: "Your payment has been successfully verified."
       });
       queryClient.invalidateQueries({ queryKey: ["booking", bookingId] });
       // Redirect to booking details page after successful verification
@@ -50,9 +50,9 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
       toast({
         title: "Verification Error",
         description: error.message || "Failed to verify payment",
-        variant: "destructive",
+        variant: "destructive"
       });
-    },
+    }
   });
 
   // Use our own mutation for payment
@@ -75,9 +75,9 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
       toast({
         title: "Payment Error",
         description: error.message || "Failed to initiate payment",
-        variant: "destructive",
+        variant: "destructive"
       });
-    },
+    }
   });
 
   if (isLoading) {
@@ -124,7 +124,6 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
   }
 
   // Process payment data from the API
-
   const processPayment = (paymentData: PaymentResponse) => {
     console.log("Payment data received:", paymentData);
 
@@ -149,16 +148,22 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
         paymentData.provider === "PAYSTACK" &&
         (paymentData.accessCode || paymentData.access_code)
       ) {
-        // For Paystack, use PaystackPop with the access code
-        try {          const accessCode =
+        // For Paystack, use the inline-js library with the access code
+        try {
+          const accessCode =
             paymentData.accessCode || paymentData.access_code || "";
-          console.log("Resuming Paystack transaction with code:", accessCode);          // Initialize Paystack with callbacks to handle payment status
-          const paystack = new Paystack();          paystack.newTransaction({
+          console.log("Processing Paystack transaction with code:", accessCode);
+          
+          // Initialize Paystack with callbacks to handle payment status
+          const paystack = new Paystack();
+          
+          // Use the new transaction method with callbacks
+          paystack.newTransaction({
             key: process.env.NEXT_PUBLIC_PAYSTACK_KEY || '',
             email: booking?.user?.email || 'customer@example.com',
             amount: booking?.totalPrice ? booking.totalPrice * 100 : 0, // Convert to kobo/cents
-            ref: paymentData.paymentIntentId || accessCode,
-            onSuccess: (transaction) => {
+            ref: paymentData.paymentIntentId || '',
+            onSuccess: (transaction: any) => {
               console.log("Payment successful:", transaction);
               // Verify the payment by calling our API endpoint
               if (paymentData.paymentIntentId) {
@@ -178,27 +183,11 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
               setIsPaymentLoading(false);
             }
           });
-          
-          // Add error handler outside the transaction options
-          paystack.onError = (error: unknown) => {
-              console.error("Paystack payment error:", error);
-              let errorMessage = "An error occurred during payment";
-              if (error && typeof error === 'object' && 'message' in error) {
-                errorMessage = String(error.message);
-              }
-              toast({
-                title: "Payment Error",
-                description: errorMessage,
-                variant: "destructive"
-              });
-              setIsPaymentLoading(false);
-            }
-          });
 
           // The popup will handle redirects/callbacks on completion
           toast({
             title: "Payment Initiated",
-            description: "Please complete your payment in the popup window.",
+            description: "Please complete your payment in the popup window."
           });
         } catch (error) {
           console.error("Paystack popup error:", error);
@@ -218,9 +207,9 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
         window.location.href = paymentData.authorizationUrl;
       }
       // Handle other payment providers with URL
-      else if (paymentData.authorizationUrl || paymentData.paymentUrl) {
+      else if (paymentData.authorizationUrl || paymentData.redirectUrl) {
         window.location.href =
-          paymentData.authorizationUrl || paymentData.paymentUrl || "";
+          paymentData.authorizationUrl || paymentData.redirectUrl || "";
       } else {
         throw new Error("No payment URL or access code provided");
       }
@@ -230,7 +219,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
         title: "Payment Processing Error",
         description:
           "An error occurred while processing your payment. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsPaymentLoading(false);
@@ -243,7 +232,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
       toast({
         title: "Payment Error",
         description: "Booking ID is missing. Cannot process payment.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -273,7 +262,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
 
     toast({
       title: "Initiating Payment",
-      description: `Processing your payment using ${provider}...`,
+      description: `Processing your payment using ${provider}...`
     });
 
     // Pass the provider as a parameter

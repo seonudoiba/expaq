@@ -1,4 +1,4 @@
-import { Booking } from "@/types";
+import { Booking, BookingStatus } from "@/types";
 import { format, isValid } from "date-fns";
 
 /**
@@ -114,7 +114,7 @@ export const normalizeBooking = (booking: Partial<Booking>): Booking => {
     activityId: booking.activityId || '',
     activityTitle: getSafeActivityTitle(booking as Booking),
     activityImage: getSafeActivityImage(booking as Booking),
-    status: booking.status || 'PENDING',
+    status: booking.status || ('pending' as BookingStatus),
     participants: getSafeParticipants(booking as Booking),
     totalPrice: typeof booking.totalPrice === 'number' ? booking.totalPrice : 0,
     createdAt: booking.createdAt || null,
@@ -122,6 +122,8 @@ export const normalizeBooking = (booking: Partial<Booking>): Booking => {
     startDate: booking.startDate,
     endDate: booking.endDate,
     date: booking.date,
-    time: booking.time
+    time: booking.time,
+    userId: booking.userId || '',
+    user: booking.user
   };
 };

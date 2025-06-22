@@ -93,10 +93,11 @@ public class PaystackClient {
             HttpHeaders headers = createHeaders();
             HttpEntity<?> request = new HttpEntity<>(headers);
 
-            ResponseEntity<String> response = restTemplate.getForEntity(
+            ResponseEntity<String> response = restTemplate.exchange(
                 paystackConfig.getBaseUrl() + "/transaction/verify/" + reference,
-                String.class,
-                request
+                HttpMethod.GET,
+                request,
+                String.class
             );
 
             JsonNode jsonResponse = objectMapper.readTree(response.getBody());
