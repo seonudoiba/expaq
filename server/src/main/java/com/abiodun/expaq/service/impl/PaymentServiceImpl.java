@@ -12,6 +12,7 @@ import com.abiodun.expaq.repository.PaymentRepository;
 import com.abiodun.expaq.repository.UserRepository;
 import com.abiodun.expaq.service.IPaymentService;
 import com.abiodun.expaq.service.payment.PaymentProvider;
+import com.abiodun.expaq.service.payment.PaystackClient;
 import com.abiodun.expaq.service.payment.StripePaymentProvider;
 import com.abiodun.expaq.service.payment.PaystackPaymentProvider;
 import lombok.RequiredArgsConstructor;
@@ -39,41 +40,77 @@ public class PaymentServiceImpl implements IPaymentService {
     private final StripePaymentProvider stripePaymentProvider;
     private final PaystackPaymentProvider paystackPaymentProvider;
 
+    private boolean isValidEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        // Basic email format validation
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(emailRegex);
+    }
+
     @Override
     @Transactional
     public PaymentDTO createPayment(UUID bookingId, UUID userId, String paymentMethod) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
         
-        User user = userRepository.findById(userId)
+        // Use the new query to ensure email is properly loaded
+        User user = userRepository.findByIdForPayment(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        log.info("Creating payment for user: {}, email: {}", user.getId(), user.getEmail());
+
+        // Validate user email for Paystack payments
+        if (paymentMethod.equalsIgnoreCase("PAYSTACK")) {
+            if (!isValidEmail(user.getEmail())) {
+                log.error("Invalid email format for user: {}, email: {}", user.getId(), user.getEmail());
+                throw new IllegalArgumentException("A valid email address is required for Paystack payments");
+            }
+            log.info("Using email: {} for Paystack payment", user.getEmail());
+        }
 
         Payment payment = new Payment();
         payment.setBooking(booking);
         payment.setUser(user);
         payment.setAmount(booking.getTotalPrice());
-        payment.setCurrency("USD"); // TODO: Make this configurable
-        payment.setStatus(PaymentStatus.PENDING);
         payment.setPaymentMethod(PaymentMethod.valueOf(paymentMethod.toUpperCase()));
+        payment.setStatus(PaymentStatus.PENDING);  // Set initial status to PENDING
+
+        // Set currency based on payment provider
+        if (paymentMethod.equalsIgnoreCase("PAYSTACK")) {
+            payment.setCurrency(Payment.Currency.NGN);
+        } else {
+            payment.setCurrency(Payment.Currency.USD);
+        }
 
         try {
-            String paymentIntentId;
+            PaystackClient.PaymentInitResponse paystackResponse = null;
             if (paymentMethod.equalsIgnoreCase("STRIPE")) {
                 payment.setPaymentProvider("STRIPE");
-                paymentIntentId = stripePaymentProvider.createPaymentIntent(payment);
+                String stripePaymentIntentId = stripePaymentProvider.createPaymentIntent(payment);
+                payment.setPaymentProviderReference(stripePaymentIntentId);
             } else if (paymentMethod.equalsIgnoreCase("PAYSTACK")) {
                 payment.setPaymentProvider("PAYSTACK");
-                paymentIntentId = paystackPaymentProvider.createPaymentIntent(payment);
+                paystackResponse = paystackPaymentProvider.createPaymentIntent(payment);
+                payment.setPaymentProviderReference(paystackResponse.getReference());
             } else {
                 throw new IllegalArgumentException("Unsupported payment method: " + paymentMethod);
             }
 
-            payment.setPaymentProviderReference(paymentIntentId);
             Payment savedPayment = paymentRepository.save(payment);
-            log.info("Created payment for booking {} by user {} with provider {}", 
+            PaymentDTO paymentDTO = PaymentDTO.fromPayment(savedPayment);
+
+            // Set the authorization URL if it's a Paystack payment
+            if (paystackResponse != null) {
+                paymentDTO.setAuthorizationUrl(paystackResponse.getAuthorizationUrl());
+                paymentDTO.setAccess_code(paystackResponse.getAccessCode());
+            }
+
+            log.info("Created payment for booking {} by user {} with provider {}",
                     bookingId, userId, paymentMethod);
             
-            return PaymentDTO.fromPayment(savedPayment);
+            return paymentDTO;
         } catch (PaymentProvider.PaymentException e) {
             log.error("Error creating payment", e);
             payment.setStatus(PaymentStatus.FAILED);
@@ -195,4 +232,4 @@ public class PaymentServiceImpl implements IPaymentService {
         }
         return PaymentDTO.fromPayment(payment);
     }
-} 
+}

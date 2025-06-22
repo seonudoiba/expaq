@@ -63,4 +63,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     List<User> findByRolesName(String name);
 
+    @Query("SELECT u FROM User u WHERE u.id = :userId")
+    Optional<User> findByIdForPayment(@Param("userId") UUID userId);
 }

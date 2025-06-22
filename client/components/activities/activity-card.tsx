@@ -42,9 +42,8 @@ export function ActivityCard({ activity }: ActivityCardProps) {  function format
             alt={activity.title}
             fill
             className="object-cover transition-transform group-hover:scale-105"
-          />
-          <Badge className="absolute top-4 left-4 bg-white text-gray-900 hover:text-white">
-            {activity.activityType.name}
+          />          <Badge className="absolute top-4 left-4 bg-white text-gray-900 hover:text-white">
+            {activity.activityType?.name || 'Activity'}
           </Badge>
           <Button
             variant="ghost"
@@ -54,10 +53,9 @@ export function ActivityCard({ activity }: ActivityCardProps) {  function format
             <Heart className="h-5 w-5" />
           </Button>
         </div>
-        <CardContent className="p-6">
-          <div className="flex items-center text-sm text-gray-600 mb-2">
+        <CardContent className="p-6">          <div className="flex items-center text-sm text-gray-600 mb-2">
             <MapPin className="h-4 w-4 mr-1" />
-            {activity.city.name}, {activity.country.name}
+            {activity.city?.name || 'Unknown City'}, {activity.country?.name || 'Unknown Country'}
           </div>
           <h3 className="text-xl font-semibold mb-2">{activity.title}</h3>
           <p className="text-gray-600 text-sm mb-3 line-clamp-2">

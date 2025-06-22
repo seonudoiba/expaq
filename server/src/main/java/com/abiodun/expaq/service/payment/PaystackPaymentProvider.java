@@ -16,20 +16,30 @@ public class PaystackPaymentProvider implements PaymentProvider {
     private final PaystackClient paystackClient;
 
     @Override
-    public String createPaymentIntent(Payment payment) throws PaymentException {
+    public PaystackClient.PaymentInitResponse createPaymentIntent(Payment payment) throws PaymentException {
         try {
+            String userEmail = payment.getUser().getEmail();
+            log.info("Creating Paystack payment intent for user: {}, email: {}, amount: {}",
+                    payment.getUser().getId(), userEmail, payment.getAmount());
+
+            if (userEmail == null || userEmail.trim().isEmpty()) {
+                log.error("User email is missing for payment creation. User ID: {}", payment.getUser().getId());
+                throw new PaymentException("User email is required for Paystack payment");
+            }
+
             Map<String, String> metadata = new HashMap<>();
             metadata.put("booking_id", payment.getBooking().getId().toString());
             metadata.put("user_id", payment.getUser().getId().toString());
 
             return paystackClient.initializePayment(
-                payment.getUser().getEmail(),
+                userEmail,
                 payment.getAmount(),
-                payment.getCurrency(),
+                payment.getCurrency().toString(),
                 metadata
             );
         } catch (Exception e) {
-            log.error("Error creating Paystack payment intent", e);
+            log.error("Error creating Paystack payment intent for user {}: {}",
+                    payment.getUser().getId(), e.getMessage(), e);
             throw new PaymentException("Failed to create payment intent: " + e.getMessage());
         }
     }
@@ -60,4 +70,4 @@ public class PaystackPaymentProvider implements PaymentProvider {
         paystackClient.verifyPayment(paymentIntentId);
         return PaymentStatus.SUCCEEDED;
     }
-} 
+}

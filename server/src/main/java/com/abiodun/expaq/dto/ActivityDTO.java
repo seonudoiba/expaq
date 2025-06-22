@@ -28,7 +28,7 @@ public class ActivityDTO {
     private Double latitude;
     private Double longitude;
     private ActivityTypeDTO activityType;
-    private ActivitySchedule schedule;
+    private ActivityScheduleDTO schedule;
     private List<String> mediaUrls;
     private Integer maxParticipants;
     private Integer minParticipants;
@@ -89,7 +89,11 @@ public class ActivityDTO {
         }
 
 
-        dto.setSchedule(activity.getSchedule());
+        // Handle schedule mapping
+        if (activity.getSchedule() != null) {
+            dto.setSchedule(ActivityScheduleDTO.fromActivitySchedule(activity.getSchedule()));
+        }
+
         dto.setMediaUrls(activity.getMediaUrls());
         dto.setMaxParticipants(activity.getMaxParticipants());
         dto.setMinParticipants(activity.getMinParticipants());

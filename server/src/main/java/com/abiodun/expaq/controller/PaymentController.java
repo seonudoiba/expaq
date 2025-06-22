@@ -2,7 +2,9 @@ package com.abiodun.expaq.controller;
 
 import com.abiodun.expaq.dto.PaymentDTO;
 import com.abiodun.expaq.dto.PaymentResponseDTO;
+import com.abiodun.expaq.exception.UnauthorizedException;
 import com.abiodun.expaq.model.Payment.PaymentStatus;
+import com.abiodun.expaq.model.ExpaqUserDetails;
 import com.abiodun.expaq.service.IPaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,12 +12,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static com.abiodun.expaq.dto.PaymentResponseDTO.*;
 
 @Slf4j
 @RestController
@@ -32,14 +38,16 @@ public class PaymentController {
             @RequestParam String paymentMethod) {
         try {
             PaymentDTO payment = paymentService.createPayment(bookingId, getCurrentUserId(), paymentMethod);
-            return ResponseEntity.ok(PaymentResponseDTO.builder()
+            return ResponseEntity.ok(builder()
                     .paymentIntentId(payment.getPaymentProviderReference())
-                    .status(payment.getStatus().name())
+                    .status(payment.getStatus())
                     .provider(payment.getPaymentProvider())
+                    .authorizationUrl(payment.getAuthorizationUrl())  // Include the authorization URL
+                    .accessCode(payment.getAccess_code())  // Include the access code for Paystack
                     .build());
         } catch (Exception e) {
             log.error("Error creating payment", e);
-            return ResponseEntity.badRequest().body(PaymentResponseDTO.builder()
+            return ResponseEntity.badRequest().body(builder()
                     .status("ERROR")
                     .message(e.getMessage())
                     .build());
@@ -119,9 +127,29 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.getPaymentByBookingAndStatus(bookingId, status));
     }
 
-    private UUID getCurrentUserId() {
-
-        // TODO: Implement getting current user ID from security context
-        return UUID.randomUUID(); // Placeholder
+    @GetMapping("/paystack/callback")
+    public ResponseEntity<String> handlePaystackCallback(
+            @RequestParam("reference") String reference,
+            @RequestParam("trxref") String transactionReference) {
+        try {
+            PaymentDTO payment = paymentService.updatePaymentStatus(
+                UUID.fromString(reference),
+                PaymentStatus.COMPLETED,
+                transactionReference
+            );
+            return ResponseEntity.ok("Payment processed successfully");
+        } catch (Exception e) {
+            log.error("Error processing Paystack callback", e);
+            return ResponseEntity.badRequest().body("Error processing payment: " + e.getMessage());
+        }
     }
-} 
+
+    private UUID getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof ExpaqUserDetails) {
+            ExpaqUserDetails userDetails = (ExpaqUserDetails) authentication.getPrincipal();
+            return userDetails.getId();
+        }
+        throw new UnauthorizedException("User not authenticated");
+    }
+}

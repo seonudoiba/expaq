@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
 import {
   Calendar,
   Clock,
@@ -15,8 +14,10 @@ import {
   Receipt,
   CreditCard,
 } from "lucide-react";
+import { formatBookingDate } from "@/lib/utils/date-utils";
 import Link from "next/link";
 import Image from "next/image";
+import { getSafeActivityImage, getSafeActivityTitle, getSafeParticipants, getSafeTime } from "@/lib/utils/booking-utils";
 
 interface BookingDetailsProps {
   bookingId: string;
@@ -45,7 +46,7 @@ const BookingDetailsSkeleton = () => (
 
 export default function BookingDetails({ bookingId }: BookingDetailsProps) {
   const { data: booking, isLoading, error } = useBookingDetails(bookingId);
-  const { mutate: initiatePayment, isLoading: isPaymentLoading } =
+  const { mutate: initiatePayment, isPending: isPaymentLoading } =
     useInitiatePayment();
   // const {
   //   data: booking,
@@ -114,32 +115,30 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
 
       <Card className="p-6">
         <div className="space-y-6">
-          <div className="flex gap-6">
-            <div className="w-96 h-64 relative rounded-lg overflow-hidden">
+          <div className="flex gap-6">            <div className="w-96 h-64 relative rounded-lg overflow-hidden">
               <Image
-                src={booking.activity.mediaUrls[0]}
-                alt={booking.activity.title}
+                src={getSafeActivityImage(booking)}
+                alt={getSafeActivityTitle(booking)}
                 fill
                 className="object-cover"
               />
             </div>
             <div className="flex-1 space-y-4">
               <h2 className="text-2xl font-semibold">
-                {booking.activity.title}
+                {getSafeActivityTitle(booking)}
               </h2>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-4">                <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-gray-500" />
-                  <span>{format(new Date(booking.date), "MMMM d, yyyy")}</span>
+                  <span>{formatBookingDate(booking.date || booking.startDate)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-gray-500" />
-                  <span>{booking.time}</span>
+                  <span>{getSafeTime(booking)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-gray-500" />
-                  <span>{booking.participants} guests</span>
+                  <span>{getSafeParticipants(booking)} guests</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-gray-500" />
@@ -157,10 +156,10 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
                   <Receipt className="w-5 h-5 text-gray-500" />
                   <span>
                     Activity Price ({booking.participants} × $
-                    {booking.activity.price})
+                    {booking.totalPrice / booking.participants})
                   </span>
                 </div>
-                <span>${booking.activity.price * booking.participants}</span>
+                <span>${booking.totalPrice}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span>Service Fee</span>

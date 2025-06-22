@@ -8,6 +8,7 @@ import { ArrowLeft, CreditCard, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import Image from 'next/image';
+import PaystackPop from '@paystack/inline-js'
 
 interface PaymentPageProps {
   bookingId: string;
@@ -15,7 +16,7 @@ interface PaymentPageProps {
 
 export default function PaymentPage({ bookingId }: PaymentPageProps) {
   const { data: booking, isLoading } = useBookingDetails(bookingId);
-  const { mutate: initiatePayment, isLoading: isPaymentLoading } = useInitiatePayment();
+  const { mutate: initiatePayment, isPending: isPaymentLoading } = useInitiatePayment();
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
 
   if (isLoading) {
@@ -91,7 +92,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
               <div className="flex gap-2">
                 <Image src="/visa.svg" alt="Visa" fill />
                 <Image src="/mastercard.svg" alt="Mastercard" fill/>
-                <Image src="/amex.svg" alt="American Express"/>
+                <Image src="/amex.svg" alt="American Express" fill/>
               </div>
             </button>
 
@@ -107,6 +108,8 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
                 <p className="text-sm text-gray-500">Pay with your PayPal account</p>
               </div>
             </button>
+
+            
           </div>
 
           <div className="mt-6">
@@ -138,7 +141,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
           <div className="space-y-3">
             <div className="flex justify-between">
               <span>Activity Price</span>
-              <span>${booking.activity.price * booking.participants}</span>
+              <span>${booking.totalPrice}</span>
             </div>
             <div className="flex justify-between">
               <span>Service Fee</span>
@@ -159,8 +162,8 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
           <div className="mt-6 space-y-3">
             <h3 className="font-semibold">Booking Details</h3>
             <div className="text-sm text-gray-600 space-y-2">
-              <p>Activity: {booking.activity.title}</p>
-              <p>Date: {new Date(booking.date).toLocaleDateString()}</p>
+              <p>Activity: {booking.activityTitle}</p>
+              <p>Date: {typeof booking.createdAt === 'string' ? new Date(booking.createdAt).toLocaleDateString() : 'N/A'}</p>
               <p>Time: {booking.time}</p>
               <p>Guests: {booking.participants}</p>
             </div>

@@ -38,7 +38,7 @@ export default function HostAuthGuard({ children }: HostAuthGuardProps) {
         const hasHostRole = user.roles && Array.isArray(user.roles) && 
                           user.roles.some(role => 
                             typeof role === 'string' 
-                              ? role.toLowerCase() === 'host' 
+                              ? (role as string).toLowerCase() === 'host' 
                               : role.name?.toLowerCase() === 'host'
                           );
         

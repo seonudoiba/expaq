@@ -6,6 +6,7 @@ import com.abiodun.expaq.model.Payment.PaymentMethod;
 import com.abiodun.expaq.model.Payment.PaymentStatus;
 import com.abiodun.expaq.repository.PaymentRepository;
 import com.abiodun.expaq.service.IPaymentAnalyticsService;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -141,7 +142,7 @@ public class PaymentAnalyticsServiceImpl implements IPaymentAnalyticsService {
         return payments.stream()
                 .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
                 .collect(Collectors.groupingBy(
-                        Payment::getCurrency,
+                        payment -> payment.getCurrency().name(),  // Convert Currency enum to String
                         Collectors.reducing(
                                 BigDecimal.ZERO,
                                 Payment::getAmount,
@@ -207,4 +208,4 @@ public class PaymentAnalyticsServiceImpl implements IPaymentAnalyticsService {
                         }
                 ));
     }
-} 
+}

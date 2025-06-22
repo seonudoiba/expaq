@@ -79,10 +79,16 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   };
 
   const handleSuggestionClick = (address: Address) => {
+    console.log('Suggestion clicked:', address);
     setQuery(address.display_name);
     setShowSuggestions(false);
     setSelectedIndex(-1);
-    onSelect?.(address);
+    
+    // Call the onSelect handler with the selected address
+    if (onSelect) {
+      console.log('Calling onSelect with address:', address);
+      onSelect(address);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -120,10 +126,11 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
   const handleBlur = () => {
     // Delay hiding suggestions to allow for clicks
+    // Increased timeout to give more time for click events to register
     setTimeout(() => {
       setShowSuggestions(false);
       setSelectedIndex(-1);
-    }, 150);
+    }, 300);
   };
 
   return (
@@ -172,7 +179,12 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             {suggestions.map((address, index) => (
               <button
                 key={address.place_id}
-                onClick={() => handleSuggestionClick(address)}
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent form submission
+                  e.stopPropagation(); // Stop event bubbling
+                  handleSuggestionClick(address);
+                }}
+                type="button" // Important: prevents form submission
                 className={`w-full text-left px-3 py-3 rounded-lg transition-colors duration-150 flex items-start space-x-3 ${
                   index === selectedIndex
                     ? 'bg-blue-50 text-blue-900'

@@ -42,7 +42,7 @@ public class FraudDetectionServiceImpl implements IFraudDetectionService {
         riskFactors.add(calculatePaymentMethodRisk(payment.getPaymentMethod()));
 
         // Currency risk
-        riskFactors.add(calculateCurrencyRisk(payment.getCurrency()));
+        riskFactors.add(calculateCurrencyRisk(String.valueOf(payment.getCurrency())));
 
         // Calculate weighted average of risk factors
         return riskFactors.stream()

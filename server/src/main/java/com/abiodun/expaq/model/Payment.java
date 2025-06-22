@@ -31,9 +31,9 @@ public class Payment {
 
     @Column(nullable = false)
     private BigDecimal amount;
-
-    @Column(nullable = false)
-    private String currency;
+//
+//    @Column(nullable = false)
+//    private String currency;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -80,6 +80,19 @@ public class Payment {
         BANK_TRANSFER,
         PAYPAL,
         STRIPE,
-        WALLET
+        WALLET,
+        PAYSTACK
     }
-} 
+
+    public enum Currency {
+        NGN,    // Nigerian Naira
+        USD,    // US Dollar
+        GHS,    // Ghanaian Cedi
+        ZAR,    // South African Rand
+        KES    // Kenyan Shilling
+    }
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Currency currency = Currency.NGN;  // Default to NGN for Paystack
+}

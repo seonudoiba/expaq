@@ -128,23 +128,43 @@ export function ActivityList() {
       </div>
     );
   }
-
   if (!activities || activities.length === 0) {
     return (
-      <div className="text-center">
+      <div className="text-center py-10">
         <h3 className="mt-2 text-sm font-semibold text-gray-900">
-          No activities
+          No activities found
         </h3>
         <p className="mt-1 text-sm text-gray-500">
-          Get started by creating a new activity.
+          {isLoading 
+          ? "Loading activities..." 
+          : error 
+            ? `Error: ${(error as unknown) instanceof Error ? (error as Error).message : 'Unknown error'}` 
+            : "Try adjusting your filters or create a new activity."}
         </p>
+        
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="mt-4 p-4 border border-gray-200 bg-gray-50 rounded-md inline-block text-left">
+            <p className="font-bold text-sm mb-2">Debug Information:</p>
+            <ul className="text-xs space-y-1">
+              <li>Loading state: {isLoading ? 'true' : 'false'}</li>
+              <li>Activities array: {Array.isArray(activities) ? `Array with ${activities.length} items` : typeof activities}</li>
+              <li>Current page: {pagination.currentPage}</li>
+              <li>Total pages: {pagination.totalPages}</li>
+            </ul>
+            <button 
+              onClick={() => fetchActivities()}
+              className="mt-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Retry Fetch
+            </button>
+          </div>
+        )}
       </div>
     );
   }
   
   return (
-    <div>
-      <div className="flex justify-between items-center my-6">
+    <div>      <div className="flex justify-between items-center my-6">
         <div>
           <h2 className="text-2xl font-bold">Activities</h2>
           <p className="text-sm text-gray-600 mt-1">
@@ -158,6 +178,15 @@ export function ActivityList() {
           Clear Filters
         </button>
       </div>
+      
+      {/* Import this directly at the top of the file */}
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="mb-4">
+          <p className="text-sm font-medium p-2 bg-yellow-100 border border-yellow-300 rounded">
+            Debug mode: {activities.length} activities in state
+          </p>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {activities.map((activity) => (

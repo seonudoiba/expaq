@@ -181,9 +181,22 @@ export const activityService = {
   getById: async (id: string): Promise<Activity> => {
     const response = await apiClient.get<Activity>(`/api/activities/${id}`);
     return response.data;
-  },
-  create: async (activityData: CreateActivityRequest): Promise<Activity> => {    try {
+  },  create: async (activityData: CreateActivityRequest): Promise<Activity> => {    try {
       console.log("Creating activity with data:", activityData);
+      
+      // Verify timeSlots is an array and ensure no isAvailable field
+      if (activityData.schedule && activityData.schedule.timeSlots) {
+        console.log("timeSlots is an array:", Array.isArray(activityData.schedule.timeSlots));
+        
+        // Remove isAvailable field if it exists as it's not recognized by backend
+        activityData.schedule.timeSlots = activityData.schedule.timeSlots.map(slot => {
+          // Create a new object without the isAvailable property
+          const { isAvailable, ...slotWithoutIsAvailable } = slot as any;
+          return slotWithoutIsAvailable;
+        });
+        
+        console.log("Updated timeSlots structure:", JSON.stringify(activityData.schedule.timeSlots));
+      }
       
       // Log authentication status
       const token = localStorage.getItem('auth-storage');

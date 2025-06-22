@@ -56,10 +56,9 @@ export default function CreateActivityPage() {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [selectedCityName, setSelectedCityName] = useState<string>("");
   const [selectedCountryName, setSelectedCountryName] = useState<string>("");
-  
-  const handleAddressSelect = (address: Address) => {
-    setSelectedAddress(address);
+    const handleAddressSelect = (address: Address) => {
     console.log('Selected address:', address);
+    setSelectedAddress(address);
     
     // Update the form's address field value using setValue from react-hook-form
     setValue("address", address.display_name, { 
@@ -67,6 +66,9 @@ export default function CreateActivityPage() {
       shouldDirty: true,
       shouldTouch: true
     });
+    
+    // Debug to verify the value is being set
+    console.log('Form address value set to:', address.display_name);
   };
 
 
@@ -132,12 +134,13 @@ export default function CreateActivityPage() {
       setSelectedCountryName(countryName);
     }
   }, [watchedCountry, countries]);
-
   const onSubmit = async (data: z.infer<typeof activitySchema>) => {
     console.log("Form submitted with data:", data); // Debugging log
     setIsLoading(true);
 
     try {
+      // Validate schedule data format
+      console.log("Preparing to build activity request with timeSlots as an array");
       // Convert isFeatured to boolean
       // const isFeatured = data.isFeatured === "true";
 
@@ -196,32 +199,34 @@ export default function CreateActivityPage() {
         endDate: formattedEndDate,
         city: { id: city },
         country: { id: country },
-        activityType: { id: data.activityType },        address: address, // Use the selected address or the form address
-        // Ensure all URLs use HTTPS
-        mediaUrls: mediaUrls.map(url => url.replace(/^http:\/\//i, 'https://')), // Use the uploaded media URLs
+        activityType: { id: data.activityType },        address: address, // Use the selected address or the form address        // Ensure all URLs use HTTPS        mediaUrls: mediaUrls.map(url => url.replace(/^http:\/\//i, 'https://')), // Use the uploaded media URLs
         schedule: {
           availableDays: data.daysOfWeek,
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Get user's timezone
-          timeSlots:{
-            maxParticipants: data.maxParticipants, // Use formatted dates
-            isAvailable: data.maxParticipants > 0, // Ensure availability if max participants is set
-            endTime: data.endDate, // Use the time from the form
-            startTime: data.startDate, // Use the time from the form
-          }
+          timeSlots: [
+            {
+              maxParticipants: data.maxParticipants,
+              // isAvailable field removed as it's not recognized by backend
+              endTime: data.endDate,
+              startTime: data.startDate,
+            }
+          ]
         },
-      };      // Step 1: Create the activity      // Log debugging information
+      };
+      
+      // Step 1: Create the activity
       console.log("Current user data:", user);
       console.log("User roles:", user?.roles);
       console.log("Submitting activity data:", activityData);
-        const createdActivity = await activityService.create(activityData);
-      console.log("Activity created with ID:", createdActivity.id, "With media URLs:", mediaUrls); // Debugging log
+      const createdActivity = await activityService.create(activityData);      console.log("Activity created with ID:", createdActivity.id, "With media URLs:", mediaUrls); // Debugging log
       
       // No need to upload images separately anymore as they're already uploaded and included in mediaUrls
-
+      
       toast({
         title: "Success",
         description: "Activity created successfully",
-      });    } catch (error: unknown) {
+      });
+    } catch (error: unknown) {
       console.error("Error creating activity:", error);
       
       // Check for 401 Unauthorized error
@@ -539,15 +544,19 @@ export default function CreateActivityPage() {
                 {errors.bookedCapacity && <p className="text-red-500">{errors.bookedCapacity.message}</p>}
               </div>
             </div>            {/* Address */}
-            <div>
-              <Label htmlFor="address">Address</Label>
+            <div>              <Label htmlFor="address">Address</Label>
               <AddressAutocomplete
                 city={selectedCityName}
                 country={selectedCountryName}
                 onSelect={handleAddressSelect}
                 placeholder={`Search for addresses in ${selectedCityName || "selected city"}...`}
                 id="address"
-                {...register("address")}
+                name="address"
+                onChange={(e) => {
+                  // This is necessary to update the form value
+                  register("address").onChange(e);
+                }}
+                onBlur={register("address").onBlur}
               />
               {errors.address && <p className="text-red-500">{errors.address.message}</p>}
             </div>

@@ -11,7 +11,8 @@ import type {
  */
 
 
-export const ActivityService = {  getAll: async (params?: {
+export const ActivityService = {  
+    getAll: async (params?: {
       city?: string;
       country?: string;
       activityType?: string;
@@ -24,10 +25,26 @@ export const ActivityService = {  getAll: async (params?: {
       page?: number;
       limit?: number;
     }): Promise<PaginatedResponse<Activity>> => {
-      const response = await apiClient.get<PaginatedResponse<Activity>>('/api/activities', { params });
-      console.log('Activities response:', response.data);
-      return response.data;
-    },    getAllFeaturedActivities: async (params?: {
+      try {
+        const response = await apiClient.get<PaginatedResponse<Activity>>('/api/activities', { params });
+        console.log('Activities response:', response.data);
+        
+        // Debugging the response structure
+        if (response.data) {
+          console.log('Response has data property:', !!response.data);
+          console.log('Response has content property:', !!response.data.content);
+          if (response.data.content) {
+            console.log('Content is array:', Array.isArray(response.data.content));
+            console.log('Content length:', response.data.content.length);
+          }
+        }
+        
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+        throw error;
+      }
+    },getAllFeaturedActivities: async (params?: {
       location?: string;
       type?: string;
       minPrice?: number;

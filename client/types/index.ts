@@ -67,15 +67,20 @@ export interface Review {
 
 export interface Booking {
   id: string;
-  activity: Activity;
-  user: User;
+  activity?: Activity;            // Full activity object might be included or not
+  activityId: string;
+  activityTitle?: string;         // Direct flat field from API
+  activityImage?: string;         // Direct flat field from API
+  user?: User;
   status: BookingStatus;
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
+  date?: string;                  // Alternative date field
+  time?: string;                  // Time field separate from date
   participants: number;
   totalPrice: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | number[] | null; // API returns array format [year, month, day, hour, minute, second, nanoseconds]
+  updatedAt?: string | number[] | null;
 }
 export interface CreateBookingRequest {
   activityId: string;

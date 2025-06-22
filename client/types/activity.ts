@@ -23,12 +23,12 @@ export interface ActivityType {
 export interface Schedule {
   availableDays: string[];
   timeZone: string;
-  timeSlots: {
+  timeSlots: Array<{
     maxParticipants: number;
-    isAvailable: boolean;
     endTime: string;
     startTime: string;
-  }
+    // isAvailable field removed as it's not recognized by backend TimeSlotDTO
+  }>
 }
 
 export interface Location {

@@ -41,14 +41,14 @@ export const bookingService = {
     const response = await apiClient.post<Booking>('/api/bookings', data);
     return response.data;
   },
-  
-  getUserBookings: async (): Promise<Booking[]> => {
-    const response = await apiClient.get<Booking[]>('/api/bookings/user');
+    getUserBookings: async (): Promise<Booking[]> => {
+    const response = await apiClient.get<Booking[]>(`/api/bookings/my-bookings`);
+    console.log("API Response bookings:", response.data);
     return response.data;
   },
-  
-  getBookingById: async (bookingId: string): Promise<Booking> => {
+    getBookingById: async (bookingId: string): Promise<Booking> => {
     const response = await apiClient.get<Booking>(`/api/bookings/${bookingId}`);
+    console.log("API Response booking detail:", response.data);
     return response.data;
   },
   

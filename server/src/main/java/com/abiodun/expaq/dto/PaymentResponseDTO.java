@@ -15,5 +15,9 @@ public class PaymentResponseDTO {
     private String redirectUrl;
     private String status;
     private String message;
+    private String access_code;
     private String provider;
-} 
+    private String authorizationUrl;  // Added for Paystack redirect URL
+    private String accessCode;
+
+}

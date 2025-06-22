@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,19 +28,18 @@ public class StripePaymentProvider implements PaymentProvider {
     public String createPaymentIntent(Payment payment) throws PaymentException {
         try {
             Map<String, Object> params = new HashMap<>();
-            params.put("amount", payment.getAmount().multiply(new BigDecimal("100")).longValue()); // Convert to cents
-            params.put("currency", payment.getCurrency().toLowerCase());
-            params.put("payment_method_types", new String[]{"card"});
+            params.put("amount", payment.getAmount().multiply(new BigDecimal("100")).intValue());
+            params.put("currency", payment.getCurrency().toString().toLowerCase());
+            params.put("payment_method_types", Arrays.asList("card"));
             params.put("metadata", Map.of(
-                "bookingId", payment.getBooking().getId().toString(),
-                "userId", payment.getUser().getId().toString()
+                "booking_id", payment.getBooking().getId().toString(),
+                "user_id", payment.getUser().getId().toString()
             ));
 
             PaymentIntent intent = PaymentIntent.create(params);
             return intent.getId();
         } catch (StripeException e) {
-            log.error("Error creating Stripe payment intent", e);
-            throw new PaymentException("Failed to create payment intent", e);
+            throw new PaymentException("Failed to create payment intent: " + e.getMessage());
         }
     }
 
@@ -87,4 +87,4 @@ public class StripePaymentProvider implements PaymentProvider {
             throw new PaymentException("Failed to get payment status", e);
         }
     }
-} 
+}

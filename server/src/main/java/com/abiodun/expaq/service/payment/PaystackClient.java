@@ -1,11 +1,15 @@
 package com.abiodun.expaq.service.payment;
 
+import com.abiodun.expaq.config.PaystackConfig;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -16,44 +20,71 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class PaystackClient {
+    private final PaystackConfig paystackConfig;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${paystack.secret.key}")
-    private String secretKey;
+    @Data
+    public static class PaymentInitResponse {
+        private String reference;
+        private String authorizationUrl;
+        private String accessCode;
+    }
 
-    private static final String BASE_URL = "https://api.paystack.co";
-    private static final String INITIALIZE_PAYMENT = "/transaction/initialize";
-    private static final String VERIFY_PAYMENT = "/transaction/verify/";
-    private static final String REFUND_PAYMENT = "/refund";
-
-    public String initializePayment(String email, BigDecimal amount, String currency, Map<String, String> metadata) {
+    public PaymentInitResponse initializePayment(String email, BigDecimal amount, String currency, Map<String, String> metadata) {
         try {
-            HttpHeaders headers = createHeaders();
-            
-            Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("email", email);
-            requestBody.put("amount", amount.multiply(new BigDecimal("100")).intValue()); // Convert to kobo/cents
-            requestBody.put("currency", currency);
-            requestBody.put("metadata", metadata);
+            if (email == null || email.trim().isEmpty()) {
+                throw new RuntimeException("Email address is required");
+            }
 
-            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-            
-            ResponseEntity<Map> response = restTemplate.postForEntity(
-                BASE_URL + INITIALIZE_PAYMENT,
+            log.info("Initializing Paystack payment with email: {}, amount: {}, currency: {}",
+                    email, amount, currency);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + paystackConfig.getSecretKey());
+            headers.set("Cache-Control", "no-cache");
+
+            // Convert amount to kobo (multiply by 100)
+            int amountInKobo = amount.multiply(new BigDecimal("100")).intValue();
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("email", email);
+            body.put("amount", String.valueOf(amountInKobo));
+            body.put("currency", currency);
+            body.put("metadata", metadata);
+            body.put("callback_url", paystackConfig.getCallbackUrl());
+
+            log.debug("Request body: {}", body);
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                paystackConfig.getBaseUrl() + "/transaction/initialize",
                 request,
-                Map.class
+                String.class
             );
 
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
-                return (String) data.get("reference");
+            log.debug("Paystack response: {}", response.getBody());
+
+            JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+
+            if (!jsonResponse.get("status").asBoolean()) {
+                String errorMessage = jsonResponse.get("message").asText();
+                log.error("Paystack initialization failed: {}", errorMessage);
+                throw new RuntimeException("Failed to initialize payment: " + errorMessage);
             }
-            
-            throw new PaymentException("Failed to initialize payment");
+
+            JsonNode data = jsonResponse.get("data");
+            PaymentInitResponse initResponse = new PaymentInitResponse();
+            initResponse.setReference(data.get("reference").asText());
+            initResponse.setAuthorizationUrl(data.get("authorization_url").asText());
+            initResponse.setAccessCode(data.get("access_code").asText());
+
+            return initResponse;
         } catch (Exception e) {
-            log.error("Error initializing Paystack payment", e);
-            throw new PaymentException("Failed to initialize payment: " + e.getMessage());
+            log.error("Error initializing payment: {}", e.getMessage());
+            throw new RuntimeException("Error initializing payment: " + e.getMessage(), e);
         }
     }
 
@@ -62,60 +93,50 @@ public class PaystackClient {
             HttpHeaders headers = createHeaders();
             HttpEntity<?> request = new HttpEntity<>(headers);
 
-            ResponseEntity<Map> response = restTemplate.exchange(
-                BASE_URL + VERIFY_PAYMENT + reference,
-                HttpMethod.GET,
-                request,
-                Map.class
+            ResponseEntity<String> response = restTemplate.getForEntity(
+                paystackConfig.getBaseUrl() + "/transaction/verify/" + reference,
+                String.class,
+                request
             );
 
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
-                String status = (String) data.get("status");
-                
-                if (!"success".equals(status)) {
-                    throw new PaymentException("Payment verification failed: " + status);
-                }
-            } else {
-                throw new PaymentException("Failed to verify payment");
+            JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+            if (!jsonResponse.get("status").asBoolean() ||
+                !jsonResponse.get("data").get("status").asText().equals("success")) {
+                throw new RuntimeException("Payment verification failed");
             }
         } catch (Exception e) {
-            log.error("Error verifying Paystack payment", e);
-            throw new PaymentException("Failed to verify payment: " + e.getMessage());
+            throw new RuntimeException("Error verifying payment: " + e.getMessage(), e);
         }
     }
 
-    public void refundPayment(String transactionId, BigDecimal amount) {
+    public void refundPayment(String reference, BigDecimal amount) {
         try {
             HttpHeaders headers = createHeaders();
             
-            Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("transaction", transactionId);
-            if (amount != null) {
-                requestBody.put("amount", amount.multiply(new BigDecimal("100")).intValue());
-            }
+            Map<String, Object> body = new HashMap<>();
+            body.put("transaction", reference);
+            body.put("amount", amount.multiply(new BigDecimal("100")).intValue()); // Convert to kobo
 
-            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-            
-            ResponseEntity<Map> response = restTemplate.postForEntity(
-                BASE_URL + REFUND_PAYMENT,
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                paystackConfig.getBaseUrl() + "/refund",
                 request,
-                Map.class
+                String.class
             );
 
-            if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
-                throw new PaymentException("Failed to process refund");
+            JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+            if (!jsonResponse.get("status").asBoolean()) {
+                throw new RuntimeException("Refund failed: " + jsonResponse.get("message").asText());
             }
         } catch (Exception e) {
-            log.error("Error processing Paystack refund", e);
-            throw new PaymentException("Failed to process refund: " + e.getMessage());
+            throw new RuntimeException("Error processing refund: " + e.getMessage(), e);
         }
     }
 
     private HttpHeaders createHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + secretKey);
+        headers.set("Authorization", "Bearer " + paystackConfig.getSecretKey());
         return headers;
     }
-} 
+}
