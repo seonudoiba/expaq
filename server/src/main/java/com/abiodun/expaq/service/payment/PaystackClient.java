@@ -1,6 +1,7 @@
 package com.abiodun.expaq.service.payment;
 
 import com.abiodun.expaq.config.PaystackConfig;
+import com.abiodun.expaq.service.impl.CurrencyConversionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
@@ -13,6 +14,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ public class PaystackClient {
     private final PaystackConfig paystackConfig;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final CurrencyConversionService currencyConversionService;
 
     @Data
     public static class PaymentInitResponse {
@@ -31,14 +34,15 @@ public class PaystackClient {
         private String accessCode;
     }
 
-    public PaymentInitResponse initializePayment(String email, BigDecimal amount, String currency, Map<String, String> metadata) {
+    public PaymentInitResponse initializePayment(String email, BigDecimal amountInUSD, String currency, Map<String, String> metadata) {
         try {
             if (email == null || email.trim().isEmpty()) {
                 throw new RuntimeException("Email address is required");
             }
 
-            log.info("Initializing Paystack payment with email: {}, amount: {}, currency: {}",
-                    email, amount, currency);
+            // Convert USD to NGN
+            BigDecimal amountInNGN = currencyConversionService.convertUSDToNGN(amountInUSD);
+            log.info("Converting {} USD to {} NGN for payment", amountInUSD, amountInNGN);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -46,14 +50,21 @@ public class PaystackClient {
             headers.set("Cache-Control", "no-cache");
 
             // Convert amount to kobo (multiply by 100)
-            int amountInKobo = amount.multiply(new BigDecimal("100")).intValue();
+            int amountInKobo = amountInNGN.multiply(new BigDecimal("100")).intValue();
 
             Map<String, Object> body = new HashMap<>();
             body.put("email", email);
             body.put("amount", String.valueOf(amountInKobo));
-            body.put("currency", currency);
+            body.put("currency", "NGN"); // Force NGN as currency
             body.put("metadata", metadata);
             body.put("callback_url", paystackConfig.getCallbackUrl());
+
+            // Add original USD amount to metadata for reference
+            if (metadata == null) {
+                metadata = new HashMap<>();
+            }
+            metadata.put("original_amount_usd", amountInUSD.toString());
+            metadata.put("exchange_rate_ngn", amountInNGN.divide(amountInUSD, 2, RoundingMode.HALF_UP).toString());
 
             log.debug("Request body: {}", body);
 

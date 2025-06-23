@@ -13,12 +13,27 @@ import {
   MapPin,
   Receipt,
   CreditCard,
+  Star,
 } from "lucide-react";
 import { formatBookingDate } from "@/lib/utils/date-utils";
 import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
-import { getSafeActivityImage, getSafeActivityTitle, getSafeParticipants, getSafeTime } from "@/lib/utils/booking-utils";
+import {
+  getSafeActivityImage,
+  getSafeActivityTitle,
+  getSafeParticipants,
+  getSafeTime,
+  isBookingCompleted,
+} from "@/lib/utils/booking-utils";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import ReviewForm from "@/components/bookings/ReviewForm";
 
 interface BookingDetailsProps {
   bookingId: string;
@@ -50,23 +65,8 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
   const { data: booking, isLoading, error } = useBookingDetails(bookingId);
   const { mutate: initiatePayment, isPending: isPaymentLoading } =
     useInitiatePayment();
-  // const {
-  //   data: booking,
-  //   error,
-  //   isLoading,
-  // } = useQuery({
-  //   queryKey: ["booking", bookingId],
-  //   queryFn: () => bookingService.getBookingById(bookingId),
-  // });
-
-  // const {
-  //   data: payment,
-  //   error: paymentError,
-  //   isLoading: isPaymentLoading,
-  // } = useQuery({
-  //   queryKey: ["payment", bookingId],
-  //   queryFn: () => PaymentService.getPaymentByBookingId(bookingId),
-  // });
+  // Add state for review dialog
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
 
   if (isLoading) {
     return <BookingDetailsSkeleton />;
@@ -89,7 +89,7 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
   const handlePayment = () => {
     // Default to PAYSTACK as the payment method
     initiatePayment(bookingId);
-    
+
     // Show a loading toast while payment is being initiated
     toast({
       title: "Initiating Payment",
@@ -97,10 +97,33 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
     });
   };
 
+  // Handle review submission success
+  const handleReviewSuccess = () => {
+    setIsReviewDialogOpen(false);
+    toast({
+      title: "Review Submitted",
+      description: "Thank you for your feedback!",
+    });
+  }; // Additional helper for status check
+  const isCompleted = (
+    booking: { status?: string } | null | undefined
+  ): boolean => {
+    // Direct string comparison
+    if (booking && booking.status === "COMPLETED") {
+      return true;
+    }
+
+    // We know the utility function can handle this type
+    // but TypeScript doesn't, so we'll cast it
+    return isBookingCompleted(booking as unknown as import("@/types").Booking);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "CONFIRMED":
         return "bg-green-500";
+      case "COMPLETED":
+        return "bg-green-600"; // Darker green for completed bookings
       case "PENDING":
         return "bg-yellow-500";
       case "CANCELLED":
@@ -123,7 +146,8 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
 
       <Card className="p-6">
         <div className="space-y-6">
-          <div className="flex gap-6">            <div className="w-96 h-64 relative rounded-lg overflow-hidden">
+          <div className="flex gap-6">
+            <div className="w-96 h-64 relative rounded-lg overflow-hidden">
               <Image
                 src={getSafeActivityImage(booking)}
                 alt={getSafeActivityTitle(booking)}
@@ -136,9 +160,12 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
                 {getSafeActivityTitle(booking)}
               </h2>
 
-              <div className="grid grid-cols-2 gap-4">                <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-gray-500" />
-                  <span>{formatBookingDate(booking.date || booking.startDate)}</span>
+                  <span>
+                    {formatBookingDate(booking.date || booking.startDate)}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-gray-500" />
@@ -163,8 +190,8 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
                 <div className="flex items-center gap-2">
                   <Receipt className="w-5 h-5 text-gray-500" />
                   <span>
-                    Activity Price ({booking.participants} × $
-                    {booking.totalPrice / booking.participants})
+                    Activity Price ({booking.numberOfGuests} × $
+                    {booking.totalPrice / booking.numberOfGuests})
                   </span>
                 </div>
                 <span>${booking.totalPrice}</span>
@@ -202,9 +229,8 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
                   )}
                 </Button>
               </div>
-            )}
-
-            {booking.status === "COMPLETED" && (
+            )}{" "}
+            {isCompleted(booking) && (
               <div className="bg-green-50 p-4 rounded-lg">
                 <div className="flex items-center gap-2 text-green-700">
                   <Badge className="bg-green-500">Paid</Badge>
@@ -215,6 +241,47 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
           </div>
         </div>
       </Card>
+      {/* Reviews Section */}
+      <Card className="p-6">
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-semibold">Reviews</h3> {/* Debug info */}
+          {/* <div className="text-xs text-gray-500">
+            Status: "{booking.status}" | isCompleted helper:{" "}
+            {isCompleted(booking) ? "true" : "false"} | isBookingCompleted:{" "}
+            {isBookingCompleted(booking) ? "true" : "false"} | Direct check:{" "}
+            {booking.status === "COMPLETED" ? "true" : "false"}
+          </div> */}
+          {isCompleted(booking) && (
+            <Button
+              variant="outline"
+              onClick={() => setIsReviewDialogOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Star className="w-4 h-4" />
+              Leave a Review
+            </Button>
+          )}
+        </div>
+        <div className="mt-4">
+          {/* Placeholder for reviews - will be populated from API once reviews are implemented */}
+          <p className="text-gray-500 text-center py-4">
+            No reviews yet. Be the first to leave a review!
+          </p>
+        </div>
+      </Card>
+      {/* Leave a Review Dialog */}
+      <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-semibold">
+              Review Your Experience
+            </DialogTitle>
+          </DialogHeader>
+          {booking && (
+            <ReviewForm booking={booking} onSuccess={handleReviewSuccess} />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

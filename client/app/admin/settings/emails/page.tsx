@@ -64,7 +64,7 @@ Booking Details:
 - Date: {{booking.date}}
 - Time: {{booking.time}}
 - Host: {{host.name}}
-- Participants: {{booking.participants}}
+- Participants: {{booking.numberOfGuests}}
 - Location: {{activity.location}}
 
 Please arrive 10 minutes before the scheduled start time. If you need to contact your host, you can reach them at {{host.email}}.
@@ -185,7 +185,7 @@ const emailVariables = {
     { name: "booking.id", description: "Booking reference ID" },
     { name: "booking.date", description: "Booking date" },
     { name: "booking.time", description: "Booking time" },
-    { name: "booking.participants", description: "Number of participants" },
+    { name: "booking.numberOfGuests", description: "Number of participants" },
     { name: "booking.price", description: "Total booking price" },
   ],
   activity: [
@@ -252,7 +252,7 @@ export default function EmailTemplatesPage() {
     "booking.id": "BK-789012",
     "booking.date": "January 15, 2024",
     "booking.time": "2:00 PM",
-    "booking.participants": "2",
+    "booking.numberOfGuests": "2",
     "booking.price": "$125.00",
     "activity.title": "Italian Pasta Making Masterclass",
     "activity.location": "123 Cuisine Ave, San Francisco",

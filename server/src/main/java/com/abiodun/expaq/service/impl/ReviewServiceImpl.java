@@ -131,7 +131,7 @@ public class ReviewServiceImpl implements IReviewService {
 
     @Override
     public ReviewPageResponse getReviewsByActivityId(UUID activityId, Pageable pageable) {
-        Page<Review> reviewPage = (Page<Review>) reviewRepository.findByActivityId(activityId, pageable);
+        Page<Review> reviewPage = reviewRepository.findLatestByActivityId(activityId, pageable);
         List<ReviewResponse> reviews = reviewPage.getContent().stream()
                 .map(reviewMapper::toReviewResponse)
                 .collect(Collectors.toList());
@@ -154,10 +154,15 @@ public class ReviewServiceImpl implements IReviewService {
         return new ReviewPageResponse(
                 reviews,
                 reviewPage.getNumber(),
-                reviewPage.getTotalPages(),
-                reviewPage.getTotalElements(),
                 reviewPage.getSize(),
+                reviewPage.getTotalElements(),
+                reviewPage.getTotalPages(),
                 statistics
+
+//                reviewPage.isFirst(),
+//                reviewPage.isLast(),
+//                reviewPage.hasNext(),
+//                reviewPage.hasPrevious()
         );
     }
 

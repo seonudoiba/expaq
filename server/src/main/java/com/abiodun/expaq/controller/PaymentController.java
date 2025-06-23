@@ -4,8 +4,10 @@ import com.abiodun.expaq.dto.PaymentDTO;
 import com.abiodun.expaq.dto.PaymentResponseDTO;
 import com.abiodun.expaq.dto.PaymentInitializeRequest;
 import com.abiodun.expaq.exception.UnauthorizedException;
+import com.abiodun.expaq.model.Payment;
 import com.abiodun.expaq.model.Payment.PaymentStatus;
 import com.abiodun.expaq.model.ExpaqUserDetails;
+import com.abiodun.expaq.repository.PaymentRepository;
 import com.abiodun.expaq.service.IPaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ import static com.abiodun.expaq.dto.PaymentResponseDTO.*;
 public class PaymentController {
 
     private final IPaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     @PostMapping("/initialize")
     @PreAuthorize("isAuthenticated()")
@@ -159,6 +162,28 @@ public class PaymentController {
         }
     }
 
+    @GetMapping("/verify")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<?> verifyPayment(
+            @RequestParam("reference") String reference,
+            @RequestParam("trxref") String trxref,
+            jakarta.servlet.http.HttpServletRequest request) {
+        try {
+            log.info("Verifying payment with reference: {}, trxref: {}", reference, trxref);
+            PaymentDTO payment = paymentService.updatePaymentStatus(
+                    fromPaymentProviderReference(reference),
+                PaymentStatus.COMPLETED,
+                trxref
+            );
+            return ResponseEntity.ok(payment);
+        } catch (Exception e) {
+            log.error("Error verifying payment with reference: {}, trxref: {}", reference, trxref, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ErrorResponse.builder(e, HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI())
+                            .build());
+        }
+    }
+
     private UUID getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof ExpaqUserDetails) {
@@ -166,5 +191,14 @@ public class PaymentController {
             return userDetails.getId();
         }
         throw new UnauthorizedException("User not authenticated");
+    }
+    private UUID fromPaymentProviderReference(String reference) {
+        try {
+            Payment payment = paymentRepository.findByPaymentProviderReference(reference);
+            return payment.getId();
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid payment reference format: {}", reference, e);
+            throw new IllegalArgumentException("Invalid payment reference format");
+        }
     }
 }

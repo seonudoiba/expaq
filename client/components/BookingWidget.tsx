@@ -139,7 +139,7 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
             <span className="text-xl font-bold">${activity.price}</span>
             <span className="text-gray-600 ml-1">/ person</span>
           </div>
-          <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-full">
+          <div className="flex items-center text-lg gap-1 bg-gray-50 px-2 py-1 rounded-full">
             <Star className="w-4 h-4 fill-current text-yellow-500" />
             <span className="font-medium">{activity.rating}</span>
             <span className="text-gray-500">({activity.reviews} reviews)</span>
@@ -231,8 +231,8 @@ const BookingWidget = ({ activity }: BookingWidgetProps) => {
                 (num) => (
                   <SelectItem key={num} value={num.toString()} className="hover:bg-blue-50">
                     <div className="flex items-center justify-between w-full">
-                      <span>{num} {num === 1 ? 'guest' : 'guests'}</span>
-                      <span className="text-gray-500">${activity.price * num}</span>
+                      <span>{num} {num === 1 ? 'guest' + " " : 'guests' +" "} </span>
+                      <span className="text-gray-500 pl-1">equals ${(activity.price * num).toFixed(2)}</span>
                     </div>
                   </SelectItem>
                 )

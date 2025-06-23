@@ -39,7 +39,7 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
 
   // Safely get participant count
   const participants =
-    typeof booking.participants === "number" ? booking.participants : 0;
+    typeof booking.numberOfGuests === "number" ? booking.numberOfGuests : 0;
 
   // Safely handle price display
   const price =

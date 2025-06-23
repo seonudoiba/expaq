@@ -1,19 +1,18 @@
-import { Activity, ActivityType } from '@/types/activity';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Activity, ActivityType, CreateActivityRequest, UpdateActivityRequest } from '@/types/activity';
 import { apiClient } from '@/lib/api/client';
 import type {
   AuthResponse,
   BecomeHostRequest,
-  CreateActivityRequest,
-  UpdateActivityRequest,
   CreateReviewRequest,
   LoginRequest,
   RegisterRequest,
   PaginatedResponse,
-  Review,
   User,  PaginatedUsersResponse,
   Booking,
   CreateBookingRequest,
 } from '@/types';
+import { Review } from '@/types/review';
 
 // Add an interceptor to include auth details with every request
 apiClient.interceptors.request.use((config) => {
@@ -189,8 +188,9 @@ export const activityService = {
         console.log("timeSlots is an array:", Array.isArray(activityData.schedule.timeSlots));
         
         // Remove isAvailable field if it exists as it's not recognized by backend
-        activityData.schedule.timeSlots = activityData.schedule.timeSlots.map(slot => {
+        activityData.schedule.timeSlots = activityData.schedule.timeSlots.map((slot: any) => {
           // Create a new object without the isAvailable property
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { isAvailable, ...slotWithoutIsAvailable } = slot as any;
           return slotWithoutIsAvailable;
         });
@@ -249,14 +249,27 @@ export const activityTypeService = {
 };
 
 // Review Services
+import { ActivityReviewsResponse } from '@/types/reviews';
+
 export const reviewService = {
   create: async (data: CreateReviewRequest): Promise<Review> => {
-    const response = await apiClient.post<Review>('/api/v1/reviews', data);
+    const response = await apiClient.post<Review>('/api/reviews', data);
     return response.data;
   },
 
   update: async (id: string, data: Partial<CreateReviewRequest>): Promise<Review> => {
-    const response = await apiClient.put<Review>(`/api/v1/reviews/${id}`, data);
+    const response = await apiClient.put<Review>(`/api/reviews/${id}`, data);
+    return response.data;
+  },
+  
+  getActivityReviews: async (
+    activityId: string, 
+    page: number = 0, 
+    size: number = 10
+  ): Promise<ActivityReviewsResponse> => {
+    const response = await apiClient.get<ActivityReviewsResponse>(
+      `/api/reviews/activity/${activityId}?page=${page}&size=${size}`
+    );
     return response.data;
   },
 };

@@ -52,6 +52,14 @@ public class SecurityConfig {
             "/api/activity-types/**",
             "/api/auth/users-by-role",
             "/api/auth/users-by-role/**",
+            "/api/activities/search",
+            "/api/activities/search/**",
+            "/api/activities/featured",
+            "/api/activities/featured/**",
+            "/api/activities/recommended",
+            "/api/activities/recommended/**",
+            "/api/payments/verify",
+            "/api/payments/verify/**",
 
     };
 

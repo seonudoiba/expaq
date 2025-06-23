@@ -1,5 +1,6 @@
 import { Activity } from "./activity";
 import { PaymentAnalytics } from "./payments";
+import { Review } from "./review";
 
 export interface User {
   id: string;
@@ -55,7 +56,8 @@ export interface Country {
   activityCount: number;
 }
 
-export interface Review {
+// Review interface has been consolidated into the types/review.ts file
+export interface OldReview {
   id: string;
   content: string;
   rating: number;
@@ -72,15 +74,25 @@ export interface Booking {
   activityTitle?: string;         // Direct flat field from API
   activityImage?: string;         // Direct flat field from API
   user?: User;
+  userId: string;
+  userName?: string;
+  userEmail?: string;    
+  numberOfGuests: number;         // Number of guests
+  participants?: number;          // Legacy field, equivalent to numberOfGuests
   status: BookingStatus;
-  startDate?: string;
-  endDate?: string;
+  startTime?: string;
+  endTime?: string;
   date?: string;                  // Alternative date field
   time?: string;                  // Time field separate from date
-  participants: number;
+  startDate?: string;             // Used in some API responses
+  endDate?: string;               // Used in some API responses
   totalPrice: number;
+  specialRequests?: string | null; // Optional field for special requests
+  cancellationReason?: string | null; // Optional field for cancellation reason
+  cancelledAt?: string | null;     // Optional field for cancellation date
+  reviews?: Review[];             // Reviews for this booking
   createdAt: string | number[] | null; // API returns array format [year, month, day, hour, minute, second, nanoseconds]
-  updatedAt?: string | number[] | null;
+  updatedAt: string | number[] | null;
 }
 export interface CreateBookingRequest {
   activityId: string;
@@ -95,6 +107,8 @@ export enum BookingStatus {
   CANCELLED = "CANCELLED",
   COMPLETED = "COMPLETED",
 }
+
+// Review interface has been moved to types/review.ts
 
 export interface Message {
   id: string;
@@ -161,75 +175,9 @@ export interface becomeHostRequest {
   bio: string;
 }
 
-// export interface CreateActivityRequest {
-//   title: string;
-//   description: string;
-//   price: number;
-//   latitude: number;
-//   longitude: number;
-//   startDate: string;
-//   endDate: string;
-//   schedule: {
-//     startDate: string;
-//     endDate: string;
-//     startTime: string;
-//     daysOfWeek: string[];
-//   };
-//   maxParticipants: number;
-//   // capacity: number;
-//   bookedCapacity: number;
-//   address: string;
-//   // isFeatured: boolean;
-//   city: {
-//     id: string;
-//   };
-//   country: {
-//     id: string;
-//   };
-//   activityType: {
-//     id: string;
-//   };
-//   minParticipants: number;
-//   durationMinutes: number;
-//   mediaUrls: string[];
-// }
-// export interface UpdateActivityRequest {
-//   title: string;
-//   description: string;
-//   price: number;
-//   latitude: number;
-//   longitude: number;
-//   schedule: {
-//     startDate: string;
-//     endDate: string;
-//     startTime: string;
-//     daysOfWeek: string[];
-//   };
-//   maxParticipants: number;
-//   capacity: number;
-//   bookedCapacity: number;
-//   address: string;
-//   isFeatured: boolean;
-//   city: {
-//     id: string;
-//   };
-//   country: {
-//     id: string;
-//   };
-//   activityType: {
-//     id: string;
-//   };
-//   minParticipants: number;
-//   durationMinutes: number;
-//   isActive: boolean;
-//   isVerified: boolean;
-//   mediaUrls: string[];
-//   locationPoint: string;
-//   startDate: string;
-//   endDate: string;
-// }
-
 export interface CreateReviewRequest {
+  bookingId: string;
+  photos?: string; // Optional photo URLs (comma-separated or JSON string)
   activityId: string;
   rating: number;
   comment: string;
@@ -243,19 +191,7 @@ export interface PaginatedUsersResponse {
   totalPages: number;
   content: UserProfile[];
 }
-export interface Booking {
-  id: string;
-  activityId: string;
-  activity: Activity;
-  userId: string;
-  user: User;
-  date: string;
-  time: string;
-  participants: number;
-  totalPrice: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// This Booking interface has been consolidated with the one above
 
 export interface BookingWidgetProps {
   activity: {
@@ -270,17 +206,7 @@ export interface BookingWidgetProps {
   };
 }
 
-export interface Review {
-  id: string;
-  activityId: string;
-  activity: Activity;
-  userId: string;
-  user: User;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// This Review interface has been consolidated with the one above
 
 export interface PaginatedResponse<T> {
   content: T[];

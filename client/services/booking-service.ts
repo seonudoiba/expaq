@@ -23,28 +23,6 @@ export interface PaymentResponse {
 
 export const bookingService = {
   createBooking: async (data: CreateBookingRequest): Promise<Booking> => {
-    // const { activityId, date, time, numberOfGuests } = data;
-    
-    // // Convert the date and time to a full datetime string
-    // const startTime = new Date(`${date} ${time}`);
-    
-    // // Calculate end time (assuming end time is based on activity duration)
-    // // For now, we'll just add 2 hours as a default
-    // const endTime = new Date(startTime);
-    // endTime.setHours(endTime.getHours() + 2);
-    
-    // // Format the dates as required by the API
-    // const formattedStartTime = startTime.toISOString().slice(0, 19).replace('T', ' ');
-    // const formattedEndTime = endTime.toISOString().slice(0, 19).replace('T', ' ');
-    
-    // // Prepare the request body according to the API expectations
-    // const requestBody = {
-    //   activityId,
-    //   startTime: formattedStartTime,
-    //   endTime: formattedEndTime,
-    //   numberOfGuests: numberOfGuests.toString()
-    // };
-    
     const response = await apiClient.post<Booking>('/api/bookings', data);
     return response.data;
   },
@@ -73,31 +51,19 @@ export const bookingService = {
     // Log the response for debugging
     console.log("Payment initiation response:", response.data);
     
-    // For consistency with the useInitiatePayment hook that expects a paymentUrl
-    // Map authorizationUrl to paymentUrl if it exists
     const responseData = response.data;
     if (responseData.authorizationUrl && !responseData.paymentUrl) {
       responseData.paymentUrl = responseData.authorizationUrl;
     }
     return responseData;
+  },  verifyPayment: async (paymentId: string): Promise<PaymentResponse> => {
+    const response = await apiClient.put<PaymentResponse>(`/api/payments/${paymentId}/status?status=COMPLETED`);
+    console.log("Payment verification response:", response.data);
+    return response.data;
+  },
+  verifyPaystackPayment: async (trxref: string, reference: string): Promise<PaymentResponse> => {
+    const response = await apiClient.get<PaymentResponse>(`/api/payments/verify?trxref=${trxref}&reference=${reference}`);
+    console.log("Paystack verification response:", response.data);
+    return response.data;
   }
-  // //   return responseData;
-  //  initiatePayment: async (bookingId: string, paymentMethod: string = 'PAYSTACK'): Promise<PaymentResponse> => {
-  //   // Based on the error, the server expects bookingId as a query parameter
-  //   const response = await apiClient.get<PaymentResponse>(
-  //     `/api/payments/initialize?bookingId=${bookingId}&paymentMethod=${paymentMethod}`
-  //   );
-    
-  //   // Log the response for debugging
-  //   console.log("Payment initiation response:", response.data);
-    
-  //   // For consistency with the useInitiatePayment hook that expects a paymentUrl
-  //   // Map authorizationUrl to paymentUrl if it exists
-  //   const responseData = response.data;
-  //   if (responseData.authorizationUrl && !responseData.paymentUrl) {
-  //     responseData.paymentUrl = responseData.authorizationUrl;
-  //   }
-    
-  //   return responseData;
-  // },
 };

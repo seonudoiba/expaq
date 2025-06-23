@@ -1,4 +1,5 @@
 import { Booking, BookingStatus } from "@/types";
+import { Review } from "@/types/review";
 import { format, isValid } from "date-fns";
 
 /**
@@ -80,7 +81,7 @@ export const getSafeActivityTitle = (booking: Booking): string => {
  * @returns Number of participants
  */
 export const getSafeParticipants = (booking: Booking): number => {
-  return typeof booking.participants === 'number' ? booking.participants : 0;
+  return typeof booking.numberOfGuests === 'number' ? booking.numberOfGuests : 0;
 };
 
 /**
@@ -115,15 +116,134 @@ export const normalizeBooking = (booking: Partial<Booking>): Booking => {
     activityTitle: getSafeActivityTitle(booking as Booking),
     activityImage: getSafeActivityImage(booking as Booking),
     status: booking.status || ('pending' as BookingStatus),
-    participants: getSafeParticipants(booking as Booking),
+    numberOfGuests: booking.numberOfGuests ?? 0,
     totalPrice: typeof booking.totalPrice === 'number' ? booking.totalPrice : 0,
     createdAt: booking.createdAt || null,
+    updatedAt: booking.updatedAt || null,
     activity: booking.activity,
-    startDate: booking.startDate,
-    endDate: booking.endDate,
-    date: booking.date,
-    time: booking.time,
+    startDate: booking.startDate || undefined,
+    endDate: booking.endDate || undefined,
+    date: booking.date || undefined,
+    time: booking.time || undefined,
     userId: booking.userId || '',
     user: booking.user
   };
+};
+
+/**
+ * Interface for review submission request
+ */
+export interface CreateReviewRequest {
+  bookingId: string;
+  activityId: string;
+  comment: string;
+  rating: number;
+  photos?: string;  // Optional photo URLs (comma-separated or JSON string)
+}
+
+/**
+ * Type for review response
+ */
+export type ReviewResponse = Review;
+
+// /**
+//  * Submit a review for a booking
+//  * @param reviewData Review data including booking ID, activity ID, comment, and rating
+//  * @param booking The booking object to validate completion status
+//  * @param apiBaseUrl Optional base URL for the API
+//  * @returns Promise that resolves to the created review
+//  */
+// export const submitBookingReview = async (
+//   reviewData: CreateReviewRequest,
+//   booking: Booking | null,
+//   apiBaseUrl = '/api'
+// ): Promise<ReviewResponse> => {
+//   try {
+//     // Validate input
+//     if (!reviewData.bookingId) {
+//       throw new Error('Booking ID is required');
+//     }
+//     if (!reviewData.activityId) {
+//       throw new Error('Activity ID is required');
+//     }
+//     if (!reviewData.rating || reviewData.rating < 1 || reviewData.rating > 5) {
+//       throw new Error('Rating must be between 1 and 5');
+//     }
+    
+//     // Validate that the booking is completed
+//     if (!booking || !isBookingCompleted(booking)) {
+//       throw new Error('Only completed bookings can be reviewed');
+//     }
+    
+//     // Ensure the booking ID from the request matches the booking provided
+//     if (booking.id !== reviewData.bookingId) {
+//       throw new Error('Booking ID mismatch');
+//     }
+    
+//     // Prepare request payload
+//     const payload = {
+//       bookingId: reviewData.bookingId,
+//       activityId: reviewData.activityId,
+//       comment: reviewData.comment || '', // Ensure comment is not undefined
+//       rating: reviewData.rating,
+//       photos: reviewData.photos || ''  // Include photos if provided
+//     };    // Send POST request to the API
+//     const response = await fetch(`${apiBaseUrl}/reviews`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${localStorage.getItem('token')}` // Add the JWT token
+//       },
+//       body: JSON.stringify(payload),
+//       credentials: 'include' // Include cookies for authentication
+//     });
+
+//     // Check if response is ok
+//     if (!response.ok) {
+//       const errorData = await response.json().catch(() => ({}));
+//       throw new Error(errorData.message || `Failed to submit review: ${response.status} ${response.statusText}`);
+//     }
+
+//     // Return the created review
+//     return await response.json();
+//   } catch (error) {
+//     console.error('Error submitting review:', error);
+//     throw error;
+//   }
+// };
+
+/**
+ * Checks if a booking has a completed status
+ * @param booking The booking to check
+ * @returns True if the booking is completed, false otherwise
+ */
+export const isBookingCompleted = (booking: Booking | null): boolean => {
+  // Handle null/undefined booking
+  if (!booking) {
+    console.log("isBookingCompleted: booking is null or undefined");
+    return false;
+  }
+  
+  // Log the status for debugging
+  console.log("isBookingCompleted: checking booking status", {
+    status: booking.status,
+    statusType: typeof booking.status,
+    isString: typeof booking.status === 'string',
+    upperCase: typeof booking.status === 'string' ? booking.status.toUpperCase() : 'N/A',
+    directCheck: booking.status === "COMPLETED",
+    enumCheck: booking.status === BookingStatus.COMPLETED
+  });
+  
+  // Direct string comparison
+  if (booking.status === "COMPLETED") {
+    return true;
+  }
+  
+  // Handle string representations with case insensitivity
+  if (typeof booking.status === 'string') {
+    return booking.status.toUpperCase() === 'COMPLETED';
+  }
+  
+  // Handle enum representation
+  return booking.status === BookingStatus.COMPLETED;
 };

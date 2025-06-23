@@ -39,6 +39,9 @@ export interface Location {
 }
 
 export interface Activity {
+  [x: string]: any;
+  [x: string]: any;
+  [x: string]: ReactNode;
   id: string;
   hostId: string;
   hostName: string;

@@ -54,4 +54,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             @Param("userId") UUID userId,
             @Param("status") PaymentStatus status
     );
-} 
+
+    Payment findByPaymentProviderReference(String paymentProviderReference);
+}
