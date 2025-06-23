@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image";
-import { Compass, Facebook, Instagram, Twitter } from "lucide-react"
+import { Facebook, Instagram, Twitter } from "lucide-react"
 
 export function Footer() {
   return (

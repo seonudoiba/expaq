@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useState, useTransition } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
@@ -31,7 +32,7 @@ export function NavigationLink({
   onClick,
   ...props
 }: NavigationLinkProps) {
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -90,12 +91,10 @@ export function NavigationButton({
   children,
   className,
   showLoadingIcon = true,
-  prefetch,
-  replace,
   scroll,
   ...props
 }: NavigationButtonProps) {
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 

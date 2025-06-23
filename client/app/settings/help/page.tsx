@@ -118,6 +118,7 @@ export default function HelpSupportPage() {
         subject: "",
         message: ""
       });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         variant: "destructive",

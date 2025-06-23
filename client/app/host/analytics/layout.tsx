@@ -7,8 +7,6 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store/auth";
 import { 
   BarChart3, 
-  LineChart, 
-  PieChart, 
   CalendarDays, 
   Star, 
   Users, 

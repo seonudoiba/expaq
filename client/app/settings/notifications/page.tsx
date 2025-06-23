@@ -4,11 +4,8 @@ import { useState } from "react";
 import { useAuthStore } from "@/lib/store/auth";
 import { useToast } from "@/components/ui/use-toast";
 import { 
-  Bell, 
   Mail, 
-  MessageSquare, 
-  Calendar, 
-  AlertCircle, 
+  
   Smartphone,
   Loader2
 } from "lucide-react";
@@ -96,6 +93,7 @@ export default function NotificationSettings() {
         title: "Preferences updated",
         description: "Your notification preferences have been saved.",
       });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         variant: "destructive",
@@ -134,7 +132,7 @@ export default function NotificationSettings() {
           <Card>
             <CardHeader>
               <CardTitle>Email Notifications</CardTitle>
-              <CardDescription>Control which emails you'd like to receive</CardDescription>
+              <CardDescription>Control which emails you&apos;d like to receive</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -182,7 +180,7 @@ export default function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="activity-updates">Activity updates</Label>
-                  <p className="text-sm text-muted-foreground">Changes or updates to activities you've booked</p>
+                  <p className="text-sm text-muted-foreground">Changes or updates to activities you&apos;ve booked</p>
                 </div>
                 <Switch 
                   id="activity-updates" 
@@ -284,7 +282,7 @@ export default function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="push-activity-updates">Activity updates</Label>
-                  <p className="text-sm text-muted-foreground">Changes or updates to activities you've booked</p>
+                  <p className="text-sm text-muted-foreground">Changes or updates to activities you&apos;ve booked</p>
                 </div>
                 <Switch 
                   id="push-activity-updates" 

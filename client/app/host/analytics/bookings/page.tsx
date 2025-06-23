@@ -6,15 +6,12 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   Calendar,
-  Clock,
   Users,
-  CalendarDays,
   CheckCircle,
   XCircle,
   Filter,
   Download
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,11 +29,9 @@ import {
 } from "@/components/ui/select";
 import {
   ResponsiveContainer,
-  AreaChart,
-  Area,
+
   BarChart,
   Bar,
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -185,7 +180,7 @@ export default function BookingAnalytics() {
   const { user } = useAuthStore();
   const [timeRange, setTimeRange] = useState("90days");
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
+  const [stats,] = useState({
     totalBookings: 152,
     bookingsChange: 14.7,
     completionRate: 92,

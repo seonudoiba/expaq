@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   User, CreditCard, Settings, Bell, Shield, 
-  HelpCircle, Trash2, LogOut, UserCircle,
+  HelpCircle, Trash2, LogOut,
   Check, Camera, ArrowLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";

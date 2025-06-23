@@ -5,9 +5,7 @@ import { useAuthStore } from "@/lib/store/auth";
 import { useToast } from "@/components/ui/use-toast";
 import { 
   Shield, 
-  Lock, 
   Key, 
-  Smartphone, 
   Loader2, 
   EyeOff, 
   Globe,
@@ -27,13 +25,6 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -70,7 +61,7 @@ export default function PrivacySettings() {
   const [verificationCode, setVerificationCode] = useState("");
 
   // Login history state
-  const [loginHistory, setLoginHistory] = useState([
+  const [loginHistory, ] = useState([
     {
       id: "login_1",
       device: "Chrome on Windows",
@@ -126,6 +117,7 @@ export default function PrivacySettings() {
         title: "Privacy settings updated",
         description: "Your privacy preferences have been saved.",
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         variant: "destructive",
@@ -159,6 +151,7 @@ export default function PrivacySettings() {
           description: "Please enter a valid phone number.",
         });
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         variant: "destructive",
@@ -194,6 +187,7 @@ export default function PrivacySettings() {
           description: "The verification code you entered is incorrect.",
         });
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         variant: "destructive",

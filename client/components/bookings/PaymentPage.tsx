@@ -11,8 +11,7 @@ import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
 import { bookingService, PaymentResponse } from "@/services/booking-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-import Paystack from "@paystack/inline-js";
+import PaystackPop from "@paystack/inline-js";
 
 interface PaymentPageProps {
   bookingId: string;
@@ -26,8 +25,6 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  // Payment verification will happen on a separate page
-
   // Use our own mutation for payment
   const { mutate: initiatePayment } = useMutation({
     mutationFn: (paymentProvider: string = "PAYSTACK") => {
@@ -42,6 +39,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
       // Handle successful payment initialization
       processPayment(data);
       queryClient.invalidateQueries({ queryKey: ["booking", bookingId] });
+
     },
     onError: (error: Error) => {
       setIsPaymentLoading(false);
@@ -97,6 +95,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
   }
 
   // Process payment data from the API
+
   const processPayment = (paymentData: PaymentResponse) => {
     console.log("Payment data received:", paymentData);
 
@@ -121,55 +120,14 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
         paymentData.provider === "PAYSTACK" &&
         (paymentData.accessCode || paymentData.access_code)
       ) {
-        // For Paystack, use the inline-js library with the access code
+        // For Paystack, use PaystackPop with the access code
         try {
+          const popup = new PaystackPop();
           const accessCode =
             paymentData.accessCode || paymentData.access_code || "";
-          console.log("Processing Paystack transaction with code:", accessCode);
-
-          // Initialize Paystack with callbacks to handle payment status
-          const paystack = new Paystack();
-
-          // Use the new transaction method with callbacks
-          paystack.newTransaction({
-            key: process.env.NEXT_PUBLIC_PAYSTACK_KEY || "",
-            email: booking?.user?.email || "customer@example.com",
-            amount: booking?.totalPrice ? booking.totalPrice * 100 : 0, // Convert to kobo/cents
-            ref: paymentData.paymentIntentId || "",
-            onSuccess: (transaction: {
-              reference?: string;
-              status?: string;
-              message?: string;
-              transaction?: string;
-              trxref?: string;
-            }) => {
-              console.log("Payment successful:", transaction);
-              // Redirect to verification page with payment details
-              const trxref = transaction.trxref || "";
-              const reference =
-                transaction.reference || transaction.trxref || "";
-              const paymentId = paymentData.paymentIntentId || "";
-
-              // Construct the URL with all needed parameters
-              const verificationUrl = `http://localhost:3000/payments/verify?trxref=${trxref}&reference=${reference}&paymentId=${paymentId}&bookingId=${bookingId}`;
-              // const verificationUrl = `/payments/verify?trxref=${trxref}&reference=${reference}&paymentId=${paymentId}&bookingId=${bookingId}`;
-
-              toast({
-                title: "Payment Successful",
-                description: "Redirecting to verification page...",
-              });
-
-              // Redirect to the verification page
-              window.location.href = verificationUrl;
-            },
-            onCancel: () => {
-              toast({
-                title: "Payment Cancelled",
-                description: "You cancelled the payment process.",
-              });
-              setIsPaymentLoading(false);
-            },
-          });
+          console.log("Resuming Paystack transaction with code:", accessCode);
+          popup.resumeTransaction(accessCode);
+          
 
           // The popup will handle redirects/callbacks on completion
           toast({
@@ -194,9 +152,9 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
         window.location.href = paymentData.authorizationUrl;
       }
       // Handle other payment providers with URL
-      else if (paymentData.authorizationUrl || paymentData.redirectUrl) {
+      else if (paymentData.authorizationUrl || paymentData.paymentUrl) {
         window.location.href =
-          paymentData.authorizationUrl || paymentData.redirectUrl || "";
+          paymentData.authorizationUrl || paymentData.paymentUrl || "";
       } else {
         throw new Error("No payment URL or access code provided");
       }
@@ -415,7 +373,7 @@ export default function PaymentPage({ bookingId }: PaymentPageProps) {
                   : "N/A"}
               </p>
               <p>Time: {booking.time}</p>
-              <p>Guests: {booking.numberOfGuests}</p>
+              <p>Guests: {booking.participants}</p>
             </div>
           </div>
         </Card>

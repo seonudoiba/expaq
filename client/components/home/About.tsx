@@ -65,7 +65,7 @@ const About = () => {
                                             </svg>
                                         ))}
                                     </div>
-                                    <p className="text-xs font-medium text-gray-800 truncate">"Incredible local experience!"</p>
+                                    <p className="text-xs font-medium text-gray-800 truncate">&quot;Incredible local experience!&quot;</p>
                                 </div>
                             </div>
                         </div>

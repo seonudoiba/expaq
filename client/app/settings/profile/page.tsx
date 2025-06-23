@@ -95,41 +95,11 @@ export default function ProfileSettings() {
   };
 
   // Submit form handler
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSubmit = async (data: ProfileFormValues) => {
     setIsLoading(true);
 
     try {
-      // Upload profile image if there's a new one
-      let profileImageUrl = user?.profilePictureUrl || user?.avatar;
-      
-      if (profileImage) {
-        // Here you would upload the image to your backend or a storage service
-        // Example:
-        // const formData = new FormData();
-        // formData.append('file', profileImage);
-        // const response = await fetch('/api/upload', {
-        //   method: 'POST',
-        //   body: formData,
-        // });
-        // const result = await response.json();
-        // profileImageUrl = result.url;
-      }
-
-      // Update user profile data
-      // In a real app, you would call your API here
-      // Example:
-      // await fetch('/api/users/profile', {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     ...data,
-      //     profilePictureUrl: profileImageUrl,
-      //   }),
-      // });
-
-      // For demo purposes, just show a success toast
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -278,7 +248,7 @@ export default function ProfileSettings() {
                     <Input placeholder="New York, USA" {...field} />
                   </FormControl>
                   <FormDescription>
-                    City, country or region where you're based
+                    City, country or region where you&apos;re based
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

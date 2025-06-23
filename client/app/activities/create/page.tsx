@@ -16,7 +16,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format, } from 'date-fns';
-import { countryService, activityTypeService, cityService, geocodingService, activityService, fileService } from "@/services/services"
+import { countryService, activityTypeService, cityService, activityService, fileService } from "@/services/services"
 import AddressAutocomplete from "@/components/AddressAutocomplete"
 import HostAuthGuard from "@/components/auth/HostAuthGuard"
 
@@ -186,6 +186,7 @@ export default function CreateActivityPage() {
       // console.log("Coordinates fetched:", { latitude, longitude }); // Debugging log
 
       // Format startDate and endDate to include time
+      console.log("Formatting start and end dates with time", startTime, daysOfWeek);
       const formattedStartDate = format(new Date(startDate), "yyyy-MM-dd'T'HH:mm:ss");
       const formattedEndDate = format(new Date(endDate), "yyyy-MM-dd'T'HH:mm:ss");  
 

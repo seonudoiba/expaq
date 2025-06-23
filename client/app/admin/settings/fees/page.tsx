@@ -294,7 +294,7 @@ export default function FeesSettingsPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Tiered Host Commission Structure</h3>
                 <p className="text-sm text-gray-500">
-                  Configure tiered commission rates based on booking value. Only applies if "Tiered Percentage" 
+                  Configure tiered commission rates based on booking value. Only applies if &quot;Tiered Percentage&quot; 
                   is selected as the host fee type.
                 </p>
 

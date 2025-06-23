@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, PaypalLogo, Plus, Trash2, CheckCircle, Loader2, X } from "lucide-react";
+import { CreditCard, Trash2, Loader2} from "lucide-react";
+import Image from "next/image";
 import { useAuthStore } from "@/lib/store/auth";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -10,7 +11,6 @@ import {
   Card, 
   CardContent, 
   CardDescription, 
-  CardFooter, 
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
@@ -115,6 +115,7 @@ export default function PaymentSettings() {
         title: "Card added",
         description: "Your payment card has been added successfully.",
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",
@@ -154,6 +155,7 @@ export default function PaymentSettings() {
         title: "PayPal added",
         description: "Your PayPal account has been linked successfully.",
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",
@@ -381,7 +383,7 @@ export default function PaymentSettings() {
             <Dialog open={showAddPaypalDialog} onOpenChange={setShowAddPaypalDialog}>
               <DialogTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-2">
-                  <PaypalLogo className="h-4 w-4" />
+                  <Image src="./paypal-logo.png" alt="PayPal logo" width={20} height={20} />
                   <span>Add PayPal</span>
                 </Button>
               </DialogTrigger>
@@ -464,7 +466,7 @@ export default function PaymentSettings() {
                       {method.type === "card" ? (
                         <CreditCard className="h-5 w-5 text-primary" />
                       ) : (
-                        <PaypalLogo className="h-5 w-5 text-primary" />
+                        <Image src="./paypal-logo.png" alt="PayPal logo" width={24} height={24} />
                       )}
                     </div>
                     
