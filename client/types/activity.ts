@@ -2,7 +2,8 @@
  * Activity related types
  */
 
-import { City, Country, Review } from './index';
+import { City, Country } from './index';
+import { Review } from './review';
 
 export interface ActivityType {
   id: string;
@@ -70,6 +71,7 @@ export interface Activity {
   reviews: Review[];
   isFeatured: boolean;
   includes?: string[]; // What's included in the activity
+  itinerary?: string; // Detailed schedule/itinerary description
 }
 export interface ActivityType {
   id: string;
