@@ -66,10 +66,10 @@ export interface Activity {
   endDate: string;
   locationPoint: string;
   address: string;
-  city: City;
-  country: Country;
+  city: City;  country: Country;
   reviews: Review[];
   isFeatured: boolean;
+  includes?: string[]; // What's included in the activity
 }
 export interface ActivityType {
   id: string;
