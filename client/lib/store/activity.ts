@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { Country, City, ActivityType } from '@/types';
+import { Country, City } from '@/types';
+import { ActivityType } from '@/types/activity';
 
 interface ActivityState {
   countries: Country[];
