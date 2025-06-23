@@ -635,7 +635,7 @@ export default function BookingAnalytics() {
                     </TableCell>
                     <TableCell>{booking.activity}</TableCell>
                     <TableCell>{booking.customer}</TableCell>
-                    <TableCell>{booking.numberOfGuests}</TableCell>
+                    <TableCell>{booking.participants}</TableCell>
                     <TableCell>
                       {booking.status === "confirmed" ? (
                         <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 border-green-200 dark:border-green-900">
