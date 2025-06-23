@@ -194,13 +194,15 @@ export default function CreateActivityPage() {
       const activityData = {
         ...rest,
         // isFeatured, // Use the converted boolean value
-        latitude: selectedAddress?.lat ? parseInt(selectedAddress.lat) : 0,
-        longitude: selectedAddress?.lon ? parseInt(selectedAddress.lon) : 0,
+        latitude: selectedAddress?.lat ? parseFloat(selectedAddress.lat) : 0,
+        longitude: selectedAddress?.lon ? parseFloat(selectedAddress.lon) : 0,
         startDate: formattedStartDate,
         endDate: formattedEndDate,
         city: { id: city },
         country: { id: country },
-        activityType: { id: data.activityType },        address: address, // Use the selected address or the form address        // Ensure all URLs use HTTPS        mediaUrls: mediaUrls.map(url => url.replace(/^http:\/\//i, 'https://')), // Use the uploaded media URLs
+        activityType: { id: data.activityType },
+        address: address,
+        mediaUrls: mediaUrls,
         schedule: {
           availableDays: data.daysOfWeek,
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Get user's timezone

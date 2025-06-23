@@ -6,7 +6,13 @@ export const metadata: Metadata = {
   description: 'View your booking details and manage your reservation',
 };
 
-export default function BookingDetailsPage({ params }: { params: { id: string } }) {
+interface BookingDetailsPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function BookingDetailsPage({ params }: BookingDetailsPageProps) {
   return (
     <div className="container mx-auto py-8">
       <BookingDetails bookingId={params.id} />

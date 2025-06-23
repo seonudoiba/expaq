@@ -6,7 +6,13 @@ export const metadata: Metadata = {
   description: 'Complete your booking payment',
 };
 
-export default function BookingPaymentPage({ params }: { params: { id: string } }) {
+interface BookingPaymentPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function BookingPaymentPage({ params }: BookingPaymentPageProps) {
   return (
     <div className="container max-w-3xl mx-auto py-8">
       <PaymentPage bookingId={params.id} />
