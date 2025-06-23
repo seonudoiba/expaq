@@ -4,7 +4,7 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { DetailHeader } from "@/components/shared/detail-header";
-import { FeaturedActivities, Activity } from "@/components/shared/featured-activities";
+import { FeaturedActivities } from "@/components/shared/featured-activities";
 import { LocationGrid } from "@/components/shared/location-grid";
 import { Country, City } from "@/types";
 import { CountryService } from "@/services/location-services";
@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Activity } from "@/types/activity";
 
 export default function CountryDetailPage() {
   const params = useParams();
