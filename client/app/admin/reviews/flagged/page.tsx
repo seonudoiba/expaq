@@ -236,11 +236,10 @@ export default function FlaggedReviewsPage() {
                 className="max-w-md"
               />
             </div>
-            
-            <Alert variant="warning" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
+              <Alert variant="default" className="mb-4 bg-amber-50 border-amber-200 text-amber-800">
+              <AlertCircle className="h-4 w-4 text-amber-500" />
               <AlertTitle>Attention Required</AlertTitle>
-              <AlertDescription>
+              <AlertDescription className="text-amber-700">
                 These reviews have been flagged by hosts or users and require moderation action.
                 Please review each case carefully before making a decision.
               </AlertDescription>
