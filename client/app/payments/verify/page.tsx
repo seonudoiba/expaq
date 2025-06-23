@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,17 @@ import Link from "next/link";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function PaymentVerificationPage() {
+  return (
+    <Suspense fallback={<div className="container py-8 text-center">
+      <LoadingSpinner className="h-8 w-8" />
+      <p className="mt-4">Verifying payment...</p>
+    </div>}>
+      <PaymentVerificationContent />
+    </Suspense>
+  );
+}
+
+function PaymentVerificationContent() {
   const searchParams = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);

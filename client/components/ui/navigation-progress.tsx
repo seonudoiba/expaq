@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 // Add custom event type
@@ -11,9 +11,14 @@ interface NavigationStartEvent extends Event {
   };
 }
 
-export function NavigationProgressBar() {
-  const [isNavigating, setIsNavigating] = useState(false);
-  const [progress, setProgress] = useState(0);
+// Component that uses useSearchParams wrapped in Suspense
+function NavigationProgressContent({
+  setProgress,
+  setIsNavigating,
+}: {
+  setProgress: (value: number) => void;
+  setIsNavigating: (value: boolean) => void;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -26,7 +31,15 @@ export function NavigationProgressBar() {
     }, 300); // Wait for transition to complete
 
     return () => clearTimeout(timer);
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, setProgress, setIsNavigating]);
+
+  return null;
+}
+
+export function NavigationProgressBar() {
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   // Start the progress bar when a navigation action is triggered
   useEffect(() => {
     const handleStartNavigation = () => {
@@ -43,8 +56,10 @@ export function NavigationProgressBar() {
         clearTimeout(timer2);
         clearTimeout(timer3);
       };
-    };    // Listen for our custom navigation start event
-    const handleNavigationStart = (event: Event) => {
+    };
+
+    // Listen for our custom navigation start event
+    const handleNavigationStart = (_event: Event) => {
       handleStartNavigation();
     };
 
@@ -72,6 +87,7 @@ export function NavigationProgressBar() {
     window.addEventListener("navigationStart", handleNavigationStart);
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("touchstart", handleMouseDown as unknown as EventListener);
+
     return () => {
       window.removeEventListener("navigationStart", handleNavigationStart);
       window.removeEventListener("mousedown", handleMouseDown);
@@ -80,13 +96,16 @@ export function NavigationProgressBar() {
   }, []);
 
   if (!isNavigating && progress === 0) return null;
-
   return (
-    <div className="fixed top-0 left-0 right-0 h-1 z-[9999] bg-transparent pointer-events-none">
-      <div
-        className="h-full bg-primary transition-all duration-300 ease-in-out"
-        style={{ width: `${progress}%` }}
-      />
-    </div>
+    <>
+      <Suspense fallback={null}>
+        <NavigationProgressContent setProgress={setProgress} setIsNavigating={setIsNavigating} />
+      </Suspense>
+      <div className="fixed top-0 left-0 right-0 h-1 z-[9999] bg-transparent pointer-events-none">
+        <div
+          className="h-full bg-primary transition-all duration-300 ease-in-out"
+          style={{ width: `${progress}%` }}
+        />      </div>
+    </>
   );
 }

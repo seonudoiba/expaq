@@ -1,12 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useActivitiesStore } from "@/lib/store/useActivitiesStore";
 import { SearchActivityList } from "@/components/activities/search-activity-list";
 
 export default function SearchResultsPage() {
+  return (
+    <Suspense fallback={<div className="container py-8 text-center">Loading search results...</div>}>
+      <SearchParamsContent />
+    </Suspense>
+  );
+}
+
+// This component is separated to be wrapped in Suspense
+function SearchParamsContent() {
+  // We're now safely using useSearchParams() inside a component wrapped by Suspense
   const searchParams = useSearchParams();
   const { setFilters } = useActivitiesStore();
   

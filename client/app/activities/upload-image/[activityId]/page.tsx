@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,14 @@ import { uploadActivityImages } from "@/services/services";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function UploadActivityImagePage() {
+  return (
+    <Suspense fallback={<div className="container py-8">Loading image upload page...</div>}>
+      <UploadActivityImageContent />
+    </Suspense>
+  );
+}
+
+function UploadActivityImageContent() {
   const { toast } = useToast();
   const [image, setImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);

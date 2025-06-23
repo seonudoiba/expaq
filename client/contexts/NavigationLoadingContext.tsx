@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -17,11 +17,23 @@ const NavigationLoadingContext = createContext<NavigationLoadingContextType>({
 
 export const useNavigationLoading = () => useContext(NavigationLoadingContext);
 
-// Define the navigation start event type
-interface NavigationStartEvent extends Event {
-  detail: {
-    href: string;
-  };
+// Define the navigation start event type (used for TypeScript typing of custom events)
+
+// Component that uses useSearchParams wrapped in Suspense
+function NavigationContent({ 
+  setIsNavigating 
+}: { 
+  setIsNavigating: (value: boolean) => void 
+}) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Track navigation state changes
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname, searchParams, setIsNavigating]);
+  
+  return null;
 }
 
 export function NavigationLoadingProvider({
@@ -30,17 +42,10 @@ export function NavigationLoadingProvider({
   children: ReactNode;
 }) {
   const [isNavigating, setIsNavigating] = useState(false);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  // Track navigation state changes
-  useEffect(() => {
-    setIsNavigating(false);
-  }, [pathname, searchParams]);
   
   // Listen for navigation start events
-  useEffect(() => {
-    const handleNavigationStart = (event: Event) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  useEffect(() => {    const handleNavigationStart = (_event: Event) => {
       setIsNavigating(true);
     };
     
@@ -50,6 +55,7 @@ export function NavigationLoadingProvider({
       window.removeEventListener('navigationStart', handleNavigationStart);
     };
   }, []);
+
   // Expose a method to manually set loading state
   const startNavigation = (href?: string) => {
     setIsNavigating(true);
@@ -74,8 +80,12 @@ export function NavigationLoadingProvider({
       </div>
     );
   };
+
   return (
     <NavigationLoadingContext.Provider value={{ isNavigating, startNavigation }}>
+      <Suspense fallback={null}>
+        <NavigationContent setIsNavigating={setIsNavigating} />
+      </Suspense>
       <NavigationLoadingIndicator />
       {children}
     </NavigationLoadingContext.Provider>
