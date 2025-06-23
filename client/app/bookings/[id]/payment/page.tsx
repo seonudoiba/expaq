@@ -1,21 +1,20 @@
 import { Metadata } from 'next';
 import PaymentPage from '@/components/bookings/PaymentPage';
+import { use } from "react";
 
 export const metadata: Metadata = {
   title: 'Payment | Expaq',
   description: 'Complete your booking payment',
 };
 
-interface BookingPaymentPageProps {
-  params: {
-    id: string;
-  };
-}
 
-export default function BookingPaymentPage({ params }: BookingPaymentPageProps) {
+
+export default function BookingPaymentPage({params}: {params: Promise<{ id: string }>}) {
+  const { id } = use(params);
+
   return (
     <div className="container max-w-3xl mx-auto py-8">
-      <PaymentPage bookingId={params.id} />
+      <PaymentPage bookingId={id} />
     </div>
   );
 }

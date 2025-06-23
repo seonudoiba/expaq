@@ -1,21 +1,17 @@
 import { Metadata } from 'next';
 import BookingDetails from '@/components/bookings/BookingDetails';
+import { use } from "react";
 
 export const metadata: Metadata = {
   title: 'Booking Details | Expaq',
   description: 'View your booking details and manage your reservation',
 };
 
-interface BookingDetailsPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function BookingDetailsPage({ params }: BookingDetailsPageProps) {
+export default function BookingDetailsPage({params}: {params: Promise<{ id: string }>}) {
+  const { id } = use(params);
   return (
     <div className="container mx-auto py-8">
-      <BookingDetails bookingId={params.id} />
+      <BookingDetails bookingId={id} />
     </div>
   );
 }
