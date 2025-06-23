@@ -4,7 +4,8 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { DetailHeader } from "@/components/shared/detail-header";
-import { FeaturedActivities, Activity } from "@/components/shared/featured-activities";
+import { FeaturedActivities } from "@/components/shared/featured-activities";
+import { Activity } from "@/types/activity";
 import { City, Country } from "@/types";
 // import { CityService, CountryService } from "@/lib/api/location-services";
 import { MapPin, Globe, Calendar } from "lucide-react";
