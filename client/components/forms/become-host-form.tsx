@@ -59,12 +59,9 @@ export function BecomeHostForm() {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
+    setIsLoading(true);    try {
       // First upload the ID document
-      const uploadResponse = await fileService.uploadFile(idDocument);
-      const idDocumentUrl = uploadResponse.url;
+      const idDocumentUrl = await fileService.upload(idDocument, 'identification');
 
       // Submit the become host request
       const becomeHostData = {
