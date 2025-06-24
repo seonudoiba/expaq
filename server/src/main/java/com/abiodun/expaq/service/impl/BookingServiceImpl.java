@@ -114,7 +114,7 @@ public class BookingServiceImpl implements IBookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         // Check if user is authorized to view the booking
-        if (!booking.getUser().getId().equals(userId) && 
+        if (!booking.getUser().getId().equals(userId) &&
             !booking.getActivity().getHost().getId().equals(userId)) {
             throw new RuntimeException("Unauthorized to view this booking");
         }
@@ -163,7 +163,7 @@ public class BookingServiceImpl implements IBookingService {
     //             .map(BookingDTO::fromBooking)
     //             .collect(Collectors.toList());
     // }
-    
+
 
     @Override
     public List<BookingDTO> getBookingsByStatus(UUID userId, Booking.BookingStatus status) {
@@ -233,3 +233,5 @@ public class BookingServiceImpl implements IBookingService {
         throw new UnsupportedOperationException("Unimplemented method 'getPastBookings'");
     }
 }
+
+

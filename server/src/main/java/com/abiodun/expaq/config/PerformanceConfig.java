@@ -33,8 +33,25 @@ public class PerformanceConfig implements WebMvcConfigurer {
         caffeineCacheManager.setCaffeine(caffeine);
         return caffeineCacheManager;
     }
-
-    @Bean(name = "taskExecutor")
+//    @Bean
+//    public CacheManager cacheManager() {
+//        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+//        cacheManager.setCaffeine(Caffeine.newBuilder()
+//                .maximumSize(1000)
+//                .expireAfterWrite(60, TimeUnit.MINUTES));
+//
+//        // Register cache names
+//        cacheManager.setCacheNames(java.util.Arrays.asList(
+//                "activities",
+//                "reviews",
+//                "bookings",
+//                "countries",
+//                "cities",
+//                "users"
+//        ));
+//
+//    }
+        @Bean(name = "taskExecutor")
     public AsyncTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(4);
