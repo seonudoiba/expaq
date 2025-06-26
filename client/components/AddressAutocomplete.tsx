@@ -7,6 +7,11 @@ interface Address {
   display_name: string;
   lat: string;
   lon: string;
+  name?: string; // jsonv2 might include this field
+  osm_id?: number;
+  category?: string;
+  type?: string;
+  importance?: number;
 }
 
 interface AddressAutocompleteProps {
@@ -46,17 +51,58 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     const searchAddresses = async () => {
       setIsLoading(true);
       try {
+        // First attempt: Search with query, city, and country
+        const params = new URLSearchParams({
+          q: `${encodeURIComponent(query + ', ' + city + ', ' + country)}`,
+          format: 'jsonv2',
+          addressdetails: '1',
+          limit: '8'
+        });
+
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?` +
-          `q=${encodeURIComponent(query + ', ' + city + ', ' + country)}&` +
-          `format=json&` +
-          `addressdetails=1&` +
-          `limit=8&` +
-          `countrycodes=${country === 'France' ? 'fr' : 'us'}`
+          `https://nominatim.openstreetmap.org/search?${params.toString()}`
         );
         
         const data = await response.json();
-        setSuggestions(data);
+        
+        // If first search returns no results, try with just city and country
+        if (data.length === 0) {
+          console.log("No results with query+city+country, trying city+country only");
+          const cityCountryParams = new URLSearchParams({
+            q: `${encodeURIComponent(city + ', ' + country)}`,
+            format: 'jsonv2',
+            addressdetails: '1',
+            limit: '8'
+          });
+
+          const cityCountryResponse = await fetch(
+            `https://nominatim.openstreetmap.org/search?${cityCountryParams.toString()}`
+          );
+          
+          const cityCountryData = await cityCountryResponse.json();
+          
+          // If second search returns no results, try with just country
+          if (cityCountryData.length === 0) {
+            console.log("No results with city+country, trying country only");
+            const countryParams = new URLSearchParams({
+              q: `${encodeURIComponent(country)}`,
+              format: 'jsonv2',
+              addressdetails: '1',
+              limit: '8'
+            });
+
+            const countryResponse = await fetch(
+              `https://nominatim.openstreetmap.org/search?${countryParams.toString()}`
+            );
+            
+            const countryData = await countryResponse.json();
+            setSuggestions(countryData);
+          } else {
+            setSuggestions(cityCountryData);
+          }
+        } else {
+          setSuggestions(data);
+        }
       } catch (error) {
         console.error('Error fetching addresses:', error);
         setSuggestions([]);
