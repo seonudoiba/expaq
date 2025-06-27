@@ -24,7 +24,8 @@ Content-Type: application/json
     "email": string,
     "password": string,
     "firstName": string,
-    "lastName": string
+    "lastName": string,
+    "displayName:string
 }
 ```
 Response: `AuthResponse` with JWT token
