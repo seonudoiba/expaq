@@ -12,7 +12,7 @@ export interface UserProfile {
   roles: Role[];
   verified: boolean;
   active: boolean;
-  createdAt: string; // ISO date string
+  createdAt: string; // ISO date
   updatedAt: string; // ISO date string
 }
 
