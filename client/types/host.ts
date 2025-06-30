@@ -17,7 +17,6 @@ export interface Host {
   firstName: string | null;
   lastName: string | null;
   verified: boolean;
-
 }
 
 export interface HostProfile {
@@ -33,7 +32,6 @@ export interface HostProfile {
   active: boolean;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
-  
 }
 
 export interface PublicHostResponse {
