@@ -1,6 +1,6 @@
 # Expaq API Documentation
 
-## Base URL
+## The Base URL
 ```
 http://localhost:8081
 ```
