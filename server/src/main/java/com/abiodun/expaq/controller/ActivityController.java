@@ -48,7 +48,10 @@ public class ActivityController {
 //    public ActivityController(IActivityService activityService) {
 //        this.activityService = activityService;
 //    }
-    // GET /activities - List activities (publicly accessible, filtering added)
+
+
+    
+    // GET /activities - List activities
     @GetMapping
     public ResponseEntity<Page<ActivityDTO>> getAllActivities(
             @RequestParam(required = false) String city,

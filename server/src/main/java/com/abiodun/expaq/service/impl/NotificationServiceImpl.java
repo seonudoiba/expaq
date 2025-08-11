@@ -3,6 +3,7 @@ package com.abiodun.expaq.service.impl;
 import com.abiodun.expaq.dto.NotificationDTO;
 import com.abiodun.expaq.model.Notification;
 import com.abiodun.expaq.model.NotificationType;
+import com.abiodun.expaq.model.SupportTicket;
 import com.abiodun.expaq.model.User;
 import com.abiodun.expaq.repository.NotificationRepository;
 import com.abiodun.expaq.repository.UserRepository;
@@ -137,5 +138,20 @@ public class NotificationServiceImpl implements INotificationService {
         dto.setReadAt(notification.getReadAt());
         dto.setCreatedAt(notification.getCreatedAt());
         return dto;
+    }
+    
+    @Override
+    public void sendSupportTicketConfirmation(String email, SupportTicket ticket) {
+        // Create a notification for the user about their support ticket
+        String title = "Support Ticket Created";
+        String message = String.format("Your support ticket #%s has been created. We'll get back to you soon.", 
+                                     ticket.getTicketNumber());
+        
+        if (ticket.getUser() != null) {
+            createNotification(ticket.getUser().getId(), title, message, NotificationType.INFO, ticket);
+        }
+        
+        // You can also send an email here if needed
+        // emailService.sendTicketCreatedEmail(email, ticket);
     }
 } 

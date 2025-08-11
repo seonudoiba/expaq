@@ -20,6 +20,13 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
+    
+    public enum UserStatus {
+        ACTIVE,
+        INACTIVE,
+        SUSPENDED,
+        DELETED
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -76,6 +83,13 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private boolean isActive = true;
+    
+    @Column
+    private LocalDateTime lastActive;
+    
+    @Enumerated(EnumType.STRING)
+    @Column
+    private UserStatus status = UserStatus.ACTIVE;
 
     @Column
     private String preferredLanguage;

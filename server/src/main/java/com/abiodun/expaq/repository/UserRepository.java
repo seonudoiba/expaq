@@ -65,4 +65,21 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE u.id = :userId")
     Optional<User> findByIdForPayment(@Param("userId") UUID userId);
+    
+    // Analytics methods
+    long countByCreatedAtAfter(LocalDateTime date);
+    
+    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = :roleName")
+    long countByRoles_Name(@Param("roleName") String roleName);
+    
+    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.createdAt > :date")
+    long countByRoles_NameAndCreatedAtAfter(@Param("roleName") String roleName, @Param("date") LocalDateTime date);
+    
+    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.createdAt < :date")
+    long countByRoles_NameAndCreatedAtBefore(@Param("roleName") String roleName, @Param("date") LocalDateTime date);
+    
+    long countByCreatedAtBefore(LocalDateTime date);
+    
+    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.isEnabled = false")
+    long countByRoles_NameAndIsEnabledFalse(@Param("roleName") String roleName);
 }

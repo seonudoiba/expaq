@@ -56,4 +56,11 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     );
 
     Payment findByPaymentProviderReference(String paymentProviderReference);
+    
+    // Analytics methods
+    @Query("SELECT COALESCE(SUM(p.amount), 0.0) FROM Payment p WHERE p.status = 'COMPLETED' AND MONTH(p.createdAt) = :month AND YEAR(p.createdAt) = :year")
+    double getTotalRevenueForMonth(@Param("month") int month, @Param("year") int year);
+    
+    @Query("SELECT COUNT(p) FROM Payment p WHERE p.status = :status")
+    long countByStatus(@Param("status") String status);
 }

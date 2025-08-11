@@ -1,8 +1,6 @@
 package com.abiodun.expaq.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -63,11 +61,8 @@ public class Activity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-//    @Enumerated(EnumType.STRING)
-//    private ActivityCategory category;
-
-//    @Column(nullable = false)
-    private Boolean isFeatured;
+    @Column
+    private Boolean isFeatured = false;
 
     @Column(nullable = false)
     private String address;

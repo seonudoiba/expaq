@@ -223,14 +223,20 @@ public class BookingServiceImpl implements IBookingService {
 
     @Override
     public List<BookingDTO> getUpcomingBookings(UUID userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUpcomingBookings'");
+        LocalDateTime now = LocalDateTime.now();
+        return bookingRepository.findByUserIdAndStartTimeAfter(userId, now)
+                .stream()
+                .map(BookingDTO::fromBooking)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<BookingDTO> getPastBookings(UUID userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPastBookings'");
+        LocalDateTime now = LocalDateTime.now();
+        return bookingRepository.findByUserIdAndEndTimeBefore(userId, now)
+                .stream()
+                .map(BookingDTO::fromBooking)
+                .collect(Collectors.toList());
     }
 }
 

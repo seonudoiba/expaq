@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -47,7 +48,7 @@ import {
 } from "@/components/ui/pagination";
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { activities, categories, featuredActivities, pendingActivities } from "@/lib/mockDatas";
+import { activityService, activityTypeService } from "@/services/services";
 
 
 export default function ActivitiesPage() {
@@ -56,19 +57,38 @@ export default function ActivitiesPage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("activities");
 
-  // Filter activities based on search term and filters
+  // Fetch activities data
+  const { data: activitiesData, isLoading: activitiesLoading, error: activitiesError } = useQuery({
+    queryKey: ["admin-activities", currentPage, searchTerm, categoryFilter, statusFilter],
+    queryFn: () => activityService.getAll({
+      page: currentPage - 1,
+      limit: 10,
+      querySearch: searchTerm || undefined,
+      activityType: categoryFilter !== "all" ? categoryFilter : undefined,
+    }),
+  });
+
+  // Fetch featured activities
+  const { data: featuredData, isLoading: featuredLoading } = useQuery({
+    queryKey: ["admin-featured-activities"],
+    queryFn: () => activityService.getAllFeaturedActivities({ limit: 50 }),
+  });
+
+  // Fetch activity types for filters
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
+    queryKey: ["activity-types"],
+    queryFn: activityTypeService.getAll,
+  });
+
+  const activities = activitiesData?.content || [];
+  const featuredActivities = featuredData?.content || [];
+  const categories = categoriesData || [];
+
+  // Filter activities based on status (client-side for more specific filtering)
   const filteredActivities = activities.filter((activity) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      activity.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      activity.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      activity.hostName?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesCategory =
-      categoryFilter === "all" ||
-      activity.activityType?.name === categoryFilter;
-
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "active" && activity.active) ||
@@ -76,7 +96,7 @@ export default function ActivitiesPage() {
       (statusFilter === "verified" && activity.verified) ||
       (statusFilter === "unverified" && !activity.verified);
 
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesStatus;
   });
 
   // Toggle selection of all activities

@@ -8,5 +8,9 @@ public enum NotificationType {
     MESSAGE_RECEIVED,
     REVIEW_RECEIVED,
     ACTIVITY_UPDATED,
-    SYSTEM_NOTIFICATION
+    SYSTEM_NOTIFICATION,
+    INFO,
+    WARNING,
+    ERROR,
+    SUCCESS
 } 

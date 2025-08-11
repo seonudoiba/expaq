@@ -15,19 +15,27 @@ public class UserPreferencesDTO {
     private boolean profilePublic;
     private boolean showEmail;
     private boolean showPhone;
+    private boolean showActivityHistory;
+    private boolean showReviews;
+    private boolean showBookings;
 
     // Notification settings
     private boolean emailNotifications;
     private boolean pushNotifications;
-    private boolean bookingNotifications;
+    private boolean smsNotifications;
     private boolean marketingEmails;
-    private String emailFrequency;
 
-    // Security settings
-    private boolean twoFactorEnabled;
-    private String twoFactorMethod;
+    // Display settings
+    private boolean darkMode;
+    private String language;
+    private String currency;
+    private String timeZone;
 
-    // Data sharing
-    private boolean shareActivityData;
-    private boolean shareProfileData;
+    // Activity preferences
+    private String preferredActivityTypes;
+    private String preferredLocations;
+    private Integer maxPriceRange;
+    private Integer minPriceRange;
+    private String dietaryRestrictions;
+    private String accessibilityNeeds;
 }

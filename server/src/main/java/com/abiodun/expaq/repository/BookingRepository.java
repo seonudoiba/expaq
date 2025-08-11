@@ -100,4 +100,9 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     double getTotalRevenueByHostId(UUID hostId);
 
     long countByHostIdAndStatus(UUID hostId, BookingStatus attr0);
+
+    // Methods for upcoming and past bookings
+    List<Booking> findByUserIdAndStartTimeAfter(UUID userId, LocalDateTime startTime);
+    
+    List<Booking> findByUserIdAndEndTimeBefore(UUID userId, LocalDateTime endTime);
 }

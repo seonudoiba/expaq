@@ -65,4 +65,8 @@ public class ExpaqUserDetails implements UserDetails {
     public User getUser() {
         return this.user;
     }
-}
+
+    public Object getEmail() {
+        return user.getEmail();
+    }
+    }

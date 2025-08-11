@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -19,11 +20,68 @@ import {
   Pie,
   Cell
 } from "recharts";
-import { platformMetrics, pendingItems, COLORS, activityCategoryData, growthData } from "@/lib/mockDatas";
+import { analyticsService } from "@/services/analytics-service";
 import { UserCircleIcon, BoxIconLine, PieChartIcon, ArrowUpIcon, ArrowDownIcon } from "@/components/admin/AdminIcons";
 
 
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
 export default function AdminDashboard() {
+  const { data: dashboardData, isLoading, error } = useQuery({
+    queryKey: ["admin-dashboard"],
+    queryFn: analyticsService.getDashboardData,
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <p className="text-gray-500 dark:text-gray-400">Loading dashboard data...</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader className="pb-2">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <Alert className="bg-red-50 border-red-200">
+            <AlertTitle className="text-red-800">Error Loading Dashboard</AlertTitle>
+            <AlertDescription className="text-red-700">
+              Unable to load dashboard data. Using fallback data. Please check your connection.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
+  const {
+    platformMetrics = [],
+    growthData = [],
+    activityCategoryData = [],
+    regionalData = [],
+    pendingItems = { items: [] }
+  } = dashboardData || {};
+
+  // Calculate total pending items for alert
+  const totalPendingActivities = pendingItems.items.find(item => item.type === "Activity Approval")?.count || 0;
+  const totalPendingHosts = pendingItems.items.find(item => item.type === "Host Verification")?.count || 0;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -33,15 +91,17 @@ export default function AdminDashboard() {
         </p>
       </div>
       
-      {/* Alerts and notifications for admin */}
-      <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
-        <AlertTitle className="text-amber-800 dark:text-amber-400">Action Required</AlertTitle>
-        <AlertDescription className="text-amber-700 dark:text-amber-300">
-          There are <strong>37</strong> new activities pending review and <strong>24</strong> host verification requests.
-        </AlertDescription>
-      </Alert>
+      {/* Dynamic alerts based on real data */}
+      {(totalPendingActivities > 0 || totalPendingHosts > 0) && (
+        <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
+          <AlertTitle className="text-amber-800 dark:text-amber-400">Action Required</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-300">
+            There are <strong>{totalPendingActivities}</strong> new activities pending review and <strong>{totalPendingHosts}</strong> host verification requests.
+          </AlertDescription>
+        </Alert>
+      )}
 
-      {/* Platform metrics */}
+      {/* Platform metrics using real data */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {platformMetrics.map((metric, idx) => (
           <Card key={idx}>
@@ -186,13 +246,7 @@ export default function AdminDashboard() {
               <CardContent className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={[
-                      { name: 'New York', value: 24 },
-                      { name: 'London', value: 18 },
-                      { name: 'Tokyo', value: 15 },
-                      { name: 'Paris', value: 12 },
-                      { name: 'Sydney', value: 8 },
-                    ]}
+                    data={regionalData}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
@@ -217,7 +271,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {pendingItems.map((item, idx) => (
+                {pendingItems.items.map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="font-medium">{item.type}</div>
                     <div className="flex items-center">

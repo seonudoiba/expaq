@@ -1,5 +1,7 @@
 package com.abiodun.expaq.service.impl;
 
+import com.abiodun.expaq.model.Subscription;
+import com.abiodun.expaq.model.SupportTicket;
 import com.abiodun.expaq.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -167,6 +169,117 @@ public class EmailServiceImpl implements EmailService {
         message.setTo(email);
         message.setSubject("Account Deleted Notification");
         message.setText("Hello " + fullName + ",\n\nYour account has been deleted.");
+        mailSender.send(message);
+    }
+    
+    // Marketing emails
+    @Override
+    public void sendMarketingEmail(String email, String subject, String content) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject(subject);
+        message.setText(content);
+        mailSender.send(message);
+    }
+    
+    // Subscription emails
+    @Override
+    public void sendSubscriptionCancellationEmail(String email, String subscriptionId) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Subscription Cancelled");
+        message.setText("Your subscription has been cancelled. Subscription ID: " + subscriptionId);
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendBillingSuccessEmail(String email, Subscription subscription) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Payment Successful");
+        message.setText("Your payment for subscription " + subscription.getId() + " was successful.");
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendPaymentFailureEmail(String email, Subscription subscription) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Payment Failed");
+        message.setText("Your payment for subscription " + subscription.getId() + " failed. Please update your payment method.");
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendSubscriptionExpiredEmail(String email, Subscription subscription) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Subscription Expired");
+        message.setText("Your subscription " + subscription.getId() + " has expired.");
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendBillingReminderEmail(String email, Subscription subscription) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Billing Reminder");
+        message.setText("Your subscription " + subscription.getId() + " will be billed soon.");
+        mailSender.send(message);
+    }
+    
+    // Support ticket emails
+    @Override
+    public void sendTicketCreatedEmail(String email, SupportTicket ticket) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Support Ticket Created: " + ticket.getTicketNumber());
+        message.setText("Your support ticket " + ticket.getTicketNumber() + " has been created. We'll get back to you soon.");
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendTicketAssignedEmail(String email, SupportTicket ticket) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Support Ticket Assigned: " + ticket.getTicketNumber());
+        message.setText("Your support ticket " + ticket.getTicketNumber() + " has been assigned to an agent.");
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendTicketStatusUpdateEmail(String email, SupportTicket ticket) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Support Ticket Status Update: " + ticket.getTicketNumber());
+        message.setText("Your support ticket " + ticket.getTicketNumber() + " status has been updated to: " + ticket.getStatus());
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendTicketNewMessageEmail(String email, SupportTicket ticket) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("New Message on Support Ticket: " + ticket.getTicketNumber());
+        message.setText("There's a new message on your support ticket " + ticket.getTicketNumber());
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendTicketResolvedEmail(String email, SupportTicket ticket) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Support Ticket Resolved: " + ticket.getTicketNumber());
+        message.setText("Your support ticket " + ticket.getTicketNumber() + " has been resolved.");
+        mailSender.send(message);
+    }
+    
+    @Override
+    public void sendTicketClosedEmail(String email, SupportTicket ticket) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Support Ticket Closed: " + ticket.getTicketNumber());
+        message.setText("Your support ticket " + ticket.getTicketNumber() + " has been closed.");
         mailSender.send(message);
     }
 } 
