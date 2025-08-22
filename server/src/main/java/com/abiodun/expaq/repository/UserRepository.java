@@ -80,6 +80,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     
     long countByCreatedAtBefore(LocalDateTime date);
     
-    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.isEnabled = false")
-    long countByRoles_NameAndIsEnabledFalse(@Param("roleName") String roleName);
+    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.isActive = false")
+    long countByRoles_NameAndIsActiveFalse(@Param("roleName") String roleName);
 }

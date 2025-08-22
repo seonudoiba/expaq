@@ -219,7 +219,7 @@ public class AnalyticsController {
             
             // Count pending items
             long pendingActivities = activityRepository.countByIsActiveFalseAndIsVerifiedFalse();
-            long pendingHosts = userRepository.countByRoles_NameAndIsEnabledFalse("HOST");
+            long pendingHosts = userRepository.countByRoles_NameAndIsActiveFalse("HOST");
             long pendingRefunds = paymentRepository.countByStatus("REFUND_PENDING");
             
             List<Map<String, Object>> items = Arrays.asList(
