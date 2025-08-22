@@ -95,7 +95,7 @@ public interface MarketingExecutionRepository extends JpaRepository<MarketingExe
     Long countByStatusSince(@Param("status") MarketingExecution.ExecutionStatus status, 
                            @Param("startDate") LocalDateTime startDate);
     
-    @Query("SELECT e FROM MarketingExecution e WHERE e.bounced_at IS NOT NULL AND " +
+    @Query("SELECT e FROM MarketingExecution e WHERE e.bouncedAt IS NOT NULL AND " +
            "e.campaign.id = :campaignId ORDER BY e.bouncedAt DESC")
     List<MarketingExecution> findBounces(@Param("campaignId") UUID campaignId);
     

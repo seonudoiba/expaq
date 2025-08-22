@@ -113,7 +113,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     
     // Subscription health metrics
     @Query("SELECT " +
-           "AVG(DATEDIFF(COALESCE(s.endDate, :now), s.startDate)) as avgLifetimeDays, " +
+           "AVG(EXTRACT(DAY FROM (COALESCE(s.endDate, :now) - s.startDate))) as avgLifetimeDays, " +
            "COUNT(CASE WHEN s.status = 'ACTIVE' THEN 1 END) as activeCount, " +
            "COUNT(CASE WHEN s.status = 'CANCELLED' THEN 1 END) as cancelledCount, " +
            "COUNT(CASE WHEN s.status = 'PAST_DUE' THEN 1 END) as pastDueCount " +
