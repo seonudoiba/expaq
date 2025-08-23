@@ -474,7 +474,7 @@ class MarketingService {
       
       // Execution statuses
       [ExecutionStatus.PENDING]: 'gray',
-      [ExecutionStatus.SCHEDULED]: 'blue',
+      // [ExecutionStatus.SCHEDULED]: 'blue', // Removed - same as CampaignStatus.SCHEDULED
       [ExecutionStatus.SENDING]: 'yellow',
       [ExecutionStatus.SENT]: 'blue',
       [ExecutionStatus.DELIVERED]: 'green',
@@ -483,7 +483,7 @@ class MarketingService {
       [ExecutionStatus.CONVERTED]: 'purple',
       [ExecutionStatus.BOUNCED]: 'red',
       [ExecutionStatus.FAILED]: 'red',
-      [ExecutionStatus.CANCELLED]: 'red',
+      // [ExecutionStatus.CANCELLED]: 'red', // Removed - same as CampaignStatus.CANCELLED
       [ExecutionStatus.UNSUBSCRIBED]: 'orange'
     };
     return colors[status] || 'gray';
