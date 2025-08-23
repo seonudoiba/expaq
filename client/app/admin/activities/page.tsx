@@ -73,7 +73,7 @@ export default function ActivitiesPage() {
   // Fetch featured activities
   const { data: featuredData } = useQuery({
     queryKey: ["admin-featured-activities"],
-    queryFn: () => activityService.getAllFeaturedActivities({ limit: 50 }),
+    queryFn: () => activityService.getAllFeaturedActivities(),
   });
 
   // Fetch activity types for filters
