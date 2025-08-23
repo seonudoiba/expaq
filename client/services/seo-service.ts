@@ -59,7 +59,7 @@ export const seoService = {
     
     const keywords = [
       activity.title.toLowerCase(),
-      activity.location.toLowerCase(),
+      activity.city?.name.toLowerCase() || activity.address.toLowerCase(),
       activity.activityType?.name.toLowerCase() || 'activity',
       'booking',
       'experience',
@@ -74,18 +74,18 @@ export const seoService = {
       canonicalUrl: `/activities/${activity.id}`,
       ogTitle: title,
       ogDescription: description,
-      ogImage: activity.photos?.[0]?.url || '/images/og-default-activity.jpg',
+      ogImage: activity.mediaUrls?.[0] || '/images/og-default-activity.jpg',
       ogType: 'article',
       twitterCard: 'summary_large_image',
       twitterTitle: title,
       twitterDescription: description,
-      twitterImage: activity.photos?.[0]?.url || '/images/og-default-activity.jpg',
+      twitterImage: activity.mediaUrls?.[0] || '/images/og-default-activity.jpg',
       structuredData: {
         '@context': 'https://schema.org',
         '@type': 'Product',
         name: activity.title,
         description: activity.description,
-        image: activity.photos?.map(photo => photo.url) || [],
+        image: activity.mediaUrls?.map(photo => photo) || [],
         brand: {
           '@type': 'Brand',
           name: 'Expaq'
@@ -94,23 +94,23 @@ export const seoService = {
           '@type': 'Offer',
           price: activity.price,
           priceCurrency: 'USD',
-          availability: activity.isActive ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          availability: activity.active ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
           seller: {
             '@type': 'Organization',
-            name: activity.host?.firstName + ' ' + activity.host?.lastName || 'Expaq Host'
+            name: activity.hostName || 'Expaq Host'
           }
         },
         aggregateRating: activity.averageRating ? {
           '@type': 'AggregateRating',
           ratingValue: activity.averageRating,
-          reviewCount: activity.reviewCount || 0,
+          reviewCount: activity.totalReviews || 0,
           bestRating: 5,
           worstRating: 1
         } : undefined,
         location: {
           '@type': 'Place',
-          name: activity.location,
-          address: activity.location
+          name: activity.city?.name || activity.address,
+          address: activity.city?.name || activity.address
         }
       }
     };
@@ -122,7 +122,7 @@ export const seoService = {
   getSearchPageSEO: (query?: string, location?: string, category?: string): SEOMetadata => {
     let title = 'Search Activities';
     let description = 'Find amazing local activities and experiences';
-    let keywords = ['search', 'activities', 'experiences', 'local', 'booking'];
+    const keywords = ['search', 'activities', 'experiences', 'local', 'booking'];
 
     if (query) {
       title = `${query} Activities - Search Results`;
@@ -301,10 +301,10 @@ export const seoService = {
     '@type': 'LocalBusiness',
     name: activity.title,
     description: activity.description,
-    image: activity.photos?.[0]?.url,
+    image: activity.mediaUrls?.[0] || '/images/og-default-activity.jpg',
     address: {
       '@type': 'PostalAddress',
-      addressLocality: activity.location
+      addressLocality: activity.city?.name || activity.address
     },
     geo: activity.latitude && activity.longitude ? {
       '@type': 'GeoCoordinates',
@@ -314,7 +314,7 @@ export const seoService = {
     aggregateRating: activity.averageRating ? {
       '@type': 'AggregateRating',
       ratingValue: activity.averageRating,
-      reviewCount: activity.reviewCount || 0
+      reviewCount: activity.totalReviews || 0
     } : undefined,
     priceRange: activity.price ? `$${activity.price}` : undefined
   }),
@@ -323,7 +323,8 @@ export const seoService = {
    * Generate sitemap URLs
    */
   generateSitemapUrls: (activities: Activity[], cities: string[], categories: string[]) => {
-    const urls = [
+    type SitemapUrl = { loc: string; priority: number; changefreq: string; lastmod?: string };
+    const urls: SitemapUrl[] = [
       { loc: '/', priority: 1.0, changefreq: 'daily' },
       { loc: '/search', priority: 0.8, changefreq: 'weekly' },
       { loc: '/become-a-host', priority: 0.7, changefreq: 'monthly' },
@@ -368,8 +369,8 @@ export const seoService = {
    * Optimize image alt text for SEO
    */
   generateImageAltText: (activity: Activity, imageIndex: number = 0): string => {
-    const baseAlt = `${activity.title} in ${activity.location}`;
-    
+    const baseAlt = `${activity.title} in ${activity.city?.name || activity.address}`;
+
     if (imageIndex === 0) {
       return baseAlt;
     }
