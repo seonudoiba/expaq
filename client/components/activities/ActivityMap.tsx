@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -7,6 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Star, Users, Clock } from 'lucide-react';
 import Image from 'next/image';
+
+declare global {
+  interface Window {
+    google: any;
+    initMap: () => void;
+  }
+}
 
 interface ActivityMapProps {
   activities: Activity[];
@@ -21,14 +29,7 @@ interface ActivityMapProps {
 interface MapMarker {
   activity: Activity;
   position: { lat: number; lng: number };
-  marker?: google.maps.Marker;
-}
-
-declare global {
-  interface Window {
-    google: typeof google;
-    initMap: () => void;
-  }
+  marker?: any; // Using any instead of google.maps.Marker to avoid namespace issues
 }
 
 export function ActivityMap({
@@ -41,9 +42,9 @@ export function ActivityMap({
   selectedActivity,
 }: ActivityMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<MapMarker[]>([]);
-  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const infoWindowRef = useRef<any>(null);
   
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
