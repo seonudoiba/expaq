@@ -12,7 +12,7 @@ import {
   useRetryFailed,
   useOptimizeCampaigns 
 } from '@/hooks/use-marketing';
-import { CampaignStatus, marketingService } from '@/services/marketing-service';
+import { CampaignStatus, MarketingCampaign, marketingService, ExecutionStatus } from '@/services/marketing-service';
 import { formatCurrency } from '@/lib/utils';
 import { 
   BarChart, 
@@ -196,13 +196,7 @@ function MetricCard({ title, value, icon, description, trend, isMonetary }: Metr
   );
 }
 
-interface Campaign {
-  id: string;
-  name?: string;
-  status?: string;
-}
-
-function CampaignStatusCard({ activeCampaigns }: { activeCampaigns?: Campaign[] }) {
+function CampaignStatusCard({ activeCampaigns }: { activeCampaigns?: MarketingCampaign[] }) {
   return (
     <Card>
       <CardHeader>
@@ -241,8 +235,10 @@ function CampaignStatusCard({ activeCampaigns }: { activeCampaigns?: Campaign[] 
 interface RecentExecution {
   id: string;
   campaignId?: string;
+  campaignName?: string;
+  recipientEmail?: string;
   executedAt?: string;
-  status?: string;
+  status?: ExecutionStatus;
 }
 
 function RecentActivityCard({ recentExecutions }: { recentExecutions?: RecentExecution[] }) {
@@ -267,7 +263,7 @@ function RecentActivityCard({ recentExecutions }: { recentExecutions?: RecentExe
                   <p className="text-sm text-muted-foreground">{execution.recipientEmail}</p>
                 </div>
                 <Badge variant={getStatusVariant(execution.status)}>
-                  {marketingService.getExecutionStatusDisplayName(execution.status)}
+                  {execution.status ? marketingService.getExecutionStatusDisplayName(execution.status) : 'Unknown'}
                 </Badge>
               </div>
             ))}
@@ -394,7 +390,8 @@ function DashboardSkeleton() {
   );
 }
 
-function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+function getStatusVariant(status?: string): "default" | "secondary" | "destructive" | "outline" {
+  if (!status) return 'outline';
   switch (status.toLowerCase()) {
     case 'sent':
     case 'delivered':
