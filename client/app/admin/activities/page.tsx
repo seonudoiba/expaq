@@ -534,10 +534,10 @@ export default function ActivitiesPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {featuredActivities.map((featured) => (
-                      <TableRow key={featured.activityId}>
+                    {featuredActivities.map((featured, index) => (
+                      <TableRow key={featured.id}>
                         <TableCell className="font-bold">
-                          {featured.featuredOrder}
+                          {index + 1}
                         </TableCell>
                         <TableCell>{featured.title}</TableCell>
                         <TableCell>{formatDate(featured.startDate)}</TableCell>
@@ -594,7 +594,7 @@ export default function ActivitiesPage() {
                         <TableCell>
                           <div className="font-medium">{category.name}</div>
                         </TableCell>
-                        <TableCell>{category.count}</TableCell>
+                        <TableCell>{category.activityCount}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button variant="outline" size="sm">
@@ -603,7 +603,7 @@ export default function ActivitiesPage() {
                             <Button
                               variant="destructive"
                               size="sm"
-                              disabled={category.count > 0}
+                              disabled={category.activityCount > 0}
                             >
                               Delete
                             </Button>
