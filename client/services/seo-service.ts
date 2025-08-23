@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Activity } from '@/types/activity';
 
 export interface SEOMetadata {
