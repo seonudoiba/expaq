@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module '@paystack/inline-js' {
   export default class PaystackPop {
     constructor();
