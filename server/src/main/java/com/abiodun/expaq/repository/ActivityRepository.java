@@ -51,9 +51,9 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     }
     
     // Basic activity queries
-    List<Activity> findByActivityTypeAndActiveTrue(ActivityType activityType);
+    List<Activity> findByActivityTypeAndIsActiveTrue(ActivityType activityType);
     List<Activity> findByLocationContainingIgnoreCase(String location);
-    List<Activity> findByActiveTrue(Pageable pageable);
+    List<Activity> findByIsActiveTrue(Pageable pageable);
     
     // Analytics methods
     long countByIsActiveTrue();
@@ -61,11 +61,10 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     long countByCreatedAtBefore(LocalDateTime date);
     long countByHostId(UUID hostId);
     long countByHostIdAndIsActive(UUID hostId, boolean isActive);
-    long countByUserId(UUID userId);
 
-    @Query("SELECT COALESCE(a.city.name, SUBSTRING(a.location, 1, LOCATE(',', a.location + ',') - 1), 'Unknown'), COUNT(a) " +
+    @Query("SELECT COALESCE(a.city.name, SUBSTRING(a.location, 1, LOCATE(',', CONCAT(a.location, ',')) - 1), 'Unknown'), COUNT(a) " +
            "FROM Activity a WHERE a.isActive = true " +
-           "GROUP BY COALESCE(a.city.name, SUBSTRING(a.location, 1, LOCATE(',', a.location + ',') - 1)) " +
+           "GROUP BY COALESCE(a.city.name, SUBSTRING(a.location, 1, LOCATE(',', CONCAT(a.location, ',')) - 1)) " +
            "ORDER BY COUNT(a) DESC")
     List<Object[]> getTopCitiesByActivityCount(Pageable pageable);
 
@@ -77,14 +76,14 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID>, JpaSp
     
     // Additional search methods for new services
     @Query("SELECT a FROM Activity a WHERE " +
-           "ST_DWithin(a.locationPoint, ST_MakePoint(:longitude, :latitude), :distance)")
+           "function('ST_DWithin', a.locationPoint, function('ST_MakePoint', :longitude, :latitude), :distance) = true")
     Page<Activity> findByLocationWithinDistance(@Param("latitude") Double latitude, 
                                                 @Param("longitude") Double longitude,
                                                 @Param("distance") Double distance,
                                                 Pageable pageable);
     
     @Query("SELECT a FROM Activity a WHERE a.activityType = :activityType AND " +
-           "ST_DWithin(a.locationPoint, :point, :distance) AND a.isActive = true")
+           "function('ST_DWithin', a.locationPoint, :point, :distance) = true AND a.isActive = true")
     List<Activity> findNearbyActivitiesByActivityType(@Param("activityType") String activityType,
                                                       @Param("point") Point point,
                                                       @Param("distance") double distance);

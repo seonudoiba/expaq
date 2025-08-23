@@ -52,12 +52,12 @@ public interface MarketingExecutionRepository extends JpaRepository<MarketingExe
         @Param("endDate") LocalDateTime endDate
     );
     
-    @Query("SELECT DATE(e.sentAt), COUNT(e), " +
+    @Query("SELECT FUNCTION('DATE', e.sentAt), COUNT(e), " +
            "SUM(CASE WHEN e.openedAt IS NOT NULL THEN 1 ELSE 0 END) as opens, " +
            "SUM(CASE WHEN e.clickedAt IS NOT NULL THEN 1 ELSE 0 END) as clicks, " +
            "SUM(CASE WHEN e.convertedAt IS NOT NULL THEN 1 ELSE 0 END) as conversions " +
            "FROM MarketingExecution e WHERE e.sentAt >= :startDate AND e.sentAt <= :endDate " +
-           "GROUP BY DATE(e.sentAt) ORDER BY DATE(e.sentAt)")
+           "GROUP BY FUNCTION('DATE', e.sentAt) ORDER BY FUNCTION('DATE', e.sentAt)")
     List<Object[]> getDailyExecutionMetrics(
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
@@ -70,15 +70,15 @@ public interface MarketingExecutionRepository extends JpaRepository<MarketingExe
         @Param("startDate") LocalDateTime startDate
     );
     
-    @Query("SELECT AVG(EXTRACT(EPOCH FROM (e.openedAt - e.sentAt))/60) FROM MarketingExecution e " +
+    @Query("SELECT AVG((EXTRACT(EPOCH FROM e.openedAt) - EXTRACT(EPOCH FROM e.sentAt))/60) FROM MarketingExecution e " +
            "WHERE e.openedAt IS NOT NULL AND e.sentAt IS NOT NULL AND e.campaign.id = :campaignId")
     Double getAverageTimeToOpen(@Param("campaignId") UUID campaignId);
     
-    @Query("SELECT AVG(EXTRACT(EPOCH FROM (e.clickedAt - e.sentAt))/60) FROM MarketingExecution e " +
+    @Query("SELECT AVG((EXTRACT(EPOCH FROM e.clickedAt) - EXTRACT(EPOCH FROM e.sentAt))/60) FROM MarketingExecution e " +
            "WHERE e.clickedAt IS NOT NULL AND e.sentAt IS NOT NULL AND e.campaign.id = :campaignId")
     Double getAverageTimeToClick(@Param("campaignId") UUID campaignId);
     
-    @Query("SELECT AVG(EXTRACT(EPOCH FROM (e.convertedAt - e.sentAt))/3600) FROM MarketingExecution e " +
+    @Query("SELECT AVG((EXTRACT(EPOCH FROM e.convertedAt) - EXTRACT(EPOCH FROM e.sentAt))/3600) FROM MarketingExecution e " +
            "WHERE e.convertedAt IS NOT NULL AND e.sentAt IS NOT NULL AND e.campaign.id = :campaignId")
     Double getAverageTimeToConvert(@Param("campaignId") UUID campaignId);
     

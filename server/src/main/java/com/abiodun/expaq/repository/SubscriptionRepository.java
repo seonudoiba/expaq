@@ -113,7 +113,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     
     // Subscription health metrics
     @Query("SELECT " +
-           "AVG(EXTRACT(DAY FROM (COALESCE(s.endDate, :now) - s.startDate))) as avgLifetimeDays, " +
+           "AVG(CAST(EXTRACT(EPOCH FROM COALESCE(s.endDate, :now)) - EXTRACT(EPOCH FROM s.startDate) AS DOUBLE) / 86400) as avgLifetimeDays, " +
            "COUNT(CASE WHEN s.status = 'ACTIVE' THEN 1 END) as activeCount, " +
            "COUNT(CASE WHEN s.status = 'CANCELLED' THEN 1 END) as cancelledCount, " +
            "COUNT(CASE WHEN s.status = 'PAST_DUE' THEN 1 END) as pastDueCount " +
@@ -123,7 +123,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     // Feature usage by plan type
     @Query("SELECT s.planType, COUNT(DISTINCT a.id) as activityCount " +
            "FROM Subscription s " +
-           "LEFT JOIN Activity a ON a.user.id = s.user.id " +
+           "LEFT JOIN Activity a ON a.host.id = s.user.id " +
            "WHERE s.status = 'ACTIVE' " +
            "GROUP BY s.planType")
     List<Object[]> getFeatureUsageByPlan();

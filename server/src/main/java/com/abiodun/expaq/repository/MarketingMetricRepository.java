@@ -73,9 +73,9 @@ public interface MarketingMetricRepository extends JpaRepository<MarketingMetric
         @Param("metricName") String metricName
     );
     
-    @Query("SELECT DATE(m.calculatedAt), m.metricName, AVG(m.metricValue) FROM MarketingMetric m " +
+    @Query("SELECT FUNCTION('DATE', m.calculatedAt), m.metricName, AVG(m.metricValue) FROM MarketingMetric m " +
            "WHERE m.campaign.id = :campaignId AND m.calculatedAt >= :startDate " +
-           "GROUP BY DATE(m.calculatedAt), m.metricName ORDER BY DATE(m.calculatedAt)")
+           "GROUP BY FUNCTION('DATE', m.calculatedAt), m.metricName ORDER BY FUNCTION('DATE', m.calculatedAt)")
     List<Object[]> getDailyMetricTrends(
         @Param("campaignId") UUID campaignId,
         @Param("startDate") LocalDateTime startDate

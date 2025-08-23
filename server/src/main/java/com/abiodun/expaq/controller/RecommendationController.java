@@ -172,7 +172,7 @@ public class RecommendationController {
             // Add activities from preferred types
             for (Map.Entry<ActivityType, Integer> entry : typePreferences.entrySet()) {
                 ActivityType type = entry.getKey();
-                List<Activity> typeActivities = activityRepository.findByActivityTypeAndActiveTrue(type);
+                List<Activity> typeActivities = activityRepository.findByActivityTypeAndIsActiveTrue(type);
 
                 // Filter out already booked activities
                 List<Activity> newActivities = typeActivities.stream()
@@ -243,7 +243,7 @@ public class RecommendationController {
         ActivityType activityType = referenceActivity.getActivityType();
         final UUID referenceId = referenceActivity.getId();
         List<Activity> similarActivities = activityType != null ?
-                activityRepository.findByActivityTypeAndActiveTrue(activityType)
+                activityRepository.findByActivityTypeAndIsActiveTrue(activityType)
                         .stream()
                         .filter(activity -> !activity.getId().equals(referenceId))
                         .limit(limit)
@@ -269,7 +269,7 @@ public class RecommendationController {
 
     private List<ActivityDTO> getFallbackRecommendations(int limit) {
         try {
-            List<Activity> fallbackActivities = activityRepository.findByActiveTrue(PageRequest.of(0, limit));
+            List<Activity> fallbackActivities = activityRepository.findByIsActiveTrue(PageRequest.of(0, limit));
             return fallbackActivities.stream()
                     .map(ActivityDTO::fromActivity)
                     .toList();

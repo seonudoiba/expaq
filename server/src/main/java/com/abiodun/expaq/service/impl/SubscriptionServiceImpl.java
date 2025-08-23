@@ -342,8 +342,8 @@ public class SubscriptionServiceImpl implements ISubscriptionService {
         }
         
         // Add current usage
-        long currentActivities = activityRepository.countByUserId(userId);
-        limits.put("currentActivities", currentActivities);
+//        UUID currentActivities = activityRepository.countByUserId(userId);
+//        limits.put("currentActivities", currentActivities);
         
         return limits;
     }
