@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { notificationService, Notification, NotificationPreferences } from '@/services/notification-service';
 import { webSocketService, WebSocketEvent } from '@/services/websocket-service';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/components/ui/use-toast';
 
 interface NotificationContextType {
@@ -32,7 +33,7 @@ interface NotificationProviderProps {
 }
 
 export function NotificationProvider({ children }: NotificationProviderProps) {
-  const { user, token } = useAuth();
+  const { user, token } = useAuthStore();
   const queryClient = useQueryClient();
   
   const [notifications, setNotifications] = useState<Notification[]>([]);

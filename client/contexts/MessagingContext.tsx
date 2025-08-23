@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { webSocketService, Message, Conversation, WebSocketEvent } from '@/services/websocket-service';
 import { messagingService } from '@/services/messaging-service';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/components/ui/use-toast';
 
 interface MessagingContextType {
@@ -35,22 +35,8 @@ interface MessagingProviderProps {
   children: ReactNode;
 }
 
-// Helper function to get token from localStorage
-const getToken = (): string | null => {
-  try {
-    const token = localStorage.getItem('auth-storage');
-    if (token) {
-      const tokenObject = JSON.parse(token);
-      return tokenObject?.state?.token || null;
-    }
-  } catch (error) {
-    console.error('Failed to parse token from localStorage:', error);
-  }
-  return null;
-};
-
 export function MessagingProvider({ children }: MessagingProviderProps) {
-  const { user } = useAuth();
+  const { user, token } = useAuthStore();
   const queryClient = useQueryClient();
   
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
@@ -82,7 +68,6 @@ export function MessagingProvider({ children }: MessagingProviderProps) {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    const token = getToken();
     if (user && token) {
       webSocketService.connect(token)
         .then(() => {
@@ -185,7 +170,7 @@ export function MessagingProvider({ children }: MessagingProviderProps) {
         webSocketService.disconnect();
       };
     }
-  }, [user, queryClient]);
+  }, [user, token, queryClient]);
 
   // Load messages for conversations
   useEffect(() => {
