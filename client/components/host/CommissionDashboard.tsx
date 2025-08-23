@@ -248,6 +248,10 @@ interface Commission {
   };
   status: string;
   bookingAmount?: number;
+  commissionRate?: number;
+  hostEarnings?: number;
+  createdAt: string;
+  paymentReference?: string;
 }
 
 interface CommissionListProps {
