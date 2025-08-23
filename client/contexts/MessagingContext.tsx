@@ -35,8 +35,22 @@ interface MessagingProviderProps {
   children: ReactNode;
 }
 
+// Helper function to get token from localStorage
+const getToken = (): string | null => {
+  try {
+    const token = localStorage.getItem('auth-storage');
+    if (token) {
+      const tokenObject = JSON.parse(token);
+      return tokenObject?.state?.token || null;
+    }
+  } catch (error) {
+    console.error('Failed to parse token from localStorage:', error);
+  }
+  return null;
+};
+
 export function MessagingProvider({ children }: MessagingProviderProps) {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
@@ -68,6 +82,7 @@ export function MessagingProvider({ children }: MessagingProviderProps) {
 
   // Initialize WebSocket connection
   useEffect(() => {
+    const token = getToken();
     if (user && token) {
       webSocketService.connect(token)
         .then(() => {
@@ -170,7 +185,7 @@ export function MessagingProvider({ children }: MessagingProviderProps) {
         webSocketService.disconnect();
       };
     }
-  }, [user, token, queryClient]);
+  }, [user, queryClient]);
 
   // Load messages for conversations
   useEffect(() => {
