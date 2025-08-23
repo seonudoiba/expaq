@@ -57,11 +57,10 @@ export default function ActivitiesPage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState("activities");
+  const [currentPage] = useState(1);
 
   // Fetch activities data
-  const { data: activitiesData, isLoading: activitiesLoading, error: activitiesError } = useQuery({
+  const { data: activitiesData } = useQuery({
     queryKey: ["admin-activities", currentPage, searchTerm, categoryFilter, statusFilter],
     queryFn: () => activityService.getAll({
       page: currentPage - 1,
@@ -72,13 +71,13 @@ export default function ActivitiesPage() {
   });
 
   // Fetch featured activities
-  const { data: featuredData, isLoading: featuredLoading } = useQuery({
+  const { data: featuredData } = useQuery({
     queryKey: ["admin-featured-activities"],
     queryFn: () => activityService.getAllFeaturedActivities({ limit: 50 }),
   });
 
   // Fetch activity types for filters
-  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
+  const { data: categoriesData } = useQuery({
     queryKey: ["activity-types"],
     queryFn: activityTypeService.getAll,
   });
@@ -431,7 +430,7 @@ export default function ActivitiesPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {pendingActivities.length === 0 ? (
+                    {activities.filter(a => !a.verified).length === 0 ? (
                       <TableRow>
                         <TableCell
                           colSpan={5}
@@ -441,7 +440,7 @@ export default function ActivitiesPage() {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      pendingActivities.map((activity) => (
+                      activities.filter(a => !a.verified).map((activity) => (
                         <TableRow key={activity.id}>
                           <TableCell>
                             <div className="flex items-center gap-3">

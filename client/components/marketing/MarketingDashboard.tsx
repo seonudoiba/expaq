@@ -13,11 +13,10 @@ import {
   useOptimizeCampaigns 
 } from '@/hooks/use-marketing';
 import { CampaignStatus, marketingService } from '@/services/marketing-service';
-import { formatNumber, formatCurrency, formatPercentage } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { 
   BarChart, 
   TrendingUp, 
-  Users, 
   Mail, 
   DollarSign, 
   Activity,
@@ -35,7 +34,6 @@ interface MarketingDashboardProps {
 export function MarketingDashboard({ className }: MarketingDashboardProps) {
   const { data: dashboardData, isLoading: dashboardLoading } = useMarketingDashboard();
   const { data: activeCampaigns } = useCampaignsByStatus(CampaignStatus.ACTIVE);
-  const { data: draftCampaigns } = useCampaignsByStatus(CampaignStatus.DRAFT);
   
   const processScheduledMutation = useProcessScheduled();
   const retryFailedMutation = useRetryFailed();
@@ -174,7 +172,7 @@ function MetricCard({ title, value, icon, description, trend, isMonetary }: Metr
   const displayValue = isMonetary && typeof value === 'number' 
     ? formatCurrency(value) 
     : typeof value === 'number' 
-    ? formatNumber(value) 
+    ? value.toLocaleString() 
     : value;
 
   return (
@@ -198,7 +196,13 @@ function MetricCard({ title, value, icon, description, trend, isMonetary }: Metr
   );
 }
 
-function CampaignStatusCard({ activeCampaigns }: { activeCampaigns?: any[] }) {
+interface Campaign {
+  id: string;
+  name?: string;
+  status?: string;
+}
+
+function CampaignStatusCard({ activeCampaigns }: { activeCampaigns?: Campaign[] }) {
   return (
     <Card>
       <CardHeader>
@@ -234,7 +238,14 @@ function CampaignStatusCard({ activeCampaigns }: { activeCampaigns?: any[] }) {
   );
 }
 
-function RecentActivityCard({ recentExecutions }: { recentExecutions?: any[] }) {
+interface RecentExecution {
+  id: string;
+  campaignId?: string;
+  executedAt?: string;
+  status?: string;
+}
+
+function RecentActivityCard({ recentExecutions }: { recentExecutions?: RecentExecution[] }) {
   return (
     <Card>
       <CardHeader>

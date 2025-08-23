@@ -1,5 +1,3 @@
-import { seoService } from '@/services/seo-service';
-import { Activity } from '@/types/activity';
 
 export interface SitemapUrl {
   loc: string;
@@ -257,22 +255,22 @@ ${urls.map(url => this.generateUrlXML(url)).join('\n')}
   /**
    * Mock API calls - replace with actual API calls
    */
-  private async fetchActivities(): Promise<any[]> {
+  private async fetchActivities(): Promise<Array<{id: string; updatedAt?: string; createdAt?: string}>> {
     // Mock implementation - replace with actual API call
     return [];
   }
 
-  private async fetchCities(): Promise<any[]> {
+  private async fetchCities(): Promise<Array<{name: string; updatedAt?: string}>> {
     // Mock implementation - replace with actual API call
     return [];
   }
 
-  private async fetchCategories(): Promise<any[]> {
+  private async fetchCategories(): Promise<Array<{name: string; updatedAt?: string}>> {
     // Mock implementation - replace with actual API call
     return [];
   }
 
-  private async fetchHosts(): Promise<any[]> {
+  private async fetchHosts(): Promise<Array<{id: string; updatedAt?: string}>> {
     // Mock implementation - replace with actual API call
     return [];
   }
@@ -323,7 +321,21 @@ Crawl-delay: 1`;
 /**
  * Generate meta tags for page
  */
-export function generateMetaTags(metadata: any): string {
+interface MetaTagsData {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  ogType?: string;
+  twitterCard?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+}
+
+export function generateMetaTags(metadata: MetaTagsData): string {
   const tags = [];
 
   // Basic meta tags

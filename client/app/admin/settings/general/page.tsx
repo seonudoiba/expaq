@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2, InfoIcon, SaveIcon } from "lucide-react";
 import { Checkbox } from "@radix-ui/react-checkbox";
+import Image from "next/image";
 
 export default function PlatformSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
@@ -220,8 +221,8 @@ export default function PlatformSettingsPage() {
                   <div className="col-span-2 space-y-2">
                     <Label htmlFor="logo-upload">Platform Logo</Label>
                     <div className="flex items-center gap-4">
-                      <div className="h-16 w-16 bg-gray-100 rounded flex items-center justify-center">
-                        <img src="/expaqlogo.png" alt="Current logo" className="max-h-12 max-w-12" />
+                      <div className="h-16 w-16 bg-gray-100 rounded flex items-center justify-center relative">
+                        <Image src="/expaqlogo.png" alt="Current logo" width={48} height={48} className="object-contain" />
                       </div>
                       <div className="flex-1">
                         <Input id="logo-upload" type="file" />
@@ -232,8 +233,8 @@ export default function PlatformSettingsPage() {
                   <div className="col-span-2 space-y-2">
                     <Label htmlFor="favicon-upload">Favicon</Label>
                     <div className="flex items-center gap-4">
-                      <div className="h-8 w-8 bg-gray-100 rounded flex items-center justify-center">
-                        <img src="/favicon.ico" alt="Current favicon" className="max-h-6 max-w-6" />
+                      <div className="h-8 w-8 bg-gray-100 rounded flex items-center justify-center relative">
+                        <Image src="/favicon.ico" alt="Current favicon" width={24} height={24} className="object-contain" />
                       </div>
                       <div className="flex-1">
                         <Input id="favicon-upload" type="file" />
@@ -308,8 +309,8 @@ export default function PlatformSettingsPage() {
                   <div className="space-y-2">
                     <Label htmlFor="hero-image-upload">Hero Image</Label>
                     <div className="flex flex-col gap-4">
-                      <div className="h-40 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
-                        <img src="/hero.jpg" alt="Current hero image" className="w-full h-full object-cover" />
+                      <div className="h-40 bg-gray-100 rounded flex items-center justify-center overflow-hidden relative">
+                        <Image src="/hero.jpg" alt="Current hero image" fill className="object-cover" />
                       </div>
                       <div className="flex-1">
                         <Input id="hero-image-upload" type="file" />

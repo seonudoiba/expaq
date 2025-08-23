@@ -12,14 +12,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { DollarSign, TrendingUp, Clock, CheckCircle, Download, Plus } from 'lucide-react';
+import { DollarSign, TrendingUp, Clock, CheckCircle, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 export function CommissionDashboard() {
   const {
     hostCommissions,
     hostCommissionSummary,
-    hostEarnings,
     isLoadingHostCommissions,
     isLoadingHostSummary,
     createWithdrawalRequest,
@@ -53,7 +52,7 @@ export function CommissionDashboard() {
     setIsCreatingWithdrawal(false);
   };
 
-  const getStatusBadge = (status: string) => {
+  const _getStatusBadge = (status: string) => {
     const statusConfig = {
       PENDING: { label: 'Pending', variant: 'secondary' as const },
       PROCESSED: { label: 'Ready for Payout', variant: 'default' as const },
@@ -254,8 +253,18 @@ export function CommissionDashboard() {
   );
 }
 
+interface Commission {
+  id: string;
+  activity: {
+    title: string;
+    location: string;
+  };
+  status: string;
+  bookingAmount?: number;
+}
+
 interface CommissionListProps {
-  commissions: any[];
+  commissions: Commission[];
   isLoading: boolean;
 }
 

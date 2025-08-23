@@ -117,7 +117,7 @@ export function CreateTicketForm({
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to create support ticket. Please try again.",
@@ -157,10 +157,10 @@ export function CreateTicketForm({
           
           <div className="space-y-2 text-sm text-gray-600">
             <p>
-              We've received your support request and our team will review it shortly.
+              We&apos;ve received your support request and our team will review it shortly.
             </p>
             <p>
-              You'll receive email updates at <strong>{formData.customerEmail}</strong> 
+              You&apos;ll receive email updates at <strong>{formData.customerEmail}</strong> 
               as we work on your ticket.
             </p>
             {user && (
@@ -209,7 +209,7 @@ export function CreateTicketForm({
           <CardTitle className="text-2xl">Create Support Ticket</CardTitle>
         </div>
         <CardDescription>
-          Describe your issue and we'll help you resolve it as quickly as possible.
+          Describe your issue and we&apos;ll help you resolve it as quickly as possible.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -285,7 +285,7 @@ export function CreateTicketForm({
               </SelectContent>
             </Select>
             <p className="text-xs text-gray-500">
-              Select "High" or "Urgent" for issues that prevent you from using the service.
+              Select &ldquo;High&rdquo; or &ldquo;Urgent&rdquo; for issues that prevent you from using the service.
             </p>
           </div>
 

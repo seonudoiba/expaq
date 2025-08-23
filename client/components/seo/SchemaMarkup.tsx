@@ -6,13 +6,13 @@ import { Activity } from '@/types/activity';
 
 interface SchemaMarkupProps {
   type: 'organization' | 'faq' | 'localBusiness';
-  data?: any;
+  data?: Record<string, unknown>;
   activity?: Activity;
   faqs?: Array<{ question: string; answer: string }>;
 }
 
 export function SchemaMarkup({ type, data, activity, faqs }: SchemaMarkupProps) {
-  let structuredData: any;
+  let structuredData: Record<string, unknown> | undefined;
 
   switch (type) {
     case 'organization':
