@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Check, Star, Zap, Crown, Building } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/components/ui/use-toast';
 
 interface PricingPlansProps {
@@ -16,7 +16,7 @@ interface PricingPlansProps {
 }
 
 export function PricingPlans({ currentPlan, onSelectPlan }: PricingPlansProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [isYearly, setIsYearly] = useState(false);
   const [loading, setLoading] = useState(true);

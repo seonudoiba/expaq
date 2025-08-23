@@ -3,7 +3,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { commissionService, Commission, CommissionSummary } from '@/services/commission-service';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/components/ui/use-toast';
 
 interface CommissionContextType {
@@ -38,7 +38,7 @@ interface CommissionProviderProps {
 }
 
 export function CommissionProvider({ children }: CommissionProviderProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
   
   const isHost = user?.roles?.some(role => role.name === 'HOST');

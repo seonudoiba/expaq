@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/components/ui/use-toast';
 import { HelpCircle, Send, CheckCircle } from 'lucide-react';
 
@@ -29,7 +29,7 @@ export function CreateTicketForm({
   defaultCategory,
   defaultSubject,
 }: CreateTicketFormProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [ticketNumber, setTicketNumber] = useState<string>('');

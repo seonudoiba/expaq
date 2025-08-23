@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { wishlistService } from '@/services/wishlist-service';
 import { Activity } from '@/types/activity';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/components/ui/use-toast';
 
 interface WishlistContextType {
@@ -35,7 +35,7 @@ interface WishlistProviderProps {
 }
 
 export function WishlistProvider({ children }: WishlistProviderProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
   
   const [wishlist, setWishlist] = useState<Activity[]>([]);
