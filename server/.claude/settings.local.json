@@ -5,7 +5,8 @@
       "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(./mvnw:*)",
-      "Bash(java:*)"
+      "Bash(java:*)",
+      "Bash(heroku config:set:*)"
     ],
     "deny": []
   }
