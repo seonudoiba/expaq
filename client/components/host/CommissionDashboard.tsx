@@ -52,19 +52,6 @@ export function CommissionDashboard() {
     setIsCreatingWithdrawal(false);
   };
 
-  const _getStatusBadge = (status: string) => {
-    const statusConfig = {
-      PENDING: { label: 'Pending', variant: 'secondary' as const },
-      PROCESSED: { label: 'Ready for Payout', variant: 'default' as const },
-      PAID_OUT: { label: 'Paid Out', variant: 'secondary' as const },
-      CANCELLED: { label: 'Cancelled', variant: 'destructive' as const },
-      DISPUTED: { label: 'Disputed', variant: 'destructive' as const },
-      ON_HOLD: { label: 'On Hold', variant: 'secondary' as const },
-    };
-
-    const config = statusConfig[status as keyof typeof statusConfig] || { label: status, variant: 'secondary' as const };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
 
   if (isLoadingHostSummary) {
     return (
