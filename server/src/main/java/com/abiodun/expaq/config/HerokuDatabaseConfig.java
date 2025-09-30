@@ -18,29 +18,54 @@ public class HerokuDatabaseConfig {
     @ConditionalOnProperty(name = "DATABASE_URL")
     public DataSource dataSource() throws URISyntaxException {
         String databaseUrl = System.getenv("DATABASE_URL");
+        String username = System.getenv("DATABASE_USERNAME");
+        String password = System.getenv("DATABASE_PASSWORD");
         
         if (databaseUrl != null && !databaseUrl.isEmpty()) {
-            // Heroku provides DATABASE_URL in format: postgres://username:password@host:port/database
-            // We need to convert it to JDBC format
-            URI dbUri = new URI(databaseUrl);
-            
-            String username = dbUri.getUserInfo().split(":")[0];
-            String password = dbUri.getUserInfo().split(":")[1];
-            String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
-            
-            // Add SSL if needed (Heroku requires SSL for Postgres)
-            if (!dbUrl.contains("?")) {
-                dbUrl += "?sslmode=require";
+            // Check if URL is already in JDBC format
+            if (databaseUrl.startsWith("jdbc:postgresql://")) {
+                // Already in JDBC format, use as-is
+                String dbUrl = databaseUrl;
+                
+                // Add SSL if needed for external databases
+                if (!dbUrl.contains("?")) {
+                    dbUrl += "?sslmode=require";
+                } else if (!dbUrl.contains("sslmode")) {
+                    dbUrl += "&sslmode=require";
+                }
+                
+                return DataSourceBuilder.create()
+                        .url(dbUrl)
+                        .username(username)
+                        .password(password)
+                        .driverClassName("org.postgresql.Driver")
+                        .build();
             } else {
-                dbUrl += "&sslmode=require";
+                // Heroku format: postgres://username:password@host:port/database
+                URI dbUri = new URI(databaseUrl);
+                
+                if (dbUri.getUserInfo() != null) {
+                    String[] userInfo = dbUri.getUserInfo().split(":");
+                    username = userInfo[0];
+                    password = userInfo[1];
+                }
+                
+                String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+                
+                // Add SSL if needed (Heroku requires SSL for Postgres)
+                if (!dbUrl.contains("?")) {
+                    dbUrl += "?sslmode=require";
+                } else {
+                    dbUrl += "&sslmode=require";
+                }
+                
+                return DataSourceBuilder.create()
+                        .url(dbUrl)
+                        .username(username)
+                        .password(password)
+                        .driverClassName("org.postgresql.Driver")
+                        .build();
             }
-            
-            return DataSourceBuilder.create()
-                    .url(dbUrl)
-                    .username(username)
-                    .password(password)
-                    .driverClassName("org.postgresql.Driver")
-                    .build();
         }
         
         // Fallback to default configuration
