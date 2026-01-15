@@ -1,4 +1,4 @@
-# Postman Testing Guide
+# Postman Testing
 
 ## Setup
 1. Download and install [Postman](https://www.postman.com/downloads/)
