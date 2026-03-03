@@ -1,8 +1,5 @@
 # Postman Testing
 
-## Setup
-1. Download and install [Postman](https://www.postman.com/downloads/)
-2. Create a new collection named "Expaq API"
 3. Set up environment variables:
    - Click "Environments" → "Create New"
    - Add these variables:
