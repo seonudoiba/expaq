@@ -1,6 +1,6 @@
 # Postman Testing
 
-3. Set up environment variables:
+Set up environment variables:
    - Click "Environments" → "Create New"
    - Add these variables:
      ```
