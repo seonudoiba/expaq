@@ -298,4 +298,4 @@ All endpoints may return the following error responses:
 2. All UUIDs are in standard UUID format
 3. File uploads are limited to 10MB per file
 4. JWT tokens expire after 1 hour
-5. CORS is enabled for http://localhost:3000 
+5. CORS is enabled for http://localhost:3000.
